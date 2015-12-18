@@ -1,0 +1,7 @@
+[
+  { "name" : "box", "type" : "dynamic"},
+  { "name" : "lift", "type" : "kinematic"},
+  { "name" : "water", "type" : "static"},
+  { "name" : "ground", "type" : "static"},
+  { "name" : "path", "type" : "static"}
+]

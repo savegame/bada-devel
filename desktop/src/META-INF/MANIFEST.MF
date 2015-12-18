@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: /com/mypinguin/game/desktop
+Main-Class: com.mypinguin.game.desktop.DesktopLauncher
+
