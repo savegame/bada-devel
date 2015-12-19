@@ -5,7 +5,6 @@ package com.mypinguin.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -33,10 +32,10 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.penguin.menu.ExtendedScreen;
 
-public class Box2DTestLevel implements Screen {
+public class Box2DTestLevel extends ExtendedScreen {
 	private boolean             needUpdateViewport = false;
-	private PenguinGame game               = null;
 	private OrthographicCamera  camera             = null;
 	private Stage               stage              = null;
 	private CameraControl       camControl         = null;
@@ -63,8 +62,8 @@ public class Box2DTestLevel implements Screen {
 	RandomXS128 rand = new RandomXS128();
 	
 	
-	Box2DTestLevel(PenguinGame gm) {
-		game = gm;
+	Box2DTestLevel( PenguinGame penguinGame ) {
+		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
 
@@ -197,10 +196,10 @@ public class Box2DTestLevel implements Screen {
 	}
 
 	private void loadTextures(AssetManager manager) {
-		manager.load("ui/btn_lr.png", Texture.class);
-		manager.load("pinguin.png", Texture.class);
-		manager.load("box_0.png", Texture.class);
-		manager.load("run_0.png", Texture.class);
+		this.loadAsset("ui/btn_lr.png", Texture.class);
+		this.loadAsset("pinguin.png", Texture.class);
+		this.loadAsset("box_0.png", Texture.class);
+		this.loadAsset("run_0.png", Texture.class);
 	}
 
 	private void createUI(Stage ui_stage) {
@@ -331,6 +330,7 @@ public class Box2DTestLevel implements Screen {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
+		super.dispose();
 		map.dispose();
 		mapBodyManager.destroyPhysics();
 	}
