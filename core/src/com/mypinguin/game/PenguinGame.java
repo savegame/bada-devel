@@ -3,6 +3,7 @@ package com.mypinguin.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.penguin.menu.MainMenuStage;
 
 public class PenguinGame extends Game {
 	public class ContactsController implements ContactListener {
@@ -80,6 +82,7 @@ public class PenguinGame extends Game {
 		}
 	}
 
+	public FontsManager fonts;
 
 	public BitmapFont   font;  //шрифт по умолчанию
 	public BitmapFont   bigFont;
@@ -109,15 +112,21 @@ public class PenguinGame extends Game {
 //		font.setUseIntegerPositions(true);
 		batch = new SpriteBatch();
 		asset = new AssetManager();
+		
+		fonts = new FontsManager();
+		fonts.LoadStylesFromJson(Gdx.files.internal("styles.json"));
+		
 		// тест загрузки шрифта
-		float densityIndependentSize = m_mainFontSize * Gdx.graphics.getDensity();
+		/*float densityIndependentSize = m_mainFontSize * Gdx.graphics.getDensity();
 		int fontSize = Math.round(densityIndependentSize );
 //		FreeTypeFontGenerator.NO_MAXIMUM = 32;
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Agentorange.ttf"));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = m_mainFontSize;
 		bigFont = generator.generateFont(parameter);
-		generator.dispose(); // don't forget to dispose to avoid memory leaks!
+		generator.dispose(); // don't forget to dispose to avoid memory leaks!*/
+		
+		bigFont = fonts.GetFont("bigFont");
 
 		font = new BitmapFont();
 
@@ -126,8 +135,10 @@ public class PenguinGame extends Game {
 		contacts = new ContactsController(this);
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
+		this.setScreen(new MainMenuStage(this));
+		
 		//this.setScreen( new MainMenuScreen(this) );
-		this.setScreen( new Box2DTestLevel(this) );
+		//this.setScreen( new Box2DTestLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -139,6 +150,7 @@ public class PenguinGame extends Game {
 	
 	public void dispose() {
 		font.dispose();
+		fonts.dispose();
 		batch.dispose();
 		asset.dispose();
 		world.dispose();
