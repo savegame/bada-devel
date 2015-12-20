@@ -284,8 +284,11 @@ public class Box2DTestLevel extends ExtendedScreen {
 //		String str = ;
 		game.batch.begin();
 		if( game.player != null)
-			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded()
-						+ "\nCanPick: " + game.player.canPick()
+			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
+							+ "\nGrounded2: " + game.player.isPlayerGrounded(delta)
+							+ "\nUnderwater: " + game.player.isUnderwater()
+							+ "\nContactCount: " + game.player.allContacts.size()
+							+ "\nCanPick: " + game.player.canPick()
 						+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
 		else
 			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);

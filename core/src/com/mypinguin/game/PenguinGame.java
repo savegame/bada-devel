@@ -23,6 +23,7 @@ public class PenguinGame extends Game {
 		public ContactsController(PenguinGame gm) {
 			this.game = gm;
 		}
+
 		@Override
 		public void beginContact(Contact contact) {
 			Fixture fixtureA = contact.getFixtureA();
@@ -30,10 +31,10 @@ public class PenguinGame extends Game {
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
 			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).beginContact(fixtureB);
+				((BodyActor)objA).beginContact(fixtureA, fixtureB, contact);
 			}
 			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).beginContact(fixtureA);
+				((BodyActor)objB).beginContact(fixtureB, fixtureA, contact);
 			}
 		}
 
@@ -44,10 +45,10 @@ public class PenguinGame extends Game {
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
 			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).endContact(fixtureB);
+				((BodyActor)objA).endContact(fixtureA, fixtureB, contact);
 			}
 			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).endContact(fixtureA);
+				((BodyActor)objB).endContact(fixtureB, fixtureA, contact);
 			}
 		}
 
