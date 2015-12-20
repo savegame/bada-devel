@@ -238,20 +238,21 @@ public class PlayerActor extends BodyActor {
 		return underwater;
 	}
 	
-	public boolean isPlayerGrounded(float deltaTime) {
-//		groundedPlatform = null;
+	public boolean isPlayerGrounded() {
 		boolean sensor = false;
-		boolean bodyToo = false;
-		if( getJoint == null ) {
-			getBody = null;
-			getItem = null;
-		}
 		Array<Contact> contactList = game.world.getContactList();
 		for(int i = 0; i < contactList.size; i++) {
 			Contact contact = contactList.get(i);
 			if( !contact.isTouching() ) continue;
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
-				Vector2 pos = body.getPosition();
+//				Vector2 pos = body.getPosition();
+//				if( !isGrounded())
+//				{
+//					Fixture fixtureA = contact.getFixtureA();
+//					Fixture fixtureB = contact.getFixtureB();
+//					int p = 0;
+//					p++;
+//				}
 				sensor = true;
 			}
 		}
@@ -323,7 +324,8 @@ public class PlayerActor extends BodyActor {
 		stateTime += delta;
 		m_dir = MoveDirection.None;
 		Array<Action> arr = getActions();
-//		grounded = isGrounded();
+		grounded = isPlayerGrounded();
+		body.setAwake(true);
 
 		if( arr.size == 0 && isGrounded() ){
 			Vector2 vel = body.getLinearVelocity();
@@ -456,13 +458,14 @@ public class PlayerActor extends BodyActor {
 
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.add(fixtureB);
-		if(fixtureA == sensorFixture || fixtureA == legsFixture) {
+		if(fixtureA == sensorFixture) {
 			if( fixtureB.getBody().getUserData() instanceof WaterActor )
 				underwater = true;
 			else {
 				groundedFixtures.add(fixtureB);
 				grounded = true;
 			}
+			grounded = true;
 		}
 		else if(getJoint == null) {
 			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
@@ -471,6 +474,19 @@ public class PlayerActor extends BodyActor {
 					getItem = fixtureA;
 				}
 			}
+		}
+		else //отлов непонятного контакта
+		{
+//			grounded = isPlayerGrounded(0);
+//			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
+//			{
+//				int hj = 0;
+//			}
+//			if( isPlayerGrounded(0) != grounded ) {
+//				Shape.Type typeA = fixtureA.getType();
+//				Shape.Type typeB = fixtureB.getType();
+//				int  p = 0;
+//			}
 		}
 	}
 
@@ -481,8 +497,13 @@ public class PlayerActor extends BodyActor {
 				underwater = false;
 			else
 				groundedFixtures.remove(fixtureB);
-			if( groundedFixtures.isEmpty() )
+			if( groundedFixtures.isEmpty() ) {
 				grounded = false;
+//				if( isPlayerGrounded(0) )
+//				{
+//					int p = 0;
+//				}
+			}
 		}
 		else if( getJoint == null && (fixtureA == getRFixture  || fixtureA == getLFixture) )
 		{
