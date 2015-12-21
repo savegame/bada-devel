@@ -2,6 +2,7 @@ package com.mypinguin.game;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -38,6 +39,10 @@ public class BodyActor extends Actor {
 
 	public boolean isInit() {
 		return isinit;
+	}
+
+	public Vector2 getVelocity() {
+		return body.getLinearVelocity();
 	}
 
 	public void initialize(Shape bodyShape) {
@@ -79,11 +84,23 @@ public class BodyActor extends Actor {
 		}
 	}
 
-	public void beginContact(Fixture fixtureB) {
+	/**
+	 * При контакте вызываеться данная функция
+	 * @param fixtureA фикстура принадлежащая bodyActor
+	 * @param fixtureB фикстура принадлежащая другому объекту
+	 * @param contact объект контакта, на всякий случай для всего объема данных
+	 */
+	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 
 	}
 
-	public void endContact(Fixture fixtureB) {
+	/**
+	 * При окончании контакта вызываеться данная функция
+	 * @param fixtureA фикстура принадлежащая bodyActor
+	 * @param fixtureB фикстура принадлежащая другому объекту
+	 * @param contact объект контакта, на всякий случай для всего объема данных
+	 */
+	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 
 	}
 

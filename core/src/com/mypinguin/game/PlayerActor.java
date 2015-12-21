@@ -8,9 +8,11 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
@@ -20,6 +22,9 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.Array;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Created by savegame on 04.11.15.
@@ -54,15 +59,20 @@ public class PlayerActor extends BodyActor {
 	private Animation animFalling;//падение
 	private Animation currentAnim;//текущая анимация
 	//All other propertios
+	public Set<Fixture> allContacts = new HashSet<Fixture>(); //список геометрий с которыми столкнулся игрок
+	private Set<Fixture> groundedFixtures; //список геометрий с которыми столкнулись ноги
 	private boolean   grounded    = false; //находится на земле
+	private boolean   underwater  = false; //находиться под водой
 	private float     moveSpeed   = 400f;  //скорость передвижения
 	private float     flySpeed    = 400f;  //скорость передвижения в воздухе
-	private float     moveImpulse = 46f;  //ускорение хотьбы
-	private float     flyImpulse  = 16f;  //ускорение в воздухе
+	private float     moveImpulse = 86f;  //ускорение хотьбы
+	private float     flyImpulse  = 36f;  //ускорение в воздухе
 	private float     jumpImpulse = 1512f; //импульс прыжка
 	private float     bodyHeight  = 110f; //высота в пикселах
 	private float     bodyDencity = 4f;
 	private float     bodyPickDencity = 12f;
+	private float     vlocityEpsilon = 0.1f; //минимальная скорость, которая приравниваеться к нулю
+	private PlatformActor platform = null;//платформа на которой находиться игрок
 	//Debug
 	private TextureRegion staticRight = null; //
 	private TextureRegion staticFront = null; //
@@ -86,20 +96,21 @@ public class PlayerActor extends BodyActor {
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef) {
 		super(game, fixtureDef);
 		this.setName("PlayerActor");
+		groundedFixtures = new HashSet<Fixture>();
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
 		super(game, fixtureDef);
 		setTexRegion(staticFront, StaticTextureType.front);
 		this.setName("PlayerActor");
+		groundedFixtures = new HashSet<Fixture>();
 	}
 
 	public void initialize(Shape bodyShape) {
-//			fixtureDef.filter.categoryBits = Env.game.getCategoryBitsManager().getCategoryBits("level");
-		//bodydef.position.set( getX() / game.units, getY() / game.units );
 		float height4 = bodyHeight*0.25f;
 		bodydef.angle = 0f;
 		body = game.world.createBody(bodydef);
+		body.setUserData(this);
 
 		CircleShape circle = new CircleShape();
 		circle.setRadius(32f / game.units);
@@ -133,6 +144,7 @@ public class PlayerActor extends BodyActor {
 
 		{
 			legsBody = game.world.createBody(bodydef);
+			legsBody.setUserData(this);
 
 			RevoluteJointDef jdef = new RevoluteJointDef();
 			jdef.bodyA = body;
@@ -219,53 +231,39 @@ public class PlayerActor extends BodyActor {
 	public boolean isGrounded() {
 		return grounded;
 	}
+
+	public int groundedCount() {
+		return groundedFixtures.size();
+	}
+
+	public boolean isUnderwater() {
+		return underwater;
+	}
 	
-	private boolean isPlayerGrounded(float deltaTime) {
-//		groundedPlatform = null;
+	public boolean isPlayerGrounded() {
 		boolean sensor = false;
-		boolean bodyToo = false;
-		if( getJoint == null ) {
-			getBody = null;
-			getItem = null;
-		}
 		Array<Contact> contactList = game.world.getContactList();
+		platform = null;
 		for(int i = 0; i < contactList.size; i++) {
 			Contact contact = contactList.get(i);
 			if( !contact.isTouching() ) continue;
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
-				Vector2 pos = body.getPosition();
-//				WorldManifold manifold = contact.getWorldManifold();
-//				for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
-//					sensor |= (manifold.getPoints()[j].y <  pos.y - 5f/game.units );
-//				}
+				Object objA = contact.getFixtureA().getBody().getUserData();
+				Object objB = contact.getFixtureB().getBody().getUserData();
+				if( /*objA != null && */objA instanceof PlatformActor ) {
+					platform = (PlatformActor)objA;
+				}
+				else if( /*objB != null && */objB instanceof PlatformActor ) {
+					platform = (PlatformActor)objB;
+				}
 				sensor = true;
-			}
-			else if(getJoint == null) {
-				if (contact.getFixtureA() == getRFixture || contact.getFixtureB() == getRFixture) {
-					if (contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("box")) {
-						getBody = contact.getFixtureA().getBody();
-						getItem = getRFixture;
-					} else if (contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("box")) {
-						getBody = contact.getFixtureB().getBody();
-						getItem = getRFixture;
-					}
-				}
-				else if (contact.getFixtureA() == getLFixture || contact.getFixtureB() == getLFixture) {
-					if (contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("box")) {
-						getBody = contact.getFixtureA().getBody();
-						getItem = getLFixture;
-					} else if (contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("box")) {
-						getBody = contact.getFixtureB().getBody();
-						getItem = getLFixture;
-					}
-				}
 			}
 		}
 		return sensor;
 	}
 
 	public  void jump() {
-		if(false == grounded) return;
+		if( !isGrounded() && !underwater ) return;
 		Vector2 pos = body.getPosition();
 		body.applyLinearImpulse( new Vector2(0,jumpImpulse/game.units) , pos, true);
 		grounded = false;
@@ -329,7 +327,8 @@ public class PlayerActor extends BodyActor {
 		stateTime += delta;
 		m_dir = MoveDirection.None;
 		Array<Action> arr = getActions();
-		grounded = isPlayerGrounded(delta);
+		grounded = isPlayerGrounded();
+		body.setAwake(true);
 
 		if( arr.size == 0 && isGrounded() ){
 			Vector2 vel = body.getLinearVelocity();
@@ -344,8 +343,6 @@ public class PlayerActor extends BodyActor {
 		else if( arr.size == 0 ) {
 			physicsFixture.setFriction(0.1f);
 			legsFixture.setFriction(0.1f);
-//			legsJoint.setLimits(legsBody.getAngle(), legsBody.getAngle());
-//			legsJoint.enableLimit(true);
 		}
 		else legsJoint.enableLimit(false);
 
@@ -356,48 +353,67 @@ public class PlayerActor extends BodyActor {
 			impulse = flyImpulse*delta;
 		}
 
-		for( Action act : arr ) {
-			if( act instanceof MoveByAction ) {
-				MoveByAction moveact = (MoveByAction) act;
-				Vector2 vel = body.getLinearVelocity();
-				Vector2 pos = body.getPosition();
-				float velocity = moveact.getAmountX()*speed/game.units;
+		Vector2 platformVel = new Vector2(0,0);
+		if( platform != null )
+			platformVel = platform.getVelocity();
 
-				if( moveact.getAmountX() < 0 ) {
-					if( getItem != getLFixture && getJoint != null){
-						PrismaticJoint joint = (PrismaticJoint)getJoint;
-						joint.setLimits(-68f/game.units, -64f/game.units);
-						getItem = getLFixture;
-					}
-					physicsFixture.setFriction(0.2f);
-					legsFixture.setFriction(0.2f);
-					m_dir = MoveDirection.Left;
-					if (vel.x > velocity ) {
-						body.applyLinearImpulse( impulse*moveact.getAmountX(), 0, pos.x, pos.y, true);
-					}
-					else if(vel.x < velocity ) {
-						body.setLinearVelocity(velocity, body.getLinearVelocity().y);
-					}
-				}
-				else if( moveact.getAmountX() > 0 ) {
-					if( getItem != getRFixture && getJoint != null){
-						PrismaticJoint joint = (PrismaticJoint)getJoint;
-						joint.setLimits( 64f/game.units, 68f/game.units);
-						getItem = getRFixture;
-					}
-					physicsFixture.setFriction(0.2f);
-					legsFixture.setFriction(0.2f);
-					m_dir = MoveDirection.Right;
-					if (vel.x < velocity ) {
-						body.applyLinearImpulse( impulse*moveact.getAmountX(), 0, pos.x, pos.y, true);
-					}
-					else if (vel.x > velocity ) {
-						body.setLinearVelocity(velocity, body.getLinearVelocity().y);
+		if( arr.size == 0 && isGrounded() ) {
+			Vector2 vel = body.getLinearVelocity();
+			Vector2 pos = body.getPosition();
+			if( vel.x <  - vlocityEpsilon + platformVel.x ) { //move left
+				//body.applyLinearImpulse(impulse, 0, pos.x, pos.y, true);
+				vel.x += speed * delta * 0.1;
+			}
+			else if( vel.x > vlocityEpsilon + platformVel.x ) { //move rigth
+				//body.applyLinearImpulse(-impulse, 0, pos.x, pos.y, true);
+				vel.x -= speed * delta * 0.1;
+			}
+			else if(vel.x > - vlocityEpsilon + platformVel.x && vel.x < vlocityEpsilon + platformVel.x ) {
+				vel.x = platformVel.x;
+			}
+			body.setLinearVelocity(vel);
+		}
+		else {
+			for (Action act : arr) {
+				if (act instanceof MoveByAction) {
+					MoveByAction moveact = (MoveByAction) act;
+					Vector2 vel = body.getLinearVelocity();
+					Vector2 pos = body.getPosition();
+					float velocity = moveact.getAmountX() * speed / game.units;
+
+					if (moveact.getAmountX() < 0) {
+						if (getItem != getLFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(-68f / game.units, -64f / game.units);
+							getItem = getLFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Left;
+						if (vel.x > velocity + platformVel.x) {
+							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+						} else if (vel.x < velocity + platformVel.x) {
+							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+						}
+					} else if (moveact.getAmountX() > 0) {
+						if (getItem != getRFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(64f / game.units, 68f / game.units);
+							getItem = getRFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Right;
+						if (vel.x < velocity + platformVel.x) {
+							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+						} else if (vel.x > velocity + platformVel.x) {
+							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+						}
 					}
 				}
 			}
+			clearActions();
 		}
-		clearActions();
 //		body.setTransform( body.getPosition(), 0 );
 	}
 
@@ -460,15 +476,69 @@ public class PlayerActor extends BodyActor {
 							getScaleX(), getScaleY(),
 							getRotation());
 		}
-		/*if( legsBody != null )
+	}
+
+	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
+		allContacts.add(fixtureB);
+		if(fixtureA == sensorFixture) {
+			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+				underwater = true;
+			else {
+				groundedFixtures.add(fixtureB);
+				grounded = true;
+			}
+			grounded = true;
+		}
+		else if(getJoint == null) {
+			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
+				if (fixtureB.getUserData() != null && fixtureB.getUserData().equals("box")) {
+					getBody = fixtureB.getBody();
+					getItem = fixtureA;
+				}
+			}
+		}
+		else //отлов непонятного контакта
 		{
-			batch.draw(staticRight,
-							getX() - staticCurrent.getRegionWidth() / 2,
-							getY() - staticCurrent.getRegionHeight() / 2,
-							getOriginX(), getOriginY(),
-							staticCurrent.getRegionWidth(), staticCurrent.getRegionHeight(),
-							getScaleX(), getScaleY(),
-							legsBody.getAngle()* MathUtils.radDeg);
-		}*/
+//			grounded = isPlayerGrounded(0);
+//			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
+//			{
+//				int hj = 0;
+//			}
+//			if( isPlayerGrounded(0) != grounded ) {
+//				Shape.Type typeA = fixtureA.getType();
+//				Shape.Type typeB = fixtureB.getType();
+//				int  p = 0;
+//			}
+		}
+	}
+
+	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
+		allContacts.remove(fixtureB);
+		if(fixtureA == sensorFixture || fixtureA == legsFixture) {
+			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+				underwater = false;
+			else
+				groundedFixtures.remove(fixtureB);
+			if( groundedFixtures.isEmpty() ) {
+				grounded = false;
+//				if( isPlayerGrounded(0) )
+//				{
+//					int p = 0;
+//				}
+			}
+		}
+		else if( getJoint == null && (fixtureA == getRFixture  || fixtureA == getLFixture) )
+		{
+			getBody = null;
+			getItem = null;
+		}
+	}
+
+	public void preSolve(Contact contact, Manifold oldManifold) {
+
+	}
+
+	public void postSolve(Contact contact, ContactImpulse impulse) {
+
 	}
 }

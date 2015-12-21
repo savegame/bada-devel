@@ -70,6 +70,7 @@ public class PlatformActor extends BodyActor {
 		if(dist < 5f)
 		smoothDist = dist;
 	}
+
 	public void initialize(Shape bodyShape) {
 		fixturedef.shape = bodyShape;
 //			fixtureDef.filter.categoryBits = Env.game.getCategoryBitsManager().getCategoryBits("level");
