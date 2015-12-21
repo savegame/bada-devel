@@ -12,10 +12,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mypinguin.game.PenguinGame;
@@ -53,8 +57,8 @@ public class MainMenuStage extends ExtendedScreen {
 		camera.zoom = 1.0f;
 		
 		main_stage = new Stage( new ExtendViewport(game.width, game.height, camera), game.batch);
-		options_stage = new MMenu_Options(new ExtendViewport(game.width, game.height, camera), game.batch);
-		levels_stage = new MMenu_LevelSelect(new ExtendViewport(game.width, game.height, camera), game.batch);
+		options_stage = new MMenu_Options(new ExtendViewport(game.width, game.height, camera), game.batch,this);
+		levels_stage = new MMenu_LevelSelect(new ExtendViewport(game.width, game.height, camera), game.batch, this);
 
 		buildSkin();
 		
@@ -63,7 +67,6 @@ public class MainMenuStage extends ExtendedScreen {
 		levels_stage.buildLayout(skin);
 		
 		currentStage = main_stage;
-		
 		Gdx.input.setInputProcessor(currentStage);
 	}
 	
@@ -100,11 +103,30 @@ public class MainMenuStage extends ExtendedScreen {
 		btnExit.setWidth(btnOptions.getWidth());
 		btnPlay.sizeBy(20);
 		
+		btnPlay.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnPlay.isPressed()) OnPlayPressed();
+			}
+		});
+		
+		btnOptions.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnOptions.isPressed()) OnOptionsPressed();
+			}
+		});
+		
+		btnExit.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnExit.isPressed()) OnExitPressed();
+			}
+		});
+		
 		main_stage.addActor(btnPlay);
 		main_stage.addActor(btnExit);
 		main_stage.addActor(btnOptions);
 		
 		spr_mmenu_logo.setOriginCenter();
+		refreshLayout();
 	}
 	
 	public void refreshLayout()
@@ -151,15 +173,22 @@ public class MainMenuStage extends ExtendedScreen {
 							0, 0,
 							main_stage.getViewport().getWorldWidth(),
 							main_stage.getViewport().getWorldHeight());
+			if (currentStage == main_stage)
 			spr_mmenu_logo.draw(game.batch);
 		game.batch.end();
 
 		currentStage.draw();
 		
 		if(needUpdateViewport){
-			currentStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			main_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			options_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			levels_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			//currentStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
 			refreshLayout();
+			options_stage.refreshLayout();
+			levels_stage.refreshLayout();
+			
 			needUpdateViewport = false;
 		}
 	}
@@ -193,5 +222,33 @@ public class MainMenuStage extends ExtendedScreen {
 		levels_stage.dispose();
 
 		skin.dispose();
+	}
+	
+	public void OnPlayPressed()
+	{
+		currentStage = levels_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnOptionsPressed()
+	{
+		currentStage = options_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnExitPressed()
+	{
+	}
+	
+	public void OnOptionsBackPressed()
+	{
+		currentStage = main_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnLevelsBackPressed()
+	{
+		currentStage = main_stage;
+		Gdx.input.setInputProcessor(currentStage);
 	}
 }
