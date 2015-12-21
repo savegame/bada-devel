@@ -81,9 +81,7 @@ public class MainMenuStage extends ExtendedScreen {
 			
 			TextButtonStyle btnStyle = new TextButtonStyle();
 			btnStyle.up = skin.newDrawable("patch9_button_"+color,Color.WHITE);
-			btnStyle.down = skin.newDrawable("patch9_button_"+color,Color.DARK_GRAY);
-			//btnStyle.checked = skin.newDrawable("patch9_button_"+color,Color.DARK_GRAY);
-			btnStyle.over = skin.newDrawable("patch9_button_"+color,Color.LIGHT_GRAY);
+			btnStyle.down = skin.newDrawable("patch9_button_"+color,Color.LIGHT_GRAY);
 			btnStyle.font = game.fonts.GetFont("mmenu-btn-normal");
 			btnStyle.fontColor = btnStyle.font.getColor();
 			
@@ -93,22 +91,32 @@ public class MainMenuStage extends ExtendedScreen {
 	
 	public void buildLayout(Skin skin)
 	{
-		btnPlay = new TextButton("Play",skin,"button_blue");
+		btnPlay = new TextButton("PLAY",skin,"button_green");
+		btnOptions = new TextButton("OPTIONS",skin,"button_blue");
+		btnExit = new TextButton("EXIT",skin,"button_red");
+		
+		btnOptions.sizeBy(20, 0);
+		btnPlay.setWidth(btnOptions.getWidth());
+		btnExit.setWidth(btnOptions.getWidth());
+		btnPlay.sizeBy(20);
+		
 		main_stage.addActor(btnPlay);
-		
-		btnPlay.sizeBy(64, 10);
-		btnPlay.setPosition(-btnPlay.getWidth()/2+main_stage.getViewport().getWorldWidth() * 0.5f,
-							-btnPlay.getHeight()/2+main_stage.getViewport().getWorldHeight() * 0.5f);
-		
-		
-		
-		
-		/*main_stage.addActor(btnOptions);
-		main_stage.addActor(btnExit);*/
+		main_stage.addActor(btnExit);
+		main_stage.addActor(btnOptions);
 		
 		spr_mmenu_logo.setOriginCenter();
-		spr_mmenu_logo.setCenter(main_stage.getViewport().getWorldWidth() * 0.5f,
-								 main_stage.getViewport().getWorldHeight() * 0.8f);
+	}
+	
+	public void refreshLayout()
+	{
+		float width = main_stage.getViewport().getWorldWidth();
+		float height = main_stage.getViewport().getWorldHeight();
+		
+		btnPlay.setPosition		(0.500f * (-btnPlay.getWidth()+ width), 0.025f * height);
+		btnOptions.setPosition	(0.025f * width, 						0.025f * height);
+		btnExit.setPosition		(0.975f * (-btnExit.getWidth()+ width), 0.025f * height);
+		
+		spr_mmenu_logo.setCenter(width * 0.5f, height * 0.8f);
 	}
 
 	public void loadResources(AssetManager manager)
@@ -151,10 +159,7 @@ public class MainMenuStage extends ExtendedScreen {
 		if(needUpdateViewport){
 			currentStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-			spr_mmenu_logo.setCenter(main_stage.getViewport().getWorldWidth() * 0.5f,
-					 				 main_stage.getViewport().getWorldHeight() * 0.8f);
-			btnPlay.setPosition(-btnPlay.getWidth()/2+main_stage.getViewport().getWorldWidth() * 0.5f,
-								-btnPlay.getHeight()/2+main_stage.getViewport().getWorldHeight() * 0.5f);
+			refreshLayout();
 			needUpdateViewport = false;
 		}
 	}
