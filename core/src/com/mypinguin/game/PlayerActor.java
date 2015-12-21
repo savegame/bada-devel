@@ -63,6 +63,7 @@ public class PlayerActor extends BodyActor {
 	private Set<Fixture> groundedFixtures; //список геометрий с которыми столкнулись ноги
 	private boolean   grounded    = false; //находится на земле
 	private boolean   underwater  = false; //находиться под водой
+	private Vector2   realitiveMoveVel = new Vector2(); //относительная скорость (без учета скорости платформы например)
 	private float     moveSpeed   = 400f;  //скорость передвижения
 	private float     flySpeed    = 400f;  //скорость передвижения в воздухе
 	private float     moveImpulse = 86f;  //ускорение хотьбы
@@ -71,7 +72,7 @@ public class PlayerActor extends BodyActor {
 	private float     bodyHeight  = 110f; //высота в пикселах
 	private float     bodyDencity = 4f;
 	private float     bodyPickDencity = 12f;
-	private float     vlocityEpsilon = 0.1f; //минимальная скорость, которая приравниваеться к нулю
+	private float     vlocityEpsilon = 0f; //минимальная скорость, которая приравниваеться к нулю
 	private PlatformActor platform = null;//платформа на которой находиться игрок
 	//Debug
 	private TextureRegion staticRight = null; //
@@ -335,9 +336,9 @@ public class PlayerActor extends BodyActor {
 			if( vel.x > 0.1f || vel.x < -0.1f ){
 				physicsFixture.setFriction(100.1f);
 				legsFixture.setFriction(100.1f);
-				legsJoint.setLimits(legsBody.getAngle(), legsBody.getAngle());
-				legsJoint.setMaxMotorTorque(1f);
-				legsJoint.enableLimit(true);
+//				legsJoint.setLimits(legsBody.getAngle(), legsBody.getAngle());
+//				legsJoint.setMaxMotorTorque(1f);
+//				legsJoint.enableLimit(true);
 			}
 		}
 		else if( arr.size == 0 ) {
@@ -358,29 +359,34 @@ public class PlayerActor extends BodyActor {
 			platformVel = platform.getVelocity();
 
 		if( arr.size == 0 && isGrounded() ) {
-			Vector2 vel = body.getLinearVelocity();
+			//Vector2 vel = body.getLinearVelocity();
 			Vector2 pos = body.getPosition();
-			if( vel.x <  - vlocityEpsilon + platformVel.x ) { //move left
+			realitiveMoveVel.y = body.getLinearVelocity().y;
+			if( realitiveMoveVel.x <  - vlocityEpsilon ) { //move left
 				//body.applyLinearImpulse(impulse, 0, pos.x, pos.y, true);
-				vel.x += speed * delta * 0.1;
+				realitiveMoveVel.x += speed * delta * 0.1;
+				if( realitiveMoveVel.x > -vlocityEpsilon )
+					realitiveMoveVel.x = 0;
 			}
-			else if( vel.x > vlocityEpsilon + platformVel.x ) { //move rigth
+			else if( realitiveMoveVel.x > vlocityEpsilon ) { //move rigth
 				//body.applyLinearImpulse(-impulse, 0, pos.x, pos.y, true);
-				vel.x -= speed * delta * 0.1;
+				realitiveMoveVel.x -= speed * delta * 0.1;
+				if( realitiveMoveVel.x < vlocityEpsilon )
+					realitiveMoveVel.x = 0;
 			}
-			else if(vel.x > - vlocityEpsilon + platformVel.x && vel.x < vlocityEpsilon + platformVel.x ) {
-				vel.x = platformVel.x;
-			}
-			body.setLinearVelocity(vel);
+//			else if(vel.x > - vlocityEpsilon + platformVel.x && vel.x < vlocityEpsilon + platformVel.x ) {
+//				vel.x = platformVel.x;
+//			}
+			body.setLinearVelocity(realitiveMoveVel.x + platformVel.x, realitiveMoveVel.y);
 		}
-		else {
+		else if( isGrounded() && platform != null ) {
 			for (Action act : arr) {
 				if (act instanceof MoveByAction) {
 					MoveByAction moveact = (MoveByAction) act;
 					Vector2 vel = body.getLinearVelocity();
 					Vector2 pos = body.getPosition();
-					float velocity = moveact.getAmountX() * speed / game.units;
-
+					float velocity = speed / game.units;
+					realitiveMoveVel.y = vel.y;
 					if (moveact.getAmountX() < 0) {
 						if (getItem != getLFixture && getJoint != null) {
 							PrismaticJoint joint = (PrismaticJoint) getJoint;
@@ -390,12 +396,18 @@ public class PlayerActor extends BodyActor {
 						physicsFixture.setFriction(0.2f);
 						legsFixture.setFriction(0.2f);
 						m_dir = MoveDirection.Left;
-						if (vel.x > velocity + platformVel.x) {
-							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-						} else if (vel.x < velocity + platformVel.x) {
-							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+
+						if( realitiveMoveVel.x > 0 )
+							realitiveMoveVel.x -= speed * delta * 0.07;
+						if ( realitiveMoveVel.x > -velocity) {
+							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+							realitiveMoveVel.x -= speed * delta * 0.07 ;
+							if( realitiveMoveVel.x < -velocity) {
+								realitiveMoveVel.x = -velocity ;
+							}
 						}
-					} else if (moveact.getAmountX() > 0) {
+					}
+					else if (moveact.getAmountX() > 0) {
 						if (getItem != getRFixture && getJoint != null) {
 							PrismaticJoint joint = (PrismaticJoint) getJoint;
 							joint.setLimits(64f / game.units, 68f / game.units);
@@ -404,10 +416,59 @@ public class PlayerActor extends BodyActor {
 						physicsFixture.setFriction(0.2f);
 						legsFixture.setFriction(0.2f);
 						m_dir = MoveDirection.Right;
-						if (vel.x < velocity + platformVel.x) {
+
+						if( realitiveMoveVel.x < 0 )
+							realitiveMoveVel.x += speed * delta * 0.07;
+						if ( realitiveMoveVel.x < velocity) {
+							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+							realitiveMoveVel.x += speed * delta * 0.07 ;
+							if( realitiveMoveVel.x > velocity) {
+								realitiveMoveVel.x = velocity ;
+							}
+						}
+					}
+
+					body.setLinearVelocity(realitiveMoveVel.x + platformVel.x, realitiveMoveVel.y);
+				}
+			}
+			clearActions();
+		}
+		else {
+			for (Action act : arr) {
+				if (act instanceof MoveByAction) {
+					MoveByAction moveact = (MoveByAction) act;
+					Vector2 vel = body.getLinearVelocity();
+					Vector2 pos = body.getPosition();
+					float velocity = moveact.getAmountX() * speed / game.units;
+					realitiveMoveVel.y = vel.y;
+					if (moveact.getAmountX() < 0) {
+						if (getItem != getLFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(-68f / game.units, -64f / game.units);
+							getItem = getLFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Left;
+						if (vel.x > velocity) {
 							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-						} else if (vel.x > velocity + platformVel.x) {
-							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+						} else if (vel.x < velocity) {
+							body.setLinearVelocity(velocity, body.getLinearVelocity().y);
+						}
+					}
+					else if (moveact.getAmountX() > 0) {
+						if (getItem != getRFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(64f / game.units, 68f / game.units);
+							getItem = getRFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Right;
+						if (vel.x < velocity ) {
+							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+						} else if (vel.x > velocity ) {
+							body.setLinearVelocity(velocity, body.getLinearVelocity().y);
 						}
 					}
 				}

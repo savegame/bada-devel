@@ -252,7 +252,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -308,7 +307,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		camera.setToOrtho(false, width, height);
 		Vector2 pos = new Vector2(140f, 5f);
 		needUpdateViewport = true;
@@ -316,24 +314,21 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
+		//
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		//
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		super.dispose();
 		map.dispose();
 		mapBodyManager.destroyPhysics();

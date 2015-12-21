@@ -140,6 +140,7 @@ public class PenguinGame extends Game {
 	
 	public void dispose() {
 		font.dispose();
+		bigFont.dispose();
 		batch.dispose();
 		asset.dispose();
 		world.dispose();
