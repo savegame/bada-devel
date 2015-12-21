@@ -289,6 +289,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 							+ "\nUnderwater: " + game.player.isUnderwater()
 							+ "\nContactCount: " + game.player.allContacts.size()
 							+ "\nCanPick: " + game.player.canPick()
+							+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
 						+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
 		else
 			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
