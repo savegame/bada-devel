@@ -3,11 +3,8 @@ package com.mypinguin.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -108,23 +105,11 @@ public class PenguinGame extends Game {
 
 	@Override
 	public void create() {
-//		font = new BitmapFont();
-//		font.setUseIntegerPositions(true);
 		batch = new SpriteBatch();
 		asset = new AssetManager();
 		
 		fonts = new FontsManager();
 		fonts.LoadStylesFromJson(Gdx.files.internal("styles.json"));
-		
-		// тест загрузки шрифта
-		/*float densityIndependentSize = m_mainFontSize * Gdx.graphics.getDensity();
-		int fontSize = Math.round(densityIndependentSize );
-//		FreeTypeFontGenerator.NO_MAXIMUM = 32;
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Agentorange.ttf"));
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = m_mainFontSize;
-		bigFont = generator.generateFont(parameter);
-		generator.dispose(); // don't forget to dispose to avoid memory leaks!*/
 		
 		bigFont = fonts.GetFont("bigFont");
 
@@ -136,7 +121,6 @@ public class PenguinGame extends Game {
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
 		this.setScreen(new MainMenuStage(this));
-		
 		//this.setScreen( new MainMenuScreen(this) );
 		//this.setScreen( new Box2DTestLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
@@ -149,7 +133,6 @@ public class PenguinGame extends Game {
 	}
 	
 	public void dispose() {
-		font.dispose();
 		fonts.dispose();
 		batch.dispose();
 		asset.dispose();
