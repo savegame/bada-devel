@@ -296,8 +296,14 @@ public class PlayerActor extends BodyActor {
 			getJoint = game.world.createJoint(jointDef);
 			PrismaticJoint joint = (PrismaticJoint)getJoint;
 			physicsFixture.setDensity(bodyPickDencity);
+			if( getBody.getUserData() instanceof BoxActor ) {
+				((BoxActor)getBody.getUserData()).setPicked(true);
+			}
 		}
 		else 	if( getJoint != null ) {
+			if( getBody.getUserData() instanceof BoxActor ) {
+				((BoxActor)getBody.getUserData()).setPicked(false);
+			}
 			game.world.destroyJoint(getJoint);
 			if( getItem == getLFixture )
 				getBody.applyForceToCenter(-125f, 0, true);
@@ -399,10 +405,10 @@ public class PlayerActor extends BodyActor {
 						m_dir = MoveDirection.Left;
 
 						if( realitiveMoveVel.x > 0 )
-							realitiveMoveVel.x -= speed * delta * 0.07;
+							realitiveMoveVel.x -= speed * delta * 0.045;
 						if ( realitiveMoveVel.x > -velocity) {
 							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-							realitiveMoveVel.x -= speed * delta * 0.07 ;
+							realitiveMoveVel.x -= speed * delta * 0.045 ;
 							if( realitiveMoveVel.x < -velocity) {
 								realitiveMoveVel.x = -velocity ;
 							}
@@ -419,10 +425,10 @@ public class PlayerActor extends BodyActor {
 						m_dir = MoveDirection.Right;
 
 						if( realitiveMoveVel.x < 0 )
-							realitiveMoveVel.x += speed * delta * 0.07;
+							realitiveMoveVel.x += speed * delta * 0.045;
 						if ( realitiveMoveVel.x < velocity) {
 							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-							realitiveMoveVel.x += speed * delta * 0.07 ;
+							realitiveMoveVel.x += speed * delta * 0.045 ;
 							if( realitiveMoveVel.x > velocity) {
 								realitiveMoveVel.x = velocity ;
 							}
@@ -616,7 +622,7 @@ public class PlayerActor extends BodyActor {
 				contact.setEnabled(false);
 			else
 				contact.setEnabled(true);
-		};
+		}
 	  }
 	}
 
