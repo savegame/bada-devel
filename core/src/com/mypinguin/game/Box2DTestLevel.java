@@ -284,7 +284,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 		game.batch.begin();
 		if( game.player != null)
 			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
-							+ "\nGrounded2: " + game.player.isPlayerGrounded()
 							+ "\nUnderwater: " + game.player.isUnderwater()
 							+ "\nContactCount: " + game.player.allContacts.size()
 							+ "\nCanPick: " + game.player.canPick()

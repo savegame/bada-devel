@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
@@ -72,8 +73,8 @@ public class PlayerActor extends BodyActor {
 	private float     bodyHeight  = 110f; //высота в пикселах
 	private float     bodyDencity = 4f;
 	private float     bodyPickDencity = 12f;
-	private float     vlocityEpsilon = 0f; //минимальная скорость, которая приравниваеться к нулю
-	private PlatformActor platform = null;//платформа на которой находиться игрок
+	private float     vlocityEpsilon = 0.05f; //минимальная скорость, которая приравниваеться к нулю
+	private BodyActor platform = null;//платформа на которой находиться игрок (или другой объект)
 	//Debug
 	private TextureRegion staticRight = null; //
 	private TextureRegion staticFront = null; //
@@ -251,11 +252,11 @@ public class PlayerActor extends BodyActor {
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
 				Object objA = contact.getFixtureA().getBody().getUserData();
 				Object objB = contact.getFixtureB().getBody().getUserData();
-				if( /*objA != null && */objA instanceof PlatformActor ) {
-					platform = (PlatformActor)objA;
+				if( objA instanceof PlatformActor || objA instanceof BoxActor) {
+					platform = (BodyActor)objA;
 				}
-				else if( /*objB != null && */objB instanceof PlatformActor ) {
-					platform = (PlatformActor)objB;
+				else if( objB instanceof PlatformActor || objB instanceof BoxActor ) {
+					platform = (BodyActor)objB;
 				}
 				sensor = true;
 			}
@@ -374,9 +375,9 @@ public class PlayerActor extends BodyActor {
 				if( realitiveMoveVel.x < vlocityEpsilon )
 					realitiveMoveVel.x = 0;
 			}
-//			else if(vel.x > - vlocityEpsilon + platformVel.x && vel.x < vlocityEpsilon + platformVel.x ) {
-//				vel.x = platformVel.x;
-//			}
+			else if(realitiveMoveVel.x > - vlocityEpsilon && realitiveMoveVel.x < vlocityEpsilon ) {
+				realitiveMoveVel.x = 0f;
+			}
 			body.setLinearVelocity(realitiveMoveVel.x + platformVel.x, realitiveMoveVel.y);
 		}
 		else if( isGrounded() && platform != null ) {
@@ -596,7 +597,27 @@ public class PlayerActor extends BodyActor {
 	}
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
-
+	  WorldManifold manifold = contact.getWorldManifold();
+	  for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
+		Object objA = contact.getFixtureA().getBody().getUserData();
+		Object objB = contact.getFixtureB().getBody().getUserData();
+		if( objA instanceof PlatformActor && objB instanceof PlayerActor ) {
+			if( contact.getFixtureB().getBody() != legsBody )
+				contact.setEnabled(false);
+			else if( manifold.getNormal().y < 0 )
+				contact.setEnabled(false);
+			else
+				contact.setEnabled(true);
+		}
+		else if( objB instanceof PlatformActor && objA instanceof PlayerActor ) {
+			if( contact.getFixtureA().getBody() != legsBody )
+				contact.setEnabled(false);
+			else if( manifold.getNormal().y < 0 )
+				contact.setEnabled(false);
+			else
+				contact.setEnabled(true);
+		};
+	  }
 	}
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
