@@ -260,6 +260,20 @@ public class PlayerActor extends BodyActor {
 				}
 				sensor = true;
 			}
+			else if(getJoint == null) {
+				if (contact.getFixtureA() == getRFixture  || contact.getFixtureA() == getLFixture) {
+					if (contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("box")) {
+						getBody = contact.getFixtureB().getBody();
+						getItem = contact.getFixtureA();
+					}
+				}
+				else if (contact.getFixtureB() == getRFixture  || contact.getFixtureB() == getLFixture) {
+					if (contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("box")) {
+						getBody = contact.getFixtureA().getBody();
+						getItem = contact.getFixtureB();
+					}
+				}
+			}
 		}
 		return sensor;
 	}
@@ -343,9 +357,6 @@ public class PlayerActor extends BodyActor {
 			if( vel.x > 0.1f || vel.x < -0.1f ){
 				physicsFixture.setFriction(100.1f);
 				legsFixture.setFriction(100.1f);
-//				legsJoint.setLimits(legsBody.getAngle(), legsBody.getAngle());
-//				legsJoint.setMaxMotorTorque(1f);
-//				legsJoint.enableLimit(true);
 			}
 		}
 		else if( arr.size == 0 ) {
@@ -557,27 +568,27 @@ public class PlayerActor extends BodyActor {
 			}
 			grounded = true;
 		}
-		else if(getJoint == null) {
-			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
-				if (fixtureB.getUserData() != null && fixtureB.getUserData().equals("box")) {
-					getBody = fixtureB.getBody();
-					getItem = fixtureA;
-				}
-			}
-		}
-		else //отлов непонятного контакта
-		{
-//			grounded = isPlayerGrounded(0);
-//			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
-//			{
-//				int hj = 0;
+//		else if(getJoint == null) {
+//			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
+//				if (fixtureB.getUserData() != null && fixtureB.getUserData().equals("box")) {
+//					getBody = fixtureB.getBody();
+//					getItem = fixtureA;
+//				}
 //			}
-//			if( isPlayerGrounded(0) != grounded ) {
-//				Shape.Type typeA = fixtureA.getType();
-//				Shape.Type typeB = fixtureB.getType();
-//				int  p = 0;
-//			}
-		}
+//		}
+//		else //отлов непонятного контакта
+//		{
+////			grounded = isPlayerGrounded(0);
+////			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
+////			{
+////				int hj = 0;
+////			}
+////			if( isPlayerGrounded(0) != grounded ) {
+////				Shape.Type typeA = fixtureA.getType();
+////				Shape.Type typeB = fixtureB.getType();
+////				int  p = 0;
+////			}
+//		}
 	}
 
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
