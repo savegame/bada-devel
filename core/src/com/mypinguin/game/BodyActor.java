@@ -44,7 +44,11 @@ public class BodyActor extends Actor {
 	public Vector2 getVelocity() {
 		return body.getLinearVelocity();
 	}
-
+	
+	public float getMass() {
+		return body.getMass();
+	}
+	
 	public void initialize(Shape bodyShape) {
 		fixturedef.shape = bodyShape;
 //			fixtureDef.filter.categoryBits = Env.game.getCategoryBitsManager().getCategoryBits("level");

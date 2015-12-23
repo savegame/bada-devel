@@ -14,6 +14,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
@@ -242,6 +243,29 @@ public class PlayerActor extends BodyActor {
 		return underwater;
 	}
 	
+	private class MyRayCallback implements RayCastCallback {
+		public boolean sensor = false;
+		public Vector2 p1;
+		
+		MyRayCallback(boolean sens, Vector2 p) {
+			sensor = sens;
+			p1 = p;
+		}
+		@Override
+		public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal,
+				float fraction) {
+			if( !fixture.isSensor() && !(fixture.getBody().getUserData() instanceof WaterActor) ) {
+				Vector2 l = new Vector2( point.x - p1.x, point.y - p1.y + 1 );
+				float length = l.len() ;
+				if( length < 1.1f ) {
+					sensor = true;
+					return length;
+				}
+			}
+			return 0;
+		}
+	}
+	
 	public boolean isPlayerGrounded() {
 		boolean sensor = false;
 		Array<Contact> contactList = game.world.getContactList();
@@ -274,6 +298,14 @@ public class PlayerActor extends BodyActor {
 					}
 				}
 			}
+		}
+		if(!sensor){
+			//raycast
+			final Vector2 p1 = new Vector2(this.getX()/game.units, this.getY()/game.units);
+			Vector2 p2 = new Vector2(p1.x, p1.y - 2f);
+			MyRayCallback mrcb = new MyRayCallback(sensor, p1);
+			game.world.rayCast(  mrcb, p1, p2);
+			sensor = mrcb.sensor; 
 		}
 		return sensor;
 	}
@@ -493,7 +525,6 @@ public class PlayerActor extends BodyActor {
 			}
 			clearActions();
 		}
-//		body.setTransform( body.getPosition(), 0 );
 	}
 
 	@Override
@@ -568,27 +599,6 @@ public class PlayerActor extends BodyActor {
 			}
 			grounded = true;
 		}
-//		else if(getJoint == null) {
-//			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
-//				if (fixtureB.getUserData() != null && fixtureB.getUserData().equals("box")) {
-//					getBody = fixtureB.getBody();
-//					getItem = fixtureA;
-//				}
-//			}
-//		}
-//		else //отлов непонятного контакта
-//		{
-////			grounded = isPlayerGrounded(0);
-////			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
-////			{
-////				int hj = 0;
-////			}
-////			if( isPlayerGrounded(0) != grounded ) {
-////				Shape.Type typeA = fixtureA.getType();
-////				Shape.Type typeB = fixtureB.getType();
-////				int  p = 0;
-////			}
-//		}
 	}
 
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
