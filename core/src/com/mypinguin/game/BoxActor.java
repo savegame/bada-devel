@@ -67,6 +67,12 @@ public class BoxActor extends BodyActor {
 			batch.draw(picture, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
 							getScaleX(), getScaleY(), getRotation());
 		}
+		if( game.isDebug ) {
+			String str;
+			str = "Picked: " + isPicked()
+					+"\nPlatformed: " + isPlatformed();
+			game.font.draw(batch, str, body.getWorldCenter().x*game.units, body.getWorldCenter().y*game.units);
+		}
 	}
 	
 	/**
@@ -79,6 +85,9 @@ public class BoxActor extends BodyActor {
 		Object objB = fixtureB.getBody().getUserData();
 		if( objB instanceof PlatformActor ) {
 			platformed = true;
+		}
+		else if( objB instanceof BoxActor ) {
+			platformed = ((BoxActor)objB).isPlatformed();
 		}
 	}
 

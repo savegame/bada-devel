@@ -28,6 +28,8 @@ import com.badlogic.gdx.utils.Array;
 import java.util.HashSet;
 import java.util.Set;
 
+import sun.print.PSPrinterJob.EPSPrinter;
+
 /*
  * Created by savegame on 04.11.15.
  */
@@ -405,8 +407,12 @@ public class PlayerActor extends BodyActor {
 		}
 
 		Vector2 platformVel = new Vector2(0,0);
-		if( platform != null )
-			platformVel = platform.getVelocity();
+		if( platform != null ) {
+			if( platform instanceof BoxActor && ((BoxActor)platform).isPlatformed() )
+				platformVel = platform.getVelocity();
+			else 
+				platformVel = platform.getVelocity();
+		}
 
 		if( arr.size == 0 && isGrounded() ) {
 			//Vector2 vel = body.getLinearVelocity();
@@ -448,7 +454,8 @@ public class PlayerActor extends BodyActor {
 						m_dir = MoveDirection.Left;
 
 						if( realitiveMoveVel.x > 0 )
-							realitiveMoveVel.x -= speed * delta * 0.045;
+							//realitiveMoveVel.x -= speed * delta * 0.1;
+							realitiveMoveVel.x = 0f;
 						if ( realitiveMoveVel.x > -velocity) {
 							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
 							realitiveMoveVel.x -= speed * delta * 0.045 ;
@@ -468,7 +475,8 @@ public class PlayerActor extends BodyActor {
 						m_dir = MoveDirection.Right;
 
 						if( realitiveMoveVel.x < 0 )
-							realitiveMoveVel.x += speed * delta * 0.045;
+							//realitiveMoveVel.x += speed * delta * 0.1;
+							realitiveMoveVel.x = 0f;
 						if ( realitiveMoveVel.x < velocity) {
 							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
 							realitiveMoveVel.x += speed * delta * 0.045 ;
