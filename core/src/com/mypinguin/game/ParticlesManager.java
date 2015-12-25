@@ -2,20 +2,17 @@ package com.mypinguin.game;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter.Particle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class ParticlesManager {
 
 	class Particle extends Sprite
 	{
+		public float life = 0;
 		public Particle(Sprite sprite)
 		{
 			super(sprite);
@@ -88,7 +85,8 @@ public class ParticlesManager {
 			usedIndexesCount--;
 		}
 		
-		public void setMaxParticlesCount(int maxCount)
+		//T must be instantiated from Particle!
+		public <T> void setMaxParticlesCount(int maxCount)
 		{
 			if (null == sprite) return;
 			
@@ -113,7 +111,7 @@ public class ParticlesManager {
 			ArrayList<Integer> usedIndexes = this.usedIndexes;
 			
 			//Emit particles
-			emit();
+			emit(delta);
 			
 			//Update active particles
 			Iterator<Integer> it = usedIndexes.iterator();
@@ -145,7 +143,7 @@ public class ParticlesManager {
 			}
 		}
 		
-		public void emit()
+		public void emit(float delta)
 		{
 			
 		}
@@ -157,15 +155,51 @@ public class ParticlesManager {
 		
 		public boolean updateParticle(float delta, Particle particle)
 		{
-			return false;
+			return true;
 		}
 	}
 	
+	class PEmitter_Snow extends PEmitter
+	{
+		float delay = 0;
+		
+		public PEmitter_Snow(PenguinGame game, Sprite sprite) {
+			super(game, sprite);
+			setMaxParticlesCount(100);
+		}
+		
+		public void emit(float delta) {
+			delay += delta*1000;
+			if (delay > 100)
+			{
+				delay = 0;
+				generate(5);
+			}
+		}
+		
+		public boolean updateParticle(float delta, Particle particle)
+		{ 
+			particle.translateY(-delta*100);
+			particle.setAlpha(particle.life);
+			particle.life -= delta;
+			if (particle.life <= 0) return false;
+			return true;
+		}
+		
+		public void resetParticle(Particle particle)
+		{
+			particle.life = 1;
+			particle.setPosition((float) (getX()-400.0f+Math.random()*800.0f), getY());
+		}
+	}
+	
+	//---------------------------------------------
 	
 	public PenguinGame 	game;
 	
 	//private ParticleEmitter builtin_snow = null;
 	private TextureAtlas particles_atlas = null;
+	public PEmitter_Snow snowEmitter = null;
 
 	public ParticlesManager( PenguinGame penguinGame ) {
 		if (penguinGame == null) throw new IllegalArgumentException("penguinGame cannot be null.");
@@ -178,29 +212,8 @@ public class ParticlesManager {
 		game.asset.finishLoadingAsset("particles.atlas");
 		
 		particles_atlas = game.asset.get("particles.atlas",TextureAtlas.class);
-	}
-	
-	public void BuiltIn_Render(Stage stage, SpriteBatch batch, float delta)
-	{
-		Boolean batch_isDrawing = batch.isDrawing();
 		
-		if (batch_isDrawing) batch.end();
-		
-		batch.begin();
-		//builtin_snow.draw(batch, delta);
-		//builtin_snow.getSprite().setCenter(game.player.getX(), game.player.getY());
-		//builtin_snow.getSprite().draw(batch);
-		batch.end();
-		
-		if (batch_isDrawing) batch.begin();
-	}
-
-	public void BuiltIn_Snow_Enable()
-	{
-	}
-	
-	public void BuiltIn_Snow_Disable()
-	{
+		snowEmitter = new PEmitter_Snow(game, particles_atlas.createSprite("tiny_snowflake"));
 	}
 	
 	public void dispose()

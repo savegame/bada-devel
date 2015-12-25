@@ -113,7 +113,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 			setupPlayer(game.player);
 		}
 		
-		game.particles.BuiltIn_Snow_Enable();
+		stage.addActor(game.particles.snowEmitter);
 	}
 
 	private void setupPlayer(PlayerActor player) {
@@ -264,8 +264,25 @@ public class Box2DTestLevel extends ExtendedScreen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+
+		/*game.batch.begin();
+		game.particles.snowEmitter.sprite.setPosition(100, 100);
+		game.particles.snowEmitter.sprite.draw(game.batch);
+		game.batch.end();*/
+		game.particles.snowEmitter.setPosition(camera.position.x, camera.position.y+camera.viewportHeight/2);
+		/*game.particles.snowEmitter.act(delta);
+		
+		game.batch.begin();
+		game.particles.snowEmitter.draw(game.batch, 1);
+		game.batch.end();*/
+		
 		ui.act();
 		stage.act();
+		
+		
+		//game.particles.snowEmitter.act(delta);
+		//game.particles.snowEmitter.draw(game.batch, 1);
+		
 		float frameTime = Math.min(delta, 0.25f);
 		accumulator += frameTime;
 //		while (accumulator >= time_stamp)
@@ -278,11 +295,15 @@ public class Box2DTestLevel extends ExtendedScreen {
 		camControl.act(Gdx.graphics.getDeltaTime());
 		camera.update();
 		
+		
+		
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();
-		stage.draw();
 		
-		game.particles.BuiltIn_Render(stage, game.batch, delta);
+		
+		
+		stage.draw();
+		//game.particles.snowEmitter.draw(game.batch, 1);
 		
 		debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
 		ui.draw();
@@ -307,6 +328,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 			btnPick.setPosition(ui.getViewport().getWorldWidth() - 263, 5);
 			needUpdateViewport = false;
 		}
+		
+		
 	}
 
 	@Override
