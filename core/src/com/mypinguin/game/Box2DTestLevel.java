@@ -112,6 +112,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 			stage.addActor(game.player);
 			setupPlayer(game.player);
 		}
+		
+		game.particles.BuiltIn_Snow_Enable();
 	}
 
 	private void setupPlayer(PlayerActor player) {
@@ -279,6 +281,9 @@ public class Box2DTestLevel extends ExtendedScreen {
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();
 		stage.draw();
+		
+		game.particles.BuiltIn_Render(stage, game.batch, delta);
+		
 		debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
 		ui.draw();
 //		String str = ;
@@ -291,6 +296,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
 
 		game.batch.end();
+		
+		
 		
 		if(needUpdateViewport){
 			stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);

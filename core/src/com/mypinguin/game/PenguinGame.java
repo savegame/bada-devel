@@ -80,6 +80,7 @@ public class PenguinGame extends Game {
 	}
 
 	public FontsManager fonts;
+	public ParticlesManager particles;
 
 	public BitmapFont   font;  //шрифт по умолчанию
 	public BitmapFont   bigFont;
@@ -111,6 +112,8 @@ public class PenguinGame extends Game {
 		fonts = new FontsManager();
 		fonts.LoadStylesFromJson(Gdx.files.internal("styles.json"));
 		
+		particles = new ParticlesManager(this);
+		
 		bigFont = fonts.GetFont("bigFont");
 
 		font = new BitmapFont();
@@ -120,9 +123,9 @@ public class PenguinGame extends Game {
 		contacts = new ContactsController(this);
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
-		this.setScreen(new MainMenuStage(this));
+		//this.setScreen(new MainMenuStage(this));
 		//this.setScreen( new MainMenuScreen(this) );
-		//this.setScreen( new Box2DTestLevel(this) );
+		this.setScreen( new Box2DTestLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -134,6 +137,7 @@ public class PenguinGame extends Game {
 	
 	public void dispose() {
 		fonts.dispose();
+		particles.dispose();
 		batch.dispose();
 		asset.dispose();
 		world.dispose();
