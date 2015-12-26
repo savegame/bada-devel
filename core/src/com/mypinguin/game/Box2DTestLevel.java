@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.penguin.menu.ExtendedScreen;
+import com.penguin.particles.Emitter_Snow;
 
 public class Box2DTestLevel extends ExtendedScreen {
 	private boolean             needUpdateViewport = false;
@@ -113,7 +114,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 			setupPlayer(game.player);
 		}
 		
-		stage.addActor(game.particles.snowEmitter);
+		game.particles.addEmitter(new Emitter_Snow(game, camera), 0);
+		stage.addActor(game.particles.getLayer(0));
 	}
 
 	private void setupPlayer(PlayerActor player) {
@@ -265,24 +267,9 @@ public class Box2DTestLevel extends ExtendedScreen {
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 
-		/*game.batch.begin();
-		game.particles.snowEmitter.sprite.setPosition(100, 100);
-		game.particles.snowEmitter.sprite.draw(game.batch);
-		game.batch.end();*/
-		game.particles.snowEmitter.setPosition(camera.position.x, camera.position.y+camera.viewportHeight/2);
-		/*game.particles.snowEmitter.act(delta);
-		
-		game.batch.begin();
-		game.particles.snowEmitter.draw(game.batch, 1);
-		game.batch.end();*/
-		
 		ui.act();
 		stage.act();
-		
-		
-		//game.particles.snowEmitter.act(delta);
-		//game.particles.snowEmitter.draw(game.batch, 1);
-		
+
 		float frameTime = Math.min(delta, 0.25f);
 		accumulator += frameTime;
 //		while (accumulator >= time_stamp)
@@ -296,14 +283,10 @@ public class Box2DTestLevel extends ExtendedScreen {
 		camera.update();
 		
 		
-		
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();
 		
-		
-		
 		stage.draw();
-		//game.particles.snowEmitter.draw(game.batch, 1);
 		
 		debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
 		ui.draw();
@@ -363,6 +346,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		super.dispose();
 		map.dispose();
 		mapBodyManager.destroyPhysics();
+		game.particles.clearLayers();
 	}
 
 }
