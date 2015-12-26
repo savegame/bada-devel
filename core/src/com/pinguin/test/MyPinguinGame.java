@@ -6,20 +6,16 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-//import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+
+//import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 
 public class MyPinguinGame extends ApplicationAdapter {
@@ -39,7 +35,6 @@ public class MyPinguinGame extends ApplicationAdapter {
 		
 		@Override
 		public boolean keyDown(int keycode) {
-			// TODO Auto-genehisrated method stub
 			if(keycode == Keys.A)
 				LEFT_KEY = 1;
 			if(keycode == Keys.D)
@@ -53,7 +48,6 @@ public class MyPinguinGame extends ApplicationAdapter {
 
 		@Override
 		public boolean keyUp(int keycode) {
-			// TODO Auto-generated method stub
 			if(keycode == Keys.A)
 				LEFT_KEY = 0;
 			if(keycode == Keys.D)
@@ -68,7 +62,6 @@ public class MyPinguinGame extends ApplicationAdapter {
 
 		@Override
 		public boolean keyTyped(char character) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
@@ -110,13 +103,11 @@ public class MyPinguinGame extends ApplicationAdapter {
 
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 
 		@Override
 		public boolean scrolled(int amount) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 		

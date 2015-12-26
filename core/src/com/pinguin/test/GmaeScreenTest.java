@@ -48,7 +48,6 @@ public class GmaeScreenTest implements Screen {
 			super(map);
 			renderer = new ShapeRenderer();
 			actors = new ArrayList<Actor>();
-			// TODO Auto-generated constructor stub
 		}
 		
 		@Override
@@ -177,12 +176,10 @@ public class GmaeScreenTest implements Screen {
 	}
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
 		Gdx.gl.glClearColor(0.3f, 0.7f, 0.7f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -219,24 +216,20 @@ public class GmaeScreenTest implements Screen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 		//saveAllGameProgress()
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
 		//restoreGame
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		stage.dispose();
 		manager.dispose();
 //		skin.dispose();
