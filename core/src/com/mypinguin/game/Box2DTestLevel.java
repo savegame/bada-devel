@@ -114,7 +114,22 @@ public class Box2DTestLevel extends ExtendedScreen {
 			setupPlayer(game.player);
 		}
 		
-		game.particles.addEmitter(new Emitter_Snow(game, camera), 0);
+		Emitter_Snow snowEmitter = new Emitter_Snow(game, camera);
+		
+		//Временное решение для информирования системы частиц о прямоугольниках с водой,
+		//впрочем если не париться, то такое решение вполне нормальное и для продакшена
+		Array<Actor> actors = stage.getActors();
+		for (int i = 0; i < actors.size; i++)
+		{
+			if (actors.items[i] instanceof WaterActor)
+			{
+				WaterActor water = (WaterActor) actors.items[i];
+				snowEmitter.AddSolidRegion(water.getX(),water.getY(),water.getWidth(),water.getHeight());
+			}
+		}
+		//mapBodyManager.
+				//actors
+		game.particles.addEmitter(snowEmitter, 0);
 		stage.addActor(game.particles.getLayer(0));
 	}
 

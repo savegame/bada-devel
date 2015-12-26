@@ -30,6 +30,16 @@ public class BaseEmitter extends Actor
 		this.sprite = sprite;
 	}
 	
+	public void WarmUp(float timeInSeconds, float stepInSeconds)
+	{
+		for (;;)
+		{
+			act(stepInSeconds);
+			timeInSeconds -= stepInSeconds;
+			if (timeInSeconds < 0) break;
+		}
+	}
+	
 	public void generate(int particlesCount)
 	{
 		Particle[] particles = this.particles;
