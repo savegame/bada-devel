@@ -45,13 +45,13 @@ public class WaterActor extends BodyActor {
 	}
 
 
-	public void beginContact(Fixture fixtureB) {
+	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		if( fixtureB.getBody().getType() == BodyDef.BodyType.DynamicBody ) {
 			waterControl.addBody(fixtureB);
 		}
 	}
 
-	public void endContact(Fixture fixtureB) {
+	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		if( fixtureB.getBody().getType() == BodyDef.BodyType.DynamicBody ) {
 			waterControl.removeBody(fixtureB);
 		}

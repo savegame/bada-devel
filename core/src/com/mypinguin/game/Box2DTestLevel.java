@@ -271,7 +271,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -308,8 +307,11 @@ public class Box2DTestLevel extends ExtendedScreen {
 //		String str = ;
 		game.batch.begin();
 		if( game.player != null)
-			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded()
-						+ "\nCanPick: " + game.player.canPick()
+			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
+							+ "\nUnderwater: " + game.player.isUnderwater()
+							+ "\nContactCount: " + game.player.allContacts.size()
+							+ "\nCanPick: " + game.player.canPick()
+							+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
 						+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
 		else
 			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
@@ -332,7 +334,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		camera.setToOrtho(false, width, height);
 		Vector2 pos = new Vector2(140f, 5f);
 		needUpdateViewport = true;
@@ -340,24 +341,21 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
+		//
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		//
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		super.dispose();
 		map.dispose();
 		mapBodyManager.destroyPhysics();
