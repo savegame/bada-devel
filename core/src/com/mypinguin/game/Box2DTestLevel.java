@@ -75,6 +75,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		camControl = new CameraControl(camera);
 		camControl.setShift(0, 128);
 		camControl.setPosition(game.width / 2, game.height / 2);
+		//camControl.setCameraZoom(2);
 //		camControl.draw(null, 1f);
 		camera.update();
 		//b2d_matrix = new Matrix4( camera.combined.scale(b2d_scale, b2d_scale, 1f) );
@@ -127,8 +128,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 				snowEmitter.AddSolidRegion(water.getX(),water.getY(),water.getWidth(),water.getHeight());
 			}
 		}
-		//mapBodyManager.
-				//actors
+		
 		game.particles.addEmitter(snowEmitter, 0);
 		stage.addActor(game.particles.getLayer(0));
 	}

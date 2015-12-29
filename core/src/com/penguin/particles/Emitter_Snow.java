@@ -3,14 +3,14 @@ package com.penguin.particles;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.mypinguin.game.PenguinGame;
 
-public class Emitter_Snow extends BaseEmitter
+public class Emitter_Snow extends BaseEmitter<Particle_Snow>
 {
 	private float emissionTimer = 0;
-	private Camera camera;
+	private OrthographicCamera camera;
 	private float screenWidth, 	screenHeight,
 				  screenLeft, 	screenRight,
 				  screenTop, 	screenBottom;
@@ -22,16 +22,27 @@ public class Emitter_Snow extends BaseEmitter
 	private ArrayList<Rectangle> visibleSolidRegions;
 	private int visibleSolidRegionsCount = 0;
 	
-	public Emitter_Snow(PenguinGame game, Camera camera) {
-		super(game, game.particles.getParticleSprite("tiny_snowflake"));
+	private float screenScale = 1.0f;
+	private float snowDensity = 1.0f;
+	private float generationAccumulator = 0;
+	
+	public Emitter_Snow(PenguinGame game, OrthographicCamera camera) {
+		super(game, game.particles.getParticleSprite("tiny_snowflake"), Particle_Snow.class);
 		
-		setMaxParticlesCount(100, Particle_Snow.class);
+		this.unlimitedGenerationEnabled = false;
+		
+		//setMaxParticlesCount(100);
 		this.camera = camera;
 		
 		solidRegions = new ArrayList<Rectangle>();
 		visibleSolidRegions = new ArrayList<Rectangle>();
 		
 		WarmUp(5.0f,0.1f);
+	}
+	
+	public void SetDensity(float density)
+	{
+		snowDensity = density;
 	}
 	
 	public void AddSolidRegion(float x, float y, float width, float height)
@@ -79,8 +90,9 @@ public class Emitter_Snow extends BaseEmitter
 	}
 	
 	public void emit(float delta) {
-		screenWidth = camera.viewportWidth*1.4f;
-		screenHeight = camera.viewportHeight*1.4f;
+		screenScale = camera.zoom / 1.3f; //первоначально эффект был настроен под зум = 1.3, поэтому теперь это база масштабирования
+		screenWidth = camera.viewportWidth*(camera.zoom + 0.1f);//1.4f;
+		screenHeight = camera.viewportHeight*(camera.zoom + 0.1f);
 		
 		screenLeft = camera.position.x - screenWidth*0.5f;
 		screenRight = screenLeft + screenWidth;
@@ -94,10 +106,14 @@ public class Emitter_Snow extends BaseEmitter
 		if (windPower < -10) windPower = -10;
 		
 		emissionTimer += delta*1000;
-		if (emissionTimer > 100)
+		if (emissionTimer > (100 / screenScale))
 		{
 			emissionTimer = 0;
-			generate(1);
+			
+			generationAccumulator += 1.0f * snowDensity;
+			int particlesToGenerate = (int) Math.floor(generationAccumulator);
+			generate(particlesToGenerate);
+			generationAccumulator -= particlesToGenerate;
 		}
 		
 		if (solidRegions.size() > 0 || visibleSolidRegionsCount > 0)
@@ -117,9 +133,9 @@ public class Emitter_Snow extends BaseEmitter
 
 			while (it.hasNext())
 			{
-				if (it.next().contains(particle.getX(), particle.getY()))
+				if (it.next().contains(snowflake.getX(), snowflake.getY()))
 				{
-					particle.life *= 0.8;
+					snowflake.life *= 0.8;
 					break;
 				}
 			}
@@ -137,7 +153,7 @@ public class Emitter_Snow extends BaseEmitter
 		if (snowflake.horizontal_speed > 3) snowflake.horizontal_speed = 3;
 		if (snowflake.horizontal_speed < -3) snowflake.horizontal_speed = -3;
 			
-		snowflake.setAlpha(Math.min(1.0f - particleAltitude / screenHeight, particle.life/6.0f));
+		snowflake.setAlpha(Math.min(1.0f - particleAltitude / screenHeight, snowflake.life/(6*snowflake.screenScale)));
 		
 		snowflake.translateX(snowflake.horizontal_speed);
 		snowflake.translateY(-delta*100);
@@ -154,7 +170,8 @@ public class Emitter_Snow extends BaseEmitter
 	{
 		Particle_Snow snowflake = (Particle_Snow) particle;
 		
-		snowflake.life = 6;
+		snowflake.life = 6*screenScale;
+		snowflake.screenScale = screenScale;
 		snowflake.horizontal_speed = 0;
 		snowflake.setPosition((float) (screenLeft+Math.random()*screenWidth), getY());
 	}
