@@ -28,8 +28,6 @@ import com.badlogic.gdx.utils.Array;
 import java.util.HashSet;
 import java.util.Set;
 
-import sun.print.PSPrinterJob.EPSPrinter;
-
 /*
  * Created by savegame on 04.11.15.
  */
@@ -177,6 +175,23 @@ public class PlayerActor extends BodyActor {
 		if( legsBody != null )
 			legsBody.setTransform(getX() / game.units, (getY() - height4)/ game.units, 0f);
 		fixturedef.shape = null;
+		//this.setSize(64f,120f);
+	}
+
+	/**
+	 * Возвращает ширину тела
+	 * @return
+	 */
+	public float getBodyWidth() {
+		return 64f;
+	}
+
+	/**
+	 * Возвраащет высоту тела
+	 * @return
+	 */
+	public float getBodyHeight() {
+		return 120f;
 	}
 
 	/**
