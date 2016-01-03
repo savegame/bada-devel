@@ -1,14 +1,12 @@
 package com.penguin.particles;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.penguin.particles.Particle;
 import com.mypinguin.game.PenguinGame;
 
 public class BaseEmitter<T> extends Actor
@@ -143,11 +141,61 @@ public class BaseEmitter<T> extends Actor
 		if (justStarted) iterationDelta = delta;
 		else			 iterationDelta += delta;
 		
+		int i = 0;
+		
+		/*
+		if (particlesToUpdate < particlesActive.size())
+		{
+			int segment1_left = 0, segment1_width = 0,
+				segment2_left = 0, segment2_width = 0;
+			
+			if (iterationIndex + particlesToUpdate > particlesActive.size()-1)
+			{
+				//two segments
+				segment1_left = 0;
+				segment1_width = (iterationIndex + 1 + particlesToUpdate) - particlesActive.size();
+				segment2_left = iterationIndex;
+				segment2_width = particlesToUpdate - segment1_width;
+			}
+			else
+			{
+				//one segment
+				segment1_left = iterationIndex;
+				segment1_width = particlesToUpdate;
+				segment2_left = segment1_left + segment1_width;
+				segment2_width = 0;
+			}
+			
+			Iterator<Particle> it;
+			
+			i = 0;
+			it = particlesActive.listIterator(i);
+			for (; i < segment1_left; i++)
+			{
+				interpolateParticle(delta, it.next());
+			}
+			
+			i = segment1_left+segment1_width;
+			it = particlesActive.listIterator(i);
+			for (; i < segment2_left; i++)
+			{
+				interpolateParticle(delta, it.next());
+			}
+			
+			i = segment2_left+segment2_width;
+			it = particlesActive.listIterator(i);
+			for (; i < particlesActive.size(); i++)
+			{
+				interpolateParticle(delta, it.next());
+			}
+		}*/
+		
+		
 		Particle tmpParticle;
 		iterationHandler = particlesActive.listIterator(iterationIndex);
 		
 		if (iterationHandler.hasNext())
-		for(int i = 0; i < particlesToUpdate; i++)
+		for(i = 0; i < particlesToUpdate; i++)
 		{
 			tmpParticle = iterationHandler.next();
 			
@@ -169,6 +217,8 @@ public class BaseEmitter<T> extends Actor
 				if (!iterationHandler.hasNext()) break;
 			}
 		}
+		
+		
 	}
 	
 	public void draw(Batch batch, float parentAlpha)
@@ -185,4 +235,5 @@ public class BaseEmitter<T> extends Actor
 	public void emit(float delta) {}
 	public void resetParticle(Particle particle) {}
 	public boolean updateParticle(float delta, Particle particle) { return true; }
+	public void interpolateParticle(float delta, Particle particle) {}
 }

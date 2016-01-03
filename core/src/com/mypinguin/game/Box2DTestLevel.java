@@ -129,6 +129,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 			}
 		}
 		
+		snowEmitter.SetPlayerActor(game.player);
+		
 		game.particles.addEmitter(snowEmitter, 0);
 		stage.addActor(game.particles.getLayer(0));
 	}
