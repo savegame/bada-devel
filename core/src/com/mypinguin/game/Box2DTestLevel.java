@@ -180,6 +180,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 			}
 		}
 	}
+	
 	private void createGround() {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.position.set(0, 0);

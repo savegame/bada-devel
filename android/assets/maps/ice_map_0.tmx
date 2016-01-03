@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="75">
- <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="36">
-  <image source="ice_tiles_0.png" width="384" height="384"/>
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="90">
+ <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
+  <image source="ice_tiles_0.png" width="384" height="448"/>
   <terraintypes>
    <terrain name="wall" tile="-1"/>
   </terraintypes>
@@ -90,7 +90,7 @@
     <property name="material" value="wood"/>
    </properties>
   </object>
-  <object id="27" name="player" type="player" x="3632" y="1856" width="32" height="128"/>
+  <object id="27" name="player" type="player" x="2096" y="592" width="32" height="128"/>
   <object id="29" name="lift01" type="lift" x="1184" y="1952" width="256" height="48"/>
   <object id="31" name="lift01" type="path" x="1200" y="2000">
    <polyline points="-16,0 -16,-752"/>
@@ -157,9 +157,6 @@
   </object>
   <object id="45" name="water0" type="water" x="1600" y="1792" width="832" height="272"/>
   <object id="46" name="lift02" type="lift" x="2480" y="1440" width="336" height="48"/>
-  <object id="48" name="lift02" type="path" x="2624" y="1472">
-   <polyline points="-144,16 -112,128 -80,224 -48,320 16,416 128,496 256,544 368,560 560,560"/>
-  </object>
   <object id="50" name="box" type="box" x="2640" y="1376" width="64" height="64">
    <properties>
     <property name="dynamic" value="true"/>
@@ -239,13 +236,30 @@
    </properties>
    <polygon points="-256,-496 -272,-480 -272,-432 48,-432 112,-480 96,-496"/>
   </object>
-  <object id="73" name="lift07" type="lift" x="3344" y="1440" width="336" height="48">
+  <object id="76" name="lift07" type="lift" x="1792" y="752" width="160" height="48">
    <properties>
-    <property name="speed" value="8"/>
+    <property name="speed" value="2.7"/>
    </properties>
   </object>
-  <object id="74" name="lift07" type="path" x="3600" y="1488">
-   <polyline points="-256,0 -752,0"/>
+  <object id="78" name="lift06" type="button" x="1296" y="656" width="64" height="80">
+   <properties>
+    <property name="act_type" value="active"/>
+   </properties>
+  </object>
+  <object id="79" gid="38" x="1296" y="720" width="64" height="64"/>
+  <object id="80" gid="38" x="1968" y="720" width="64" height="64"/>
+  <object id="81" gid="37" x="1968" y="736" width="64" height="64"/>
+  <object id="82" gid="37" x="1296" y="736" width="64" height="64"/>
+  <object id="84" name="lift06" type="button" x="1968" y="656" width="64" height="80">
+   <properties>
+    <property name="act_type" value="active"/>
+   </properties>
+  </object>
+  <object id="85" name="lift02" type="path" x="2480" y="1488">
+   <polyline points="0,0 0,592"/>
+  </object>
+  <object id="89" name="lift07" type="path" x="1792" y="800">
+   <polyline points="0,0 -400,0"/>
   </object>
  </objectgroup>
 </map>
