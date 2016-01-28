@@ -12,41 +12,47 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.penguin.mechanism.Activable;
 
 /**
  * Created by savegame on 10.11.15.
  */
-public class BodyActor extends Actor {
-	protected FixtureDef  fixturedef = null;
-	protected BodyDef     bodydef = null;
-	protected Body        body    = null;
-	protected PenguinGame game   = null;
-	protected boolean     isinit  = false;
+public class BodyActor extends Actor implements Activable {
+	protected FixtureDef  fixturedef = null;//настройки геометрии физического тела
+	protected BodyDef     bodydef = null; //настройки физщического тела по умолчанию
+	protected Body        body    = null; //физическое тело
+	protected PenguinGame game   = null;  //главный игровой класс
+	protected boolean     isinit  = false;//объект проинициаоизирован
+	protected boolean     active = true;  //объект активный или нет
 
-	BodyActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
+	public BodyActor(PenguinGame penguinGame) {
 		game = penguinGame;
 
-		bodydef = new BodyDef();
-		bodydef.type = BodyDef.BodyType.DynamicBody;
+		this.bodydef = new BodyDef();
+		this.bodydef.type = BodyDef.BodyType.DynamicBody;
 
-		fixturedef = _fixturedef;
+		//fixturedef = _fixturedef;
+	}
+
+	public void setFixtureDef(FixtureDef fixtureDef) {
+		this.fixturedef = fixtureDef;
 	}
 
 	public void setBodyType( BodyDef.BodyType bodyType ) {
-		if(!isinit)
-			bodydef.type = bodyType;
+		if(!this.isinit)
+			this.bodydef.type = bodyType;
 	}
 
 	public boolean isInit() {
-		return isinit;
+		return this.isinit;
 	}
 
 	public Vector2 getVelocity() {
-		return body.getLinearVelocity();
+		return this.body.getLinearVelocity();
 	}
 	
 	public float getMass() {
-		return body.getMass();
+		return this.body.getMass();
 	}
 	
 	public void initialize(Shape bodyShape) {
@@ -114,5 +120,20 @@ public class BodyActor extends Actor {
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 
+	}
+
+	@Override
+	public void activate() {
+		active = true;
+	}
+
+	@Override
+	public void deactivate() {
+		active = false;
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
 	}
 }

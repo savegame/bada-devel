@@ -28,8 +28,6 @@ import com.badlogic.gdx.utils.Array;
 import java.util.HashSet;
 import java.util.Set;
 
-import sun.print.PSPrinterJob.EPSPrinter;
-
 /*
  * Created by savegame on 04.11.15.
  */
@@ -99,13 +97,15 @@ public class PlayerActor extends BodyActor {
 	MoveDirection m_dir = MoveDirection.None;
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef) {
-		super(game, fixtureDef);
+		super(game);
+		this.setFixtureDef(fixtureDef);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
-		super(game, fixtureDef);
+		super(game);
+		this.setFixtureDef(fixtureDef);
 		setTexRegion(staticFront, StaticTextureType.front);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
@@ -571,8 +571,10 @@ public class PlayerActor extends BodyActor {
 						currentAnim = animStay;
 					}
 					else {
-						setScaleX(1);
-						staticCurrent = staticFront;
+						//setScaleX(1);
+						//if(this.getScaleX() < 0)
+							staticCurrent = staticRight;
+						//staticCurrent = staticFront;
 						currentAnim = animStay;
 					}
 				}
@@ -584,12 +586,12 @@ public class PlayerActor extends BodyActor {
 		}
 
 		if (staticCurrent != null) {
-			setSize(staticCurrent.getRegionWidth(), staticCurrent.getRegionHeight());
-			setOrigin(staticCurrent.getRegionWidth() / 2, staticCurrent.getRegionHeight() / 2);
+			float halfWidth = staticCurrent.getRegionWidth() / 2;
+			float halfHeight = staticCurrent.getRegionHeight() / 2;
 			batch.draw(staticCurrent,
-							getX() - staticCurrent.getRegionWidth() / 2,
-							getY() - staticCurrent.getRegionHeight() / 2,
-							getOriginX(), getOriginY(),
+							getX() - halfWidth,
+							getY() - halfHeight,
+							halfWidth, halfHeight,
 							staticCurrent.getRegionWidth(), staticCurrent.getRegionHeight(),
 							getScaleX(), getScaleY(),
 							getRotation());

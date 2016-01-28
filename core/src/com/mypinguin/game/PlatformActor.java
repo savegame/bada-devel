@@ -32,8 +32,10 @@ public class PlatformActor extends BodyActor {
 	protected float currentSpeed;
 
 	PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
-		super(penguinGame, _fixturedef);
+		super(penguinGame);
+		setFixtureDef(_fixturedef);
 		bodydef.type = BodyDef.BodyType.KinematicBody;
+		mode = Animation.PlayMode.LOOP_PINGPONG;
 	}
 
 	public void setBodyType( BodyDef.BodyType bodyType ) {
@@ -100,6 +102,8 @@ public class PlatformActor extends BodyActor {
 	 */
 	@Override
 	public void act(float delta) {
+		if( !isActive() ) return;
+
 		Vector2 bodyPos = body.getPosition();
 		bodyPos.x *= game.units;
 		bodyPos.y *= game.units;
@@ -107,9 +111,10 @@ public class PlatformActor extends BodyActor {
 		Vector2 len = new Vector2();
 
 		if( path.isEmpty() ) {
-			nextPointPos = new Vector2(firstPoint.x, firstPoint.y * game.units * 5);
-			if( bodyPos.y * game.units == nextPointPos.y )
-				nextPointPos = firstPoint;
+//			nextPointPos = new Vector2(firstPoint.x, firstPoint.y * game.units * 5);
+//			if( bodyPos.y * game.units == nextPointPos.y )
+//				nextPointPos = firstPoint;
+			deactivate();
 		}
 		else {
 			switch ( mode ) {
@@ -151,9 +156,9 @@ public class PlatformActor extends BodyActor {
 						if( ( 	(nextPoint == 0  && incPoint == -1 )
 								|| 	(nextPoint == path.size() - 1 && incPoint == 1 )
 							) && distance <= smoothDist) {
-//							int p = (int)(distance * smoothSteps / smoothDist);
-//							speed = moveSpeed / (smoothSteps * game.units) * ( (p == 0)?1:p );
-							speed = moveSpeed * distance/ (smoothDist*game.units);
+							int p = (int)(distance * smoothSteps / smoothDist);
+							speed = moveSpeed / (smoothSteps * game.units) * ( (p == 0)?1:p );
+//							speed = moveSpeed * distance/ (smoothDist*game.units);
 						}
 						else if( (nextPoint == 1 && incPoint == 1) || (nextPoint == path.size() - 2 && incPoint == -1) ) {
 							Vector2 distV = new Vector2( path.get(nextPoint - incPoint).x - bodyPos.x, path.get(nextPoint - incPoint).y - bodyPos.y );
@@ -182,11 +187,15 @@ public class PlatformActor extends BodyActor {
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
-		super.draw(batch,parentAlpha);
+		super.draw(batch, parentAlpha);
 		if( game.isDebug ) {
 			String text = new String();
-			text = "speed = " + currentSpeed;
-			game.font.draw( batch, text, (int)this.getX(), (int)this.getY() );
+			//Color ret = game.font.getColor();
+			game.font.setColor(1f, 0.3f, 0.25f,1f);
+			text = "speed = " + currentSpeed
+					+ "\nActive = " + isActive();
+			game.font.draw( batch, text, (int)this.getX(), (int)this.getY() + (int)this.getHeight() );
+			game.font.setColor(1f,1f,1f,1f);
 		}
 	}
 	/**
@@ -194,5 +203,21 @@ public class PlatformActor extends BodyActor {
 	 */
 	public void dispose() {
 		super.dispose();
+	}
+
+	/**
+	 * Активируем объект
+	 */
+	@Override
+	public void activate() {
+		super.activate();
+	}
+
+	/**
+	 * Декативирует объект
+	 */
+	@Override
+	public void deactivate() {
+		super.deactivate();
 	}
 }

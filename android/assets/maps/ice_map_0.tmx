@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="90">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="100">
  <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
   <image source="ice_tiles_0.png" width="384" height="448"/>
   <terraintypes>
@@ -14,10 +14,17 @@
    </objectgroup>
   </tile>
   <tile id="20" terrain="0,0,0,0"/>
+  <tile id="37">
+   <objectgroup draworder="index">
+    <object id="0" x="0" y="32">
+     <polygon points="0,0 16,-32 48,-32 64,0 64,16 48,32 16,32 0,16"/>
+    </object>
+   </objectgroup>
+  </tile>
  </tileset>
  <layer name="tiles" width="64" height="32">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+1YbU8DMQjuzul8mzPZdO6+7PT//0jhA1lzAi2V7Xq5PgmJba9I+0CBbcNysQN5m9qICfEeln1+5H87tRETovHf+G/8LxeN/8b/0vk/gXQgdyBrkPtoPJ5/YHSsMr/z2leitxN0I/97kEeQJ5BnkBdhfAh8rGyY718z7CzdV6IXbef83BL/c44VtJ07pzTPYc5vpdTnWfmP3wqPWL0VPPjHuKKYkt6CWuHBf46+WqHxX3IOigWvnHVtaPzjObjcr+VkjAXKK3OIA43/M8gA8g3yw4y188X+cwT5crHWHxr/4/rHUpPMJSd6x39KL0KqQ3PG3u+K9/uf0ovg6tDcsVctTCjJ/xjLHIfx372yvyZIPEn+T+fG83H9UaqvqA0Sz5L/x76r+eEmsV4LrPxb8JlYR1+yvmUlezRY+bcglfNL7ti715b8dNzTrYP9N5mPxHrJHVv6sv8AbTszMoRL/ZfiAX2V64dxHu+wz9DB2XWLdxXveQiXs3L1b+wfXL3SR9/RHM2THlrjcmgXCc334W9fwu2RaqnxmlRv4f/5BTCNVeoAIAAA
+   H4sIAAAAAAAAA+1X207DMAwNY7BxGSAxbn1ZQer//yL2g7UoHOeGu6Zqj2RpuXl2j+04B7dcPJM8TW3EhHhxy/af+T9MbcSEWPlf+V/5Xy5W/lf+rfkfRto7Bpj/L5INyTXJluTGG4fzt0DHVbBvUPahc0OG/lKE9og/SDfz/0qyJ7kjuSd5UMZHh3NlB/Y/ZthZe65GL9uO4rwk/+dcK9l25Kc2jzDnWqm980r592uFRa5eChb8c15JTmm1oFVY8J+jr1XE+K/xQ3LB6s4aGzH+2Q9098fuZM4FuVfmkAcx/k8kPck3yQ8Yx/zz4+eD5NPEWnvE+A/7n5KeZC53onX+p/QytD40Z2xdV6zrf0ovA/WhuWOrXlhQc/9zLiMO/d9d5HxL0HjS4l/8Zv/Q+yj1rmgNGs9a/PuxG4vDXWK9FZTyX4L3xDrHUmktqzkTQyn/JUjd+TXf2PqtrcVp+Kbburz+z8dbYr3mG5e8y/4Dtu0EpHfn/i/FA8cqeg/zPH/DLkMHsusSdZW/c+/OvqL+148P1K903j6Zk3nRI2voDt14IvOd+/suQWe0Xipc0/ot/p9fzbx4qgAgAAA=
   </data>
  </layer>
  <objectgroup name="Objects">
@@ -90,7 +97,7 @@
     <property name="material" value="wood"/>
    </properties>
   </object>
-  <object id="27" name="player" type="player" x="2096" y="592" width="32" height="128"/>
+  <object id="27" name="player" type="player" x="2096" y="608" width="32" height="128"/>
   <object id="29" name="lift01" type="lift" x="1184" y="1952" width="256" height="48"/>
   <object id="31" name="lift01" type="path" x="1200" y="2000">
    <polyline points="-16,0 -16,-752"/>
@@ -236,30 +243,33 @@
    </properties>
    <polygon points="-256,-496 -272,-480 -272,-432 48,-432 112,-480 96,-496"/>
   </object>
-  <object id="76" name="lift07" type="lift" x="1792" y="752" width="160" height="48">
+  <object id="76" name="lift07" type="lift" x="1792" y="736" width="160" height="48">
    <properties>
+    <property name="isactive" value="false"/>
     <property name="speed" value="2.7"/>
    </properties>
   </object>
-  <object id="78" name="lift06" type="button" x="1296" y="656" width="64" height="80">
+  <object id="78" name="button02" type="button" x="1280" y="656" width="64" height="80"/>
+  <object id="84" name="button01" type="button" x="1984" y="656" width="64" height="80">
    <properties>
-    <property name="act_type" value="active"/>
-   </properties>
-  </object>
-  <object id="79" gid="38" x="1296" y="720" width="64" height="64"/>
-  <object id="80" gid="38" x="1968" y="720" width="64" height="64"/>
-  <object id="81" gid="37" x="1968" y="736" width="64" height="64"/>
-  <object id="82" gid="37" x="1296" y="736" width="64" height="64"/>
-  <object id="84" name="lift06" type="button" x="1968" y="656" width="64" height="80">
-   <properties>
-    <property name="act_type" value="active"/>
+    <property name="activate" value="lift07"/>
+    <property name="deactivate" value="self"/>
    </properties>
   </object>
   <object id="85" name="lift02" type="path" x="2480" y="1488">
    <polyline points="0,0 0,592"/>
   </object>
-  <object id="89" name="lift07" type="path" x="1792" y="800">
+  <object id="89" name="lift07" type="path" x="1792" y="784">
    <polyline points="0,0 -400,0"/>
+  </object>
+  <object id="96" name="box" type="body" gid="37" x="64" y="896" width="64" height="64"/>
+  <object id="97" gid="38" x="128" y="896" width="64" height="64"/>
+  <object id="98" name="stone" type="body" gid="38" x="128" y="896" width="64" height="64"/>
+ </objectgroup>
+ <objectgroup name="Templates">
+  <object id="90" name="box" type="fixture" x="64" y="832" width="64" height="64"/>
+  <object id="92" name="stone" type="fixture" x="128" y="864">
+   <polygon points="4.08806,24.1761 1.63522,-5.16665 17.6352,-28.934 37.1666,-30.3648 62.5692,-2.65724 61.3428,19.2704 49.8396,29.5472 19.8837,30.7736"/>
   </object>
  </objectgroup>
 </map>

@@ -21,7 +21,8 @@ public class WaterActor extends BodyActor {
 	protected Vector2 shift;
 
 	public WaterActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
-		super(penguinGame, _fixturedef);
+		super(penguinGame);
+		this.setFixtureDef(_fixturedef);
 	}
 
 	@Override

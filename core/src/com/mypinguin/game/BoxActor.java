@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -23,7 +22,8 @@ public class BoxActor extends BodyActor {
 	
 	BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
 	{
-		super(penguinGame, fixturedef);
+		super(penguinGame);
+		this.setFixtureDef(fixturedef);
 		picture = reg;
 		if(picture != null) {
 //			setOrigin(picture.getRegionWidth() / 2, picture.getRegionHeight() / 2);
