@@ -59,6 +59,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private float    time_stamp  = 1/30f;
 
 	private MapBodyManager     mapBodyManager      = null;
+	private Texture            defaultBG           = null;
 	//randomizer
 	RandomXS128 rand = new RandomXS128();
 	
@@ -67,6 +68,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
+		game.isDebug = true;
 
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
@@ -104,6 +106,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 		mapBodyManager = new MapBodyManager(game, Gdx.files.internal("PhysicsMaterials.json"), 0 );
 		mapBodyManager.createPhysics(map);
 		mapBodyManager.actorsToStage(stage);
+		defaultBG = game.asset.get("defaultbg.png", Texture.class );
+
 
 		if( game.player != null )
 		{
@@ -220,6 +224,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		this.loadAsset("pinguin.png", Texture.class);
 		this.loadAsset("box_0.png", Texture.class);
 		this.loadAsset("run_0.png", Texture.class);
+		this.loadAsset("defaultbg.png", Texture.class);
 	}
 
 	private void createUI(Stage ui_stage) {
@@ -296,28 +301,35 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 		camControl.act(Gdx.graphics.getDeltaTime());
 		camera.update();
-		
-		
+
+		game.batch.begin();
+		//game.batch.setProjectionMatrix(camera.combined);
+		game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight() );
+		game.batch.end();
+
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();
-		
+
 		stage.draw();
-		
-		debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
+		if( game.isDebug )
+			debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
 		ui.draw();
 //		String str = ;
-		game.batch.begin();
-		if( game.player != null)
-			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
-							+ "\nUnderwater: " + game.player.isUnderwater()
-							+ "\nContactCount: " + game.player.allContacts.size()
-							+ "\nCanPick: " + game.player.canPick()
-							+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
-						+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
-		else
-			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
+		if(game.isDebug)
+		{
+			game.batch.begin();
+			if (game.player != null)
+				game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
+								+ "\nUnderwater: " + game.player.isUnderwater()
+								+ "\nContactCount: " + game.player.allContacts.size()
+								+ "\nCanPick: " + game.player.canPick()
+								+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
+								+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
+			else
+				game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
 
-		game.batch.end();
+			game.batch.end();
+		}
 		
 		
 		
