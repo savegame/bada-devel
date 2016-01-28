@@ -72,9 +72,11 @@ public class WaterActor extends BodyActor {
 
 	public void draw (Batch batch, float parentAlpha) {
 		//super.draw(batch, parentAlpha);
-
-		Vector2 pos = new Vector2( getX() + getWidth()/2, getY() + getHeight()/2 );
-		game.font.draw( batch, this.getName(), pos.x, pos.y );
+		if(game.isDebug)
+		{
+			Vector2 pos = new Vector2(getX() + getWidth() / 2, getY() + getHeight() / 2);
+			game.font.draw(batch, this.getName(), pos.x, pos.y);
+		}
 	}
 
 	@Override
