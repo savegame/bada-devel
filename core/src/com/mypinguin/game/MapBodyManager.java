@@ -46,6 +46,7 @@ public class MapBodyManager {
 	private Array<Body> bodies = new Array<Body>();
 	private ObjectMap<String, FixtureDef> materials = new ObjectMap<String, FixtureDef>();
 	private ObjectMap<String, PlatformActor> platforms = new ObjectMap<String, PlatformActor>();
+	private ObjectMap<String, PolylineMapObject> paths = new ObjectMap<String, PolylineMapObject>();
 
 	private PenguinGame game;
 
@@ -161,29 +162,29 @@ public class MapBodyManager {
 				plat.setName(name);
 				plat.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
 				plat.initialize(shape);
+				plat.setSize(width, height);
 
 				if( properties.containsKey("speed") ){
 					float speed = Float.parseFloat(properties.get("speed", "2", String.class));
 					plat.setMoveSpeed(speed*game.units);
+				}
+				if( properties.containsKey("isactive") ){
+					boolean active = Boolean.parseBoolean(properties.get("isactive", "true", String.class));
+					if( active )
+						plat.activate();
+					else
+						plat.deactivate();
 				}
 
 				platforms.put(name, plat);
 				actors.add(plat);
 			}
 			else if( type.equalsIgnoreCase("path") ) {
-				if( platforms.containsKey(name) ){
-					PlatformActor plat = platforms.get(name);
-					PolylineMapObject poly = (PolylineMapObject)object;
-					float[] vertices = poly.getPolyline().getVertices();
-					Vector2[] path = new Vector2[vertices.length / 2];
+				paths.put(name, (PolylineMapObject)object);
+			}
+			else if( type.equalsIgnoreCase("button") ) {
+				//TODO Дописать инициализацию кнопок, с захватом списка действий
 
-					for (int i = 0; i < vertices.length / 2; ++i) {
-						path[i] = new Vector2();
-						path[i].x = vertices[i * 2] + poly.getPolyline().getX();
-						path[i].y = vertices[i * 2 + 1] + poly.getPolyline().getY();
-					}
-					plat.setPath(path);
-				}
 			}
 			else if( type.equalsIgnoreCase("water") ) {
 				FixtureDef fixtureDef = new FixtureDef();
@@ -197,14 +198,11 @@ public class MapBodyManager {
 
 				actors.add(water);
 			}
-			else  {
+			else if( type.equalsIgnoreCase("ground") ) {
 				if (dynamic.equalsIgnoreCase("true"))
 					bodyDef.type = BodyDef.BodyType.DynamicBody;
 				else
 					bodyDef.type = BodyDef.BodyType.StaticBody;
-
-				//bodyDef.position.set();
-
 				FixtureDef fixtureDef = materials.get(material);
 
 				if (fixtureDef == null) {
@@ -224,6 +222,27 @@ public class MapBodyManager {
 			}
 			shape.dispose();
 		}
+
+		//Add paths to platforms
+		ObjectMap.Entries<String, PolylineMapObject> it = paths.iterator();
+		while( it.hasNext() ) {
+			ObjectMap.Entry<String, PolylineMapObject> current = it.next();
+
+			if( platforms.containsKey(current.key) ){
+				PlatformActor plat = platforms.get(current.key);
+				PolylineMapObject poly = current.value;
+				float[] vertices = poly.getPolyline().getVertices();
+				Vector2[] path = new Vector2[vertices.length / 2];
+
+				for (int i = 0; i < vertices.length / 2; ++i) {
+					path[i] = new Vector2();
+					path[i].x = vertices[i * 2] + poly.getPolyline().getX();
+					path[i].y = vertices[i * 2 + 1] + poly.getPolyline().getY();
+				}
+				plat.setPath(path);
+			}
+		}
+		paths.clear();
 	}
 
 	/**
