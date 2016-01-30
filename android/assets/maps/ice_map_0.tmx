@@ -262,13 +262,20 @@
   <object id="89" name="lift07" type="path" x="1792" y="784">
    <polyline points="0,0 -400,0"/>
   </object>
-  <object id="96" name="box" type="body" gid="37" x="64" y="896" width="64" height="64"/>
-  <object id="97" gid="38" x="128" y="896" width="64" height="64"/>
-  <object id="98" name="stone" type="body" gid="38" x="128" y="896" width="64" height="64"/>
+  <object id="96" name="box" type="temp" gid="37" x="64" y="896" width="64" height="64"/>
+  <object id="97" name="stone" type="temp" gid="38" x="1824" y="736" width="64" height="64"/>
+  <object id="98" name="stone" type="temp" gid="38" x="192" y="896" width="64" height="64"/>
  </objectgroup>
  <objectgroup name="Templates">
-  <object id="90" name="box" type="fixture" x="64" y="832" width="64" height="64"/>
-  <object id="92" name="stone" type="fixture" x="128" y="864">
+  <object id="90" name="box" type="dynamic" x="64" y="832" width="64" height="64">
+   <properties>
+    <property name="pick" value="true"/>
+   </properties>
+  </object>
+  <object id="92" name="stone" type="dynamic" x="192" y="864">
+   <properties>
+    <property name="pick" value="true"/>
+   </properties>
    <polygon points="4.08806,24.1761 1.63522,-5.16665 17.6352,-28.934 37.1666,-30.3648 62.5692,-2.65724 61.3428,19.2704 49.8396,29.5472 19.8837,30.7736"/>
   </object>
  </objectgroup>

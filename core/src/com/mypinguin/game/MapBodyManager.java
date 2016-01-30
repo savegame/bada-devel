@@ -27,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
@@ -40,6 +41,27 @@ import java.util.List;
  * Created by savegame on 11.11.15.
  */
 public class MapBodyManager {
+/** вспомогательные классы данных */
+
+	/**
+	 * Класс для хранения шаблона физического объекта
+	 */
+	public class BodyTemplate implements Disposable {
+		public FixtureDef  fixturDef;
+		public BodyDef     bodyDef;
+		public Shape       shape;
+		//public boolean     isdynamic;
+
+		public BodyTemplate( Shape shape ) {
+			this.shape = shape;
+		}
+
+		@Override
+		public void dispose() {
+			shape.dispose();
+		}
+	}
+/** Параметрыы */
 	private Logger logger;
 	private World world;
 	private List<BodyActor> actors = new ArrayList<BodyActor>();
@@ -80,6 +102,7 @@ public class MapBodyManager {
 	 * @param map will use the "physics" layer of this map to look for shapes in order to create the static bodies.
 	 */
 	public void createPhysics(Map map) {
+		createTemplates(map, "Templates");
 		createPhysics(map, "Objects");
 	}
 
@@ -245,6 +268,146 @@ public class MapBodyManager {
 		paths.clear();
 	}
 
+	/**
+	 * Создает шаблонные физические обекты,
+	 * берет их из специльного слоя шаблонных объектов
+	 */
+	public void createTemplates(Map map, String layerName){
+		MapLayer layer = map.getLayers().get(layerName);
+
+		if (layer == null) {
+			logger.error("layer " + layerName + " does not exist");
+			return;
+		}
+
+		MapObjects objects = layer.getObjects();
+		Iterator<MapObject> objectIt = objects.iterator();
+
+		while(objectIt.hasNext()) {
+			MapObject object = objectIt.next();
+
+			if (object instanceof TextureMapObject){
+				continue;
+			}
+
+			Shape shape;
+			BodyDef bodyDef = new BodyDef();
+
+			if (object instanceof RectangleMapObject) {
+//				RectangleMapObject rectangle = (RectangleMapObject)object;
+				shape = getRectangle((RectangleMapObject)object, bodyDef);
+			}
+			else if (object instanceof PolygonMapObject) {
+				shape = getPolygon((PolygonMapObject)object);
+			}
+			else if (object instanceof PolylineMapObject) {
+				shape = getPolyline((PolylineMapObject)object);
+			}
+			else if (object instanceof CircleMapObject) {
+				shape = getCircle((CircleMapObject)object);
+			}
+			else {
+				logger.error("non suported shape " + object);
+				continue;
+			}
+
+			MapProperties properties = object.getProperties();
+			String material = properties.get("material", "default", String.class);
+			String dynamic = properties.get("dynamic", "false", String.class);
+			String type = properties.get("type", "notype", String.class);
+			String name = object.getName();
+			if( type.equalsIgnoreCase("box") ) {
+				FixtureDef fixtureDef = materials.get(material);
+				TextureRegion reg = null;
+				if( game.asset.isLoaded("box_0.png") )
+				{
+					reg = new TextureRegion( game.asset.get("box_0.png", Texture.class) );
+				}
+				BoxActor box = new BoxActor(game, reg, fixtureDef );
+				box.setPosition( bodyDef.position.x*game.units, bodyDef.position.y*game.units );
+				box.initialize(shape);
+				actors.add(box);
+			}
+			else if( type.equalsIgnoreCase("player") ) {
+				FixtureDef fixtureDef = materials.get(material);
+				game.player = new PlayerActor(game, fixtureDef);
+
+				game.player.setName("PlayerActor");
+				game.player.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
+				game.player.setBodyType(BodyDef.BodyType.DynamicBody);
+				game.player.initialize(shape);
+				//actors.add(player);
+			}
+			else if( type.equalsIgnoreCase("lift") ) {
+				RectangleMapObject rect =(RectangleMapObject)object;
+				float width = rect.getRectangle().getWidth();
+				float height = rect.getRectangle().getHeight();
+				FixtureDef fixtureDef = materials.get(material);
+				PlatformActor plat = new PlatformActor(game, fixtureDef);
+				plat.setName(name);
+				plat.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
+				plat.initialize(shape);
+				plat.setSize(width, height);
+
+				if( properties.containsKey("speed") ){
+					float speed = Float.parseFloat(properties.get("speed", "2", String.class));
+					plat.setMoveSpeed(speed*game.units);
+				}
+				if( properties.containsKey("isactive") ){
+					boolean active = Boolean.parseBoolean(properties.get("isactive", "true", String.class));
+					if( active )
+						plat.activate();
+					else
+						plat.deactivate();
+				}
+
+				platforms.put(name, plat);
+				actors.add(plat);
+			}
+			else if( type.equalsIgnoreCase("path") ) {
+				paths.put(name, (PolylineMapObject)object);
+			}
+			else if( type.equalsIgnoreCase("button") ) {
+				//TODO Дописать инициализацию кнопок, с захватом списка действий
+
+			}
+			else if( type.equalsIgnoreCase("water") ) {
+				FixtureDef fixtureDef = new FixtureDef();
+				fixtureDef.isSensor = true;
+				WaterActor water = new WaterActor(game, fixtureDef);
+				water.setName(name);
+				RectangleMapObject rectangle = (RectangleMapObject) object;
+				water.setSize(rectangle.getRectangle().getWidth(), rectangle.getRectangle().getHeight() );
+				water.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
+				water.initialize(shape);
+
+				actors.add(water);
+			}
+			else if( type.equalsIgnoreCase("ground") ) {
+				if (dynamic.equalsIgnoreCase("true"))
+					bodyDef.type = BodyDef.BodyType.DynamicBody;
+				else
+					bodyDef.type = BodyDef.BodyType.StaticBody;
+				FixtureDef fixtureDef = materials.get(material);
+
+				if (fixtureDef == null) {
+					logger.error("material does not exist " + material + " using default");
+					fixtureDef = materials.get("default");
+				}
+
+				fixtureDef.shape = shape;
+				//			fixtureDef.filter.categoryBits = Env.game.getCategoryBitsManager().getCategoryBits("level");
+
+				Body body = world.createBody(bodyDef);
+				body.createFixture(fixtureDef);
+
+				bodies.add(body);
+
+				fixtureDef.shape = null;
+			}
+			shape.dispose();
+		}
+	}
 	/**
 	 * Destroys every static body that has been created using the manager.
 	 */
