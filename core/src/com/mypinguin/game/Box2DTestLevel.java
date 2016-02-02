@@ -68,7 +68,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
-		game.isDebug = true;
+		game.isDebug = false;
 
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
@@ -95,11 +95,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 		world = game.world;
 		debugRenderer = new Box2DDebugRenderer();
-		
-//		createGround();
-//		for(int i = 0 ; i < 10; ++i ) {
-//			createRect();
-//		}
 
 //		positionPlayer(map, camControl );
 		
@@ -371,7 +366,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 	public void dispose() {
 		super.dispose();
 		map.dispose();
-		mapBodyManager.destroyPhysics();
+		mapBodyManager.dispose();
 		game.particles.clearLayers();
 	}
 

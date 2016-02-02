@@ -40,7 +40,8 @@ import java.util.List;
 /**
  * Created by savegame on 11.11.15.
  */
-public class MapBodyManager {
+public class MapBodyManager implements Disposable {
+
 /** вспомогательные классы данных */
 
 	/**
@@ -69,7 +70,7 @@ public class MapBodyManager {
 	private ObjectMap<String, FixtureDef> materials = new ObjectMap<String, FixtureDef>();
 	private ObjectMap<String, PlatformActor> platforms = new ObjectMap<String, PlatformActor>();
 	private ObjectMap<String, PolylineMapObject> paths = new ObjectMap<String, PolylineMapObject>();
-
+	private ObjectMap<String, BodyTemplate> templates = new ObjectMap<String, BodyTemplate>();
 	private PenguinGame game;
 
 	/**
@@ -124,12 +125,29 @@ public class MapBodyManager {
 		while(objectIt.hasNext()) {
 			MapObject object = objectIt.next();
 
+			BodyDef bodyDef = new BodyDef();
+
+			MapProperties properties = object.getProperties();
+			String material = properties.get("material", "default", String.class);
+			String dynamic = properties.get("dynamic", "false", String.class);
+			String type = properties.get("type", "notype", String.class);
+			String name = object.getName();
+
 			if (object instanceof TextureMapObject){
+				TextureMapObject tmo = (TextureMapObject)object;
+				if( templates.containsKey(name) )
+				{
+					BodyTemplate tmpl = templates.get(name);
+					BoxActor box = new BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
+					box.setPosition( tmo.getX() + tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
+					box.setRotation( tmo.getRotation() );
+					box.initialize(tmpl.shape);
+					actors.add(box);
+				}
 				continue;
 			}
 
 			Shape shape;
-			BodyDef bodyDef = new BodyDef();
 
 			if (object instanceof RectangleMapObject) {
 //				RectangleMapObject rectangle = (RectangleMapObject)object;
@@ -148,12 +166,7 @@ public class MapBodyManager {
 				logger.error("non suported shape " + object);
 				continue;
 			}
-			
-			MapProperties properties = object.getProperties();
-			String material = properties.get("material", "default", String.class);
-			String dynamic = properties.get("dynamic", "false", String.class);
-			String type = properties.get("type", "notype", String.class);
-			String name = object.getName();
+
 			if( type.equalsIgnoreCase("box") ) {
 				FixtureDef fixtureDef = materials.get(material);
 				TextureRegion reg = null;
@@ -298,7 +311,7 @@ public class MapBodyManager {
 				shape = getRectangle((RectangleMapObject)object, bodyDef);
 			}
 			else if (object instanceof PolygonMapObject) {
-				shape = getPolygon((PolygonMapObject)object);
+				shape = getPolygon((PolygonMapObject)object, bodyDef);
 			}
 			else if (object instanceof PolylineMapObject) {
 				shape = getPolyline((PolylineMapObject)object);
@@ -313,88 +326,23 @@ public class MapBodyManager {
 
 			MapProperties properties = object.getProperties();
 			String material = properties.get("material", "default", String.class);
-			String dynamic = properties.get("dynamic", "false", String.class);
 			String type = properties.get("type", "notype", String.class);
 			String name = object.getName();
-			if( type.equalsIgnoreCase("box") ) {
+
+			if( type.equalsIgnoreCase("dynamic") ) {
+//				FixtureDef fixtureDef = materials.get(material);
+				BodyTemplate temp = new BodyTemplate(shape);
+				temp.bodyDef = bodyDef;
+				temp.fixturDef = materials.get(material);
+				templates.put(name, temp);
+			}
+			else if( type.equalsIgnoreCase("static") ) {
+				bodyDef.type = BodyDef.BodyType.StaticBody;
 				FixtureDef fixtureDef = materials.get(material);
-				TextureRegion reg = null;
-				if( game.asset.isLoaded("box_0.png") )
-				{
-					reg = new TextureRegion( game.asset.get("box_0.png", Texture.class) );
-				}
-				BoxActor box = new BoxActor(game, reg, fixtureDef );
-				box.setPosition( bodyDef.position.x*game.units, bodyDef.position.y*game.units );
-				box.initialize(shape);
-				actors.add(box);
-			}
-			else if( type.equalsIgnoreCase("player") ) {
-				FixtureDef fixtureDef = materials.get(material);
-				game.player = new PlayerActor(game, fixtureDef);
-
-				game.player.setName("PlayerActor");
-				game.player.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
-				game.player.setBodyType(BodyDef.BodyType.DynamicBody);
-				game.player.initialize(shape);
-				//actors.add(player);
-			}
-			else if( type.equalsIgnoreCase("lift") ) {
-				RectangleMapObject rect =(RectangleMapObject)object;
-				float width = rect.getRectangle().getWidth();
-				float height = rect.getRectangle().getHeight();
-				FixtureDef fixtureDef = materials.get(material);
-				PlatformActor plat = new PlatformActor(game, fixtureDef);
-				plat.setName(name);
-				plat.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
-				plat.initialize(shape);
-				plat.setSize(width, height);
-
-				if( properties.containsKey("speed") ){
-					float speed = Float.parseFloat(properties.get("speed", "2", String.class));
-					plat.setMoveSpeed(speed*game.units);
-				}
-				if( properties.containsKey("isactive") ){
-					boolean active = Boolean.parseBoolean(properties.get("isactive", "true", String.class));
-					if( active )
-						plat.activate();
-					else
-						plat.deactivate();
-				}
-
-				platforms.put(name, plat);
-				actors.add(plat);
-			}
-			else if( type.equalsIgnoreCase("path") ) {
-				paths.put(name, (PolylineMapObject)object);
-			}
-			else if( type.equalsIgnoreCase("button") ) {
-				//TODO Дописать инициализацию кнопок, с захватом списка действий
-
-			}
-			else if( type.equalsIgnoreCase("water") ) {
-				FixtureDef fixtureDef = new FixtureDef();
-				fixtureDef.isSensor = true;
-				WaterActor water = new WaterActor(game, fixtureDef);
-				water.setName(name);
-				RectangleMapObject rectangle = (RectangleMapObject) object;
-				water.setSize(rectangle.getRectangle().getWidth(), rectangle.getRectangle().getHeight() );
-				water.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
-				water.initialize(shape);
-
-				actors.add(water);
-			}
-			else if( type.equalsIgnoreCase("ground") ) {
-				if (dynamic.equalsIgnoreCase("true"))
-					bodyDef.type = BodyDef.BodyType.DynamicBody;
-				else
-					bodyDef.type = BodyDef.BodyType.StaticBody;
-				FixtureDef fixtureDef = materials.get(material);
-
 				if (fixtureDef == null) {
 					logger.error("material does not exist " + material + " using default");
 					fixtureDef = materials.get("default");
 				}
-
 				fixtureDef.shape = shape;
 				//			fixtureDef.filter.categoryBits = Env.game.getCategoryBitsManager().getCategoryBits("level");
 
@@ -405,17 +353,23 @@ public class MapBodyManager {
 
 				fixtureDef.shape = null;
 			}
-			shape.dispose();
+			else
+				shape.dispose();
 		}
 	}
 	/**
 	 * Destroys every static body that has been created using the manager.
 	 */
-	public void destroyPhysics() {
+	@Override
+	public void dispose() {
 		for (Body body : bodies) {
 			world.destroyBody(body);
 		}
-
+		ObjectMap.Entries<String,BodyTemplate> it = templates.iterator();
+		while( it.hasNext() ) {
+			ObjectMap.Entry<String,BodyTemplate> cur = it.next();
+			cur.value.dispose();
+		}
 		bodies.clear();
 	}
 
@@ -491,11 +445,23 @@ public class MapBodyManager {
 		float[] vertices = polygonObject.getPolygon().getTransformedVertices();
 
 		float[] worldVertices = new float[vertices.length];
-
 		for (int i = 0; i < vertices.length; ++i) {
 			worldVertices[i] = vertices[i] / game.units;
 		}
 
+		polygon.set(worldVertices);
+		return polygon;
+	}
+
+	private Shape getPolygon(PolygonMapObject polygonObject, BodyDef bodyDef) {
+		PolygonShape polygon = new PolygonShape();
+		float[] vertices = polygonObject.getPolygon().getTransformedVertices();
+
+		float[] worldVertices = new float[vertices.length];
+		//float half_unit = game.units / 2;
+		for (int i = 0; i < vertices.length; ++i) {
+			worldVertices[i] = (vertices[i] % game.units)/game.units;
+		}
 		polygon.set(worldVertices);
 		return polygon;
 	}
