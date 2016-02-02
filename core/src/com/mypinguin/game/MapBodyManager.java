@@ -62,6 +62,16 @@ public class MapBodyManager implements Disposable {
 			shape.dispose();
 		}
 	}
+
+	public class Part {
+		TextureRegion region; //текстура
+		Vector2       shift; // смещение
+	}
+
+	public class TextureTemplate {
+		public String name;
+		ObjectMap<String, Part> parts = new ObjectMap<String, Part>();
+	}
 /** Параметрыы */
 	private Logger logger;
 	private World world;
@@ -71,8 +81,12 @@ public class MapBodyManager implements Disposable {
 	private ObjectMap<String, PlatformActor> platforms = new ObjectMap<String, PlatformActor>();
 	private ObjectMap<String, PolylineMapObject> paths = new ObjectMap<String, PolylineMapObject>();
 	private ObjectMap<String, BodyTemplate> templates = new ObjectMap<String, BodyTemplate>();
+	private ObjectMap<String, TextureTemplate> textempl = new ObjectMap<String, TextureTemplate>();
 	private PenguinGame game;
 
+	private float abs(float a) {
+		return (a < 0 )?-a:a;
+	}
 	/**
 	 * @param pg pinguin game
 //	 * @param unitsPerPixel conversion ratio from pixel units to box2D metres.
@@ -195,6 +209,23 @@ public class MapBodyManager implements Disposable {
 				float height = rect.getRectangle().getHeight();
 				FixtureDef fixtureDef = materials.get(material);
 				PlatformActor plat = new PlatformActor(game, fixtureDef);
+				//ищем текстуру если нужно
+				String texTemplateName = properties.get("textmpl", "none", String.class);
+				if( texTemplateName != "none" && textempl.containsKey(texTemplateName) ){
+					TextureTemplate texTempl = textempl.get(texTemplateName);
+					float length = width;
+					Part leftR = texTempl.parts.get("left");
+					Part rightR = texTempl.parts.get("right");
+					Part midR = texTempl.parts.get("mid");
+					length -= leftR.region.getRegionWidth();
+					plat.addTextureRegion(leftR.region, leftR.shift.x, leftR.shift.y);
+					//float rightT = rightR.region.getRegionWidth() - abs(rightR.shift.x);
+					while ( length > rightR.region.getRegionWidth() ) {
+						plat.addTextureRegion(midR.region, midR.shift.x, midR.shift.y );
+						length -= midR.region.getRegionWidth() ;
+					}
+					plat.addTextureRegion(rightR.region, rightR.shift.x, rightR.shift.y);
+				}
 				plat.setName(name);
 				plat.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
 				plat.initialize(shape);
@@ -299,7 +330,37 @@ public class MapBodyManager implements Disposable {
 		while(objectIt.hasNext()) {
 			MapObject object = objectIt.next();
 
-			if (object instanceof TextureMapObject){
+
+			MapProperties properties = object.getProperties();
+			String material = properties.get("material", "default", String.class);
+			String type = properties.get("type", "notype", String.class);
+			String name = object.getName();
+
+			if (object instanceof TextureMapObject && type.equalsIgnoreCase("texture") ){
+				TextureMapObject tmo = (TextureMapObject)object;
+				String key = properties.get("key", "nokey", String.class);
+				//String str = ;
+				float sx = Float.parseFloat(properties.get("shiftX", "0", String.class));
+				float sy = Float.parseFloat(properties.get("shiftY", "0", String.class));
+				if( key == "nokey" )
+					continue;
+
+				if( textempl.containsKey(name) ) {
+					TextureTemplate txtempl = textempl.get(name);
+					Part part = new Part();
+					part.region = tmo.getTextureRegion();
+					part.shift = new Vector2(sx,sy);
+					txtempl.parts.put(key, part);
+				}
+				else
+				{
+					TextureTemplate txtempl = new TextureTemplate();
+					Part part = new Part();
+					part.region = tmo.getTextureRegion();
+					part.shift = new Vector2(sx,sy);
+					txtempl.parts.put(key, part);
+					textempl.put( name, txtempl );
+				}
 				continue;
 			}
 
@@ -323,11 +384,6 @@ public class MapBodyManager implements Disposable {
 				logger.error("non suported shape " + object);
 				continue;
 			}
-
-			MapProperties properties = object.getProperties();
-			String material = properties.get("material", "default", String.class);
-			String type = properties.get("type", "notype", String.class);
-			String name = object.getName();
 
 			if( type.equalsIgnoreCase("dynamic") ) {
 //				FixtureDef fixtureDef = materials.get(material);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="122">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="138">
  <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
   <image source="ice_tiles_0.png" width="384" height="448"/>
   <terraintypes>
@@ -49,8 +49,11 @@
    </properties>
    <polyline points="-960,-832 -272,-832 -256,-816 -256,-592 -240,-576 -80,-576 -64,-560 -64,-400 -48,-384 48,-384 64,-368 64,128 0,128 0,-320 -128,-320 -128,-512 -320,-512 -320,-768 -960,-768 -960,-336 -912,-304"/>
   </object>
-  <object id="27" name="player" type="player" x="2012" y="509.333" width="32" height="128"/>
-  <object id="29" name="lift01" type="lift" x="1184" y="1952" width="256" height="48"/>
+  <object id="29" name="lift01" type="lift" x="1184" y="1936" width="256" height="64">
+   <properties>
+    <property name="textmpl" value="platform2"/>
+   </properties>
+  </object>
   <object id="31" name="lift01" type="path" x="1200" y="2000">
    <polyline points="-16,0 -16,-752"/>
   </object>
@@ -73,18 +76,31 @@
    <polygon points="0,0 -16,-16 -16,-48 0,-64 992,-64 1008,-48 1008,-16 992,0"/>
   </object>
   <object id="45" name="water0" type="water" x="1600" y="1792" width="832" height="272"/>
-  <object id="46" name="lift02" type="lift" x="2480" y="1440" width="336" height="48"/>
-  <object id="55" name="lift03" type="lift" x="544" y="1264" width="208" height="48"/>
+  <object id="46" name="lift02" type="lift" x="2480" y="1440" width="320" height="64">
+   <properties>
+    <property name="textmpl" value="platform2"/>
+   </properties>
+  </object>
+  <object id="55" name="lift03" type="lift" x="544" y="1264" width="192" height="64">
+   <properties>
+    <property name="textmpl" value="platform1"/>
+   </properties>
+  </object>
   <object id="56" name="lift03" type="path" x="544" y="1568">
    <polyline points="-1.33333,-2.66667 0,-288"/>
   </object>
-  <object id="59" name="lift04" type="lift" x="32" y="1840" width="192" height="48"/>
+  <object id="59" name="lift04" type="lift" x="32" y="1824" width="192" height="64">
+   <properties>
+    <property name="textmpl" value="platform0"/>
+   </properties>
+  </object>
   <object id="60" name="lift04" type="path" x="32" y="1856">
    <polyline points="-1.33333,34.6667 0,-288"/>
   </object>
   <object id="61" name="lift05" type="lift" x="1664" y="1712" width="192" height="32">
    <properties>
     <property name="speed" value="2.1"/>
+    <property name="textmpl" value="platform2"/>
    </properties>
   </object>
   <object id="62" name="lift05" type="path" x="1760" y="1952">
@@ -98,7 +114,11 @@
    <polygon points="0,0 16,16 48,16 64,0 64,-1056 0,-1008"/>
   </object>
   <object id="65" name="water1" type="water" x="3712" y="768" width="384" height="1296"/>
-  <object id="67" name="lift06" type="lift" x="3024" y="736" width="336" height="48"/>
+  <object id="67" name="lift06" type="lift" x="3024" y="736" width="336" height="48">
+   <properties>
+    <property name="textmpl" value="platform2"/>
+   </properties>
+  </object>
   <object id="68" name="lift06" type="path" x="3024" y="784">
    <polyline points="0,0 -752,0"/>
   </object>
@@ -123,10 +143,11 @@
    </properties>
    <polygon points="-256,-496 -272,-480 -272,-432 48,-432 112,-480 96,-496"/>
   </object>
-  <object id="76" name="lift07" type="lift" x="1792" y="736" width="160" height="48">
+  <object id="76" name="lift07" type="lift" x="1792" y="736" width="128" height="64">
    <properties>
     <property name="isactive" value="false"/>
     <property name="speed" value="2.7"/>
+    <property name="textmpl" value="platform0"/>
    </properties>
   </object>
   <object id="78" name="button02" type="button" x="1280" y="656" width="64" height="80"/>
@@ -136,10 +157,10 @@
     <property name="deactivate" value="self"/>
    </properties>
   </object>
-  <object id="85" name="lift02" type="path" x="2480" y="1488">
+  <object id="85" name="lift02" type="path" x="2480" y="1504">
    <polyline points="0,0 0,592"/>
   </object>
-  <object id="89" name="lift07" type="path" x="1792" y="784">
+  <object id="89" name="lift07" type="path" x="1792" y="800">
    <polyline points="0,0 -400,0"/>
   </object>
   <object id="96" name="box" type="temp" gid="37" x="64" y="896" width="64" height="64"/>
@@ -157,12 +178,14 @@
   <object id="113" name="box" type="temp" gid="37" x="2272" y="1424" width="64" height="64"/>
   <object id="114" name="box" type="temp" gid="37" x="2336" y="1440" width="64" height="64"/>
   <object id="115" name="box" type="temp" gid="37" x="2307.3" y="1208.93" width="64" height="64" rotation="53.9933"/>
-  <object id="116" name="box" type="temp" gid="37" x="1792" y="690.667" width="64" height="64" rotation="45"/>
+  <object id="116" name="box" type="temp" gid="37" x="2053" y="641.667" width="64" height="64" rotation="45"/>
   <object id="117" name="box" type="temp" gid="37" x="1890.67" y="735" width="64" height="64"/>
-  <object id="118" name="stone" type="temp" gid="38" x="269.682" y="856.642" width="64" height="64"/>
+  <object id="118" name="stone" type="temp" gid="38" x="624" y="1216" width="64" height="64"/>
   <object id="119" name="stone" type="temp" gid="38" x="2136.4" y="536.463" width="64" height="64"/>
-  <object id="120" name="stone" type="temp" gid="38" x="2065" y="596" width="64" height="64"/>
+  <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
   <object id="121" name="stone" type="temp" gid="38" x="2136.4" y="536.463" width="64" height="64"/>
+  <object id="122" name="stone" type="temp" gid="38" x="2047.01" y="-867.345" width="64" height="64"/>
+  <object id="133" name="player" type="player" x="384" y="1072" width="32" height="128"/>
  </objectgroup>
  <objectgroup name="Templates">
   <object id="90" name="box" type="dynamic" x="64" y="832" width="64" height="64">
@@ -177,6 +200,64 @@
     <property name="pick" value="true"/>
    </properties>
    <polygon points="3.17766,22.9015 1.63522,-5.16665 15.4502,-28.0236 38.1907,-31.2717 62.5692,-2.65724 61.3428,19.2704 49.8396,29.5472 15.5138,30.4094"/>
+  </object>
+  <object id="124" name="platform0" type="texture" gid="31" x="64" y="1024" width="64" height="64">
+   <properties>
+    <property name="key" value="left"/>
+   </properties>
+  </object>
+  <object id="125" name="platform0" type="texture" gid="1073741856" x="128" y="1024" width="64" height="64">
+   <properties>
+    <property name="key" value="mid"/>
+   </properties>
+  </object>
+  <object id="126" name="platform0" type="texture" gid="1073741857" x="192" y="1024" width="64" height="64">
+   <properties>
+    <property name="key" value="right"/>
+   </properties>
+  </object>
+  <object id="130" name="platform1" type="texture" gid="1" x="64" y="1152" width="64" height="64">
+   <properties>
+    <property name="key" value="left"/>
+    <property name="shiftX" value="-32.0"/>
+    <property name="shiftY" value="32.0"/>
+   </properties>
+  </object>
+  <object id="131" name="platform1" type="texture" gid="2" x="128" y="1152" width="64" height="64">
+   <properties>
+    <property name="key" value="mid"/>
+    <property name="shiftX" value="-32.0"/>
+    <property name="shiftY" value="32.0"/>
+   </properties>
+  </object>
+  <object id="132" name="platform1" type="texture" gid="6" x="192" y="1152" width="64" height="64">
+   <properties>
+    <property name="key" value="right"/>
+    <property name="shiftX" value="-32.0"/>
+    <property name="shiftY" value="32.0"/>
+   </properties>
+  </object>
+  <object id="134" name="platform1" type="texture" gid="6" x="192" y="1152" width="64" height="64">
+   <properties>
+    <property name="key" value="right"/>
+    <property name="shiftX" value="-32.0"/>
+    <property name="shiftY" value="32.0"/>
+   </properties>
+  </object>
+  <object id="135" name="platform2" type="texture" gid="37" x="192" y="1216" width="64" height="64">
+   <properties>
+    <property name="key" value="left"/>
+   </properties>
+  </object>
+  <object id="136" name="platform2" type="texture" gid="37" x="256" y="1216" width="64" height="64">
+   <properties>
+    <property name="key" value="mid"/>
+   </properties>
+  </object>
+  <object id="137" name="platform2" type="texture" gid="37" x="320" y="1216" width="64" height="64">
+   <properties>
+    <property name="key" value="right"/>
+   </properties>
   </object>
  </objectgroup>
 </map>

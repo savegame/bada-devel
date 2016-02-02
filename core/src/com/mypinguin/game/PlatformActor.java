@@ -2,6 +2,7 @@ package com.mypinguin.game;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -18,6 +19,11 @@ public class PlatformActor extends BodyActor {
 		ends //смазывать только крайние
 	}
 
+	public class Part {
+		TextureRegion region; //текстура
+		Vector2       shift; // смещение
+	}
+
 	protected ArrayList<Vector2> path = new ArrayList<Vector2>();
 	protected float moveSpeed = game.units*3;
 	protected Animation.PlayMode  mode = Animation.PlayMode.LOOP_PINGPONG;
@@ -30,6 +36,7 @@ public class PlatformActor extends BodyActor {
 	protected int smoothSteps = 20;
 	protected SmoothPointType smoothType = SmoothPointType.ends;
 	protected float currentSpeed;
+	protected ArrayList<Part> parts = new ArrayList<Part>();
 
 	PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
 		super(penguinGame);
@@ -43,6 +50,12 @@ public class PlatformActor extends BodyActor {
 		bodydef.type = BodyDef.BodyType.KinematicBody;
 	}
 
+	public void addTextureRegion(TextureRegion texa, float shiftX, float shiftY) {
+		Part part = new Part();
+		part.region = texa;
+		part.shift = new Vector2(shiftX, shiftY);
+		parts.add(part);
+	}
 	public void setMoveSpeed(float speed) {
 		moveSpeed = speed;
 	}
@@ -196,6 +209,12 @@ public class PlatformActor extends BodyActor {
 					+ "\nActive = " + isActive();
 			game.font.draw( batch, text, (int)this.getX(), (int)this.getY() + (int)this.getHeight() );
 			game.font.setColor(1f,1f,1f,1f);
+		}
+		float length = 0;
+		game.batch.setColor(1,1,1,1);
+		for (Part part : parts) {
+			game.batch.draw( part.region, this.getX() + length + part.shift.x, this.getY() + part.shift.y );
+			length += part.region.getRegionWidth();
 		}
 	}
 	/**
