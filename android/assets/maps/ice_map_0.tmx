@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="138">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="142">
  <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
   <image source="ice_tiles_0.png" width="384" height="448"/>
   <terraintypes>
-   <terrain name="wall" tile="-1"/>
+   <terrain name="Новый участок" tile="-1"/>
   </terraintypes>
-  <tile id="5" terrain=",,0,0"/>
+  <tile id="0" terrain=",,,0"/>
+  <tile id="1" terrain=",,0,0"/>
+  <tile id="5" terrain=",,0,"/>
+  <tile id="6" terrain=",0,,"/>
+  <tile id="7" terrain="0,0,,"/>
+  <tile id="11" terrain="0,,,"/>
+  <tile id="13" terrain="0,,0,"/>
+  <tile id="14" terrain=",0,,0"/>
   <tile id="15">
    <objectgroup draworder="index">
     <object id="0" x="33" y="62">
@@ -13,7 +20,6 @@
     </object>
    </objectgroup>
   </tile>
-  <tile id="20" terrain="0,0,0,0"/>
   <tile id="37">
    <objectgroup draworder="index">
     <object id="0" x="0" y="32">
@@ -24,7 +30,7 @@
  </tileset>
  <layer name="tiles" width="64" height="32">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+1X207DMAwNY7BxGSAxbn1ZQer//yL2g7UoHOeGu6Zqj2RpuXl2j+04B7dcPJM8TW3EhHhxy/af+T9MbcSEWPlf+V/5Xy5W/lf+rfkfRto7Bpj/L5INyTXJluTGG4fzt0DHVbBvUPahc0OG/lKE9og/SDfz/0qyJ7kjuSd5UMZHh3NlB/Y/ZthZe65GL9uO4rwk/+dcK9l25Kc2jzDnWqm980r592uFRa5eChb8c15JTmm1oFVY8J+jr1XE+K/xQ3LB6s4aGzH+2Q9098fuZM4FuVfmkAcx/k8kPck3yQ8Yx/zz4+eD5NPEWnvE+A/7n5KeZC53onX+p/QytD40Z2xdV6zrf0ovA/WhuWOrXlhQc/9zLiMO/d9d5HxL0HjS4l/8Zv/Q+yj1rmgNGs9a/PuxG4vDXWK9FZTyX4L3xDrHUmktqzkTQyn/JUjd+TXf2PqtrcVp+Kbburz+z8dbYr3mG5e8y/4Dtu0EpHfn/i/FA8cqeg/zPH/DLkMHsusSdZW/c+/OvqL+148P1K903j6Zk3nRI2voDt14IvOd+/suQWe0Xipc0/ot/p9fzbx4qgAgAAA=
+   H4sIAAAAAAAAA+1Y207DMAwN22DcBkjc+7LC/38k9oO1KBwncTBrqvZIlsjN2D127OwQlotHkoepjZgQT2HZ/jP/h6mNmBAr/yv/K//Lxcr/yv/S+f8k2ZBsSXYkl9E4nb8COi6SfVtlHzon+3P6rUjtEX+Qbub/meSa5IbkluROGb8EnCt7sP++ws7Wcy162XYU55b8n3OusO3IT20eYc53pfbOs/If3xUeuXouePDPeSU5pd0FvcKD/xp9vSLHf4sfkgteNeu/keOf/UC1P1eTORekrswhD3L8H0lGki+SbzDO+RfHzzvJh4u1/sjxn/Y/lp5kLjXRO/9LehlaH1oz9r5XvO//kl4G6kNrx169sKCl/nMuIw7jv4fM+Z6g8aTFv/jN/qH3Ueld0Rs0nrX4j2M3F4f7wnovsPJvwVthnWPJepe1nMnByr8FpZrf8o2939panKZvul2o6/9ivBbWW76x5V32F7BtRyBjOPV/JR44VtF7WH7fGip0ILvOca/ydx7DyVfU/8bxgfqVIdonczIvemQN1dBNJDI/hN/vEnRG66XSNa3f4v/zA/mHsBwAIAAA
   </data>
  </layer>
  <objectgroup name="Objects">
@@ -81,7 +87,7 @@
     <property name="textmpl" value="platform2"/>
    </properties>
   </object>
-  <object id="55" name="lift03" type="lift" x="544" y="1264" width="192" height="64">
+  <object id="55" name="lift03" type="lift" x="544" y="1248" width="194.625" height="32">
    <properties>
     <property name="textmpl" value="platform1"/>
    </properties>
@@ -97,10 +103,10 @@
   <object id="60" name="lift04" type="path" x="32" y="1856">
    <polyline points="-1.33333,34.6667 0,-288"/>
   </object>
-  <object id="61" name="lift05" type="lift" x="1664" y="1712" width="192" height="32">
+  <object id="61" name="lift05" type="lift" x="1664" y="1712" width="193.75" height="32">
    <properties>
     <property name="speed" value="2.1"/>
-    <property name="textmpl" value="platform2"/>
+    <property name="textmpl" value="platform1"/>
    </properties>
   </object>
   <object id="62" name="lift05" type="path" x="1760" y="1952">
@@ -114,13 +120,13 @@
    <polygon points="0,0 16,16 48,16 64,0 64,-1056 0,-1008"/>
   </object>
   <object id="65" name="water1" type="water" x="3712" y="768" width="384" height="1296"/>
-  <object id="67" name="lift06" type="lift" x="3024" y="736" width="336" height="48">
+  <object id="67" name="lift06" type="lift" x="3040" y="736" width="321.5" height="32">
    <properties>
-    <property name="textmpl" value="platform2"/>
+    <property name="textmpl" value="platform1"/>
    </properties>
   </object>
-  <object id="68" name="lift06" type="path" x="3024" y="784">
-   <polyline points="0,0 -752,0"/>
+  <object id="68" name="lift06" type="path" x="3024" y="768">
+   <polyline points="15,0 -752,0"/>
   </object>
   <object id="69" type="ground" x="1952" y="752">
    <properties>
@@ -201,60 +207,53 @@
    </properties>
    <polygon points="3.17766,22.9015 1.63522,-5.16665 15.4502,-28.0236 38.1907,-31.2717 62.5692,-2.65724 61.3428,19.2704 49.8396,29.5472 15.5138,30.4094"/>
   </object>
-  <object id="124" name="platform0" type="texture" gid="31" x="64" y="1024" width="64" height="64">
+  <object id="124" name="platform0" type="texture" gid="31" x="64" y="1728" width="64" height="64">
    <properties>
     <property name="key" value="left"/>
    </properties>
   </object>
-  <object id="125" name="platform0" type="texture" gid="1073741856" x="128" y="1024" width="64" height="64">
+  <object id="125" name="platform0" type="texture" gid="1073741856" x="128" y="1728" width="64" height="64">
    <properties>
     <property name="key" value="mid"/>
    </properties>
   </object>
-  <object id="126" name="platform0" type="texture" gid="1073741857" x="192" y="1024" width="64" height="64">
+  <object id="126" name="platform0" type="texture" gid="1073741857" x="192" y="1728" width="64" height="64">
    <properties>
     <property name="key" value="right"/>
    </properties>
   </object>
-  <object id="130" name="platform1" type="texture" gid="1" x="64" y="1152" width="64" height="64">
+  <object id="130" name="platform1" type="texture" gid="1" x="64" y="1600" width="64" height="64">
    <properties>
     <property name="key" value="left"/>
     <property name="shiftX" value="-32.0"/>
-    <property name="shiftY" value="32.0"/>
+    <property name="shiftY" value="0"/>
    </properties>
   </object>
-  <object id="131" name="platform1" type="texture" gid="2" x="128" y="1152" width="64" height="64">
+  <object id="131" name="platform1" type="texture" gid="2" x="128" y="1600" width="64" height="64">
    <properties>
     <property name="key" value="mid"/>
     <property name="shiftX" value="-32.0"/>
-    <property name="shiftY" value="32.0"/>
+    <property name="shiftY" value="0"/>
    </properties>
   </object>
-  <object id="132" name="platform1" type="texture" gid="6" x="192" y="1152" width="64" height="64">
+  <object id="134" name="platform1" type="texture" gid="6" x="192" y="1600" width="64" height="64">
    <properties>
     <property name="key" value="right"/>
     <property name="shiftX" value="-32.0"/>
-    <property name="shiftY" value="32.0"/>
+    <property name="shiftY" value="0"/>
    </properties>
   </object>
-  <object id="134" name="platform1" type="texture" gid="6" x="192" y="1152" width="64" height="64">
-   <properties>
-    <property name="key" value="right"/>
-    <property name="shiftX" value="-32.0"/>
-    <property name="shiftY" value="32.0"/>
-   </properties>
-  </object>
-  <object id="135" name="platform2" type="texture" gid="37" x="192" y="1216" width="64" height="64">
+  <object id="135" name="platform2" type="texture" gid="37" x="64" y="1472" width="64" height="64">
    <properties>
     <property name="key" value="left"/>
    </properties>
   </object>
-  <object id="136" name="platform2" type="texture" gid="37" x="256" y="1216" width="64" height="64">
+  <object id="136" name="platform2" type="texture" gid="37" x="128" y="1472" width="64" height="64">
    <properties>
     <property name="key" value="mid"/>
    </properties>
   </object>
-  <object id="137" name="platform2" type="texture" gid="37" x="320" y="1216" width="64" height="64">
+  <object id="137" name="platform2" type="texture" gid="37" x="192" y="1472" width="64" height="64">
    <properties>
     <property name="key" value="right"/>
    </properties>
