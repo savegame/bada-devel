@@ -217,7 +217,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private void loadTextures(AssetManager manager) {
 		this.loadAsset("ui/btn_lr.png", Texture.class);
 		this.loadAsset("pinguin.png", Texture.class);
-		this.loadAsset("box_0.png", Texture.class);
 		this.loadAsset("run_0.png", Texture.class);
 		this.loadAsset("defaultbg.png", Texture.class);
 	}

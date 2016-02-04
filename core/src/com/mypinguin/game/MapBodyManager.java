@@ -1,7 +1,6 @@
 package com.mypinguin.game;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapLayer;
@@ -181,19 +180,7 @@ public class MapBodyManager implements Disposable {
 				continue;
 			}
 
-			if( type.equalsIgnoreCase("box") ) {
-				FixtureDef fixtureDef = materials.get(material);
-				TextureRegion reg = null;
-				if( game.asset.isLoaded("box_0.png") )
-				{
-					reg = new TextureRegion( game.asset.get("box_0.png", Texture.class) );
-				}
-				BoxActor box = new BoxActor(game, reg, fixtureDef );
-				box.setPosition( bodyDef.position.x*game.units, bodyDef.position.y*game.units );
-				box.initialize(shape);
-				actors.add(box);
-			}
-			else if( type.equalsIgnoreCase("player") ) {
+			if( type.equalsIgnoreCase("player") ) {
 				FixtureDef fixtureDef = materials.get(material);
 				game.player = new PlayerActor(game, fixtureDef);
 
