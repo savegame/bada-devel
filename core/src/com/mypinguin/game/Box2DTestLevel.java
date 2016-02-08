@@ -120,9 +120,9 @@ public class Box2DTestLevel extends ExtendedScreen {
 		Array<Actor> actors = stage.getActors();
 		for (int i = 0; i < actors.size; i++)
 		{
-			if (actors.items[i] instanceof WaterActor)
+			if (actors.items[i] instanceof com.penguin.physics.WaterActor)
 			{
-				WaterActor water = (WaterActor) actors.items[i];
+				com.penguin.physics.WaterActor water = (com.penguin.physics.WaterActor) actors.items[i];
 				snowEmitter.AddSolidRegion(water.getX(),water.getY(),water.getWidth(),water.getHeight());
 			}
 		}

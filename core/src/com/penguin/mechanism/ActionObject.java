@@ -1,6 +1,6 @@
 package com.penguin.mechanism;
 
-import com.mypinguin.game.BodyActor;
+import com.penguin.physics.BodyActor;
 import com.mypinguin.game.PenguinGame;
 
 public class ActionObject extends BodyActor {

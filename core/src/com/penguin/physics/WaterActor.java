@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.physics;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -10,12 +10,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.penguin.physics.WaterController;
+import com.mypinguin.game.PenguinGame;
 
 /**
  * Created by savegame on 14.12.15.
  */
-public class WaterActor extends BodyActor {
+public class WaterActor extends com.penguin.physics.BodyActor {
 	protected Fixture  waterSensor;
 	private WaterController waterControl;
 	protected Vector2 shift;

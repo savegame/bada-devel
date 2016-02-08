@@ -31,7 +31,7 @@ import java.util.Set;
 /*
  * Created by savegame on 04.11.15.
  */
-public class PlayerActor extends BodyActor {
+public class PlayerActor extends com.penguin.physics.BodyActor {
 	//Box2D
 	private Fixture physicsFixture;
 	private Fixture sensorFixture;
@@ -75,7 +75,7 @@ public class PlayerActor extends BodyActor {
 	private float     bodyDencity = 4f;
 	private float     bodyPickDencity = 12f;
 	private float     vlocityEpsilon = 0.05f; //минимальная скорость, которая приравниваеться к нулю
-	private BodyActor platform = null;//платформа на которой находиться игрок (или другой объект)
+	private com.penguin.physics.BodyActor platform = null;//платформа на которой находиться игрок (или другой объект)
 	//Debug
 	private TextureRegion staticRight = null; //
 	private TextureRegion staticFront = null; //
@@ -256,7 +256,7 @@ public class PlayerActor extends BodyActor {
 		@Override
 		public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal,
 				float fraction) {
-			if( !fixture.isSensor() && !(fixture.getBody().getUserData() instanceof WaterActor) ) {
+			if( !fixture.isSensor() && !(fixture.getBody().getUserData() instanceof com.penguin.physics.WaterActor) ) {
 				Vector2 l = new Vector2( point.x - p1.x, point.y - p1.y + 1 );
 				float length = l.len() ;
 				if( length < 1.1f ) {
@@ -278,11 +278,11 @@ public class PlayerActor extends BodyActor {
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
 				Object objA = contact.getFixtureA().getBody().getUserData();
 				Object objB = contact.getFixtureB().getBody().getUserData();
-				if( objA instanceof PlatformActor || objA instanceof BoxActor) {
-					platform = (BodyActor)objA;
+				if( objA instanceof com.penguin.physics.PlatformActor || objA instanceof com.penguin.physics.BoxActor) {
+					platform = (com.penguin.physics.BodyActor)objA;
 				}
-				else if( objB instanceof PlatformActor || objB instanceof BoxActor ) {
-					platform = (BodyActor)objB;
+				else if( objB instanceof com.penguin.physics.PlatformActor || objB instanceof com.penguin.physics.BoxActor) {
+					platform = (com.penguin.physics.BodyActor)objB;
 				}
 				sensor = true;
 			}
@@ -344,13 +344,13 @@ public class PlayerActor extends BodyActor {
 			getJoint = game.world.createJoint(jointDef);
 			PrismaticJoint joint = (PrismaticJoint)getJoint;
 			physicsFixture.setDensity(bodyPickDencity);
-			if( getBody.getUserData() instanceof BoxActor ) {
-				((BoxActor)getBody.getUserData()).setPicked(true);
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor) {
+				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(true);
 			}
 		}
 		else 	if( getJoint != null ) {
-			if( getBody.getUserData() instanceof BoxActor ) {
-				((BoxActor)getBody.getUserData()).setPicked(false);
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor) {
+				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(false);
 			}
 			game.world.destroyJoint(getJoint);
 			if( getItem == getLFixture )
@@ -408,7 +408,7 @@ public class PlayerActor extends BodyActor {
 
 		Vector2 platformVel = new Vector2(0,0);
 		if( platform != null ) {
-			if( platform instanceof BoxActor && ((BoxActor)platform).isPlatformed() )
+			if( platform instanceof com.penguin.physics.BoxActor && ((com.penguin.physics.BoxActor)platform).isPlatformed() )
 				platformVel = platform.getVelocity();
 			else 
 				platformVel = platform.getVelocity();
@@ -601,7 +601,7 @@ public class PlayerActor extends BodyActor {
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.add(fixtureB);
 		if(fixtureA == sensorFixture) {
-			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
 				underwater = true;
 			else {
 				groundedFixtures.add(fixtureB);
@@ -614,7 +614,7 @@ public class PlayerActor extends BodyActor {
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.remove(fixtureB);
 		if(fixtureA == sensorFixture || fixtureA == legsFixture) {
-			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
 				underwater = false;
 			else
 				groundedFixtures.remove(fixtureB);
@@ -638,7 +638,7 @@ public class PlayerActor extends BodyActor {
 	  for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
 		Object objA = contact.getFixtureA().getBody().getUserData();
 		Object objB = contact.getFixtureB().getBody().getUserData();
-		if( objA instanceof PlatformActor && objB instanceof PlayerActor ) {
+		if( objA instanceof com.penguin.physics.PlatformActor && objB instanceof PlayerActor ) {
 			if( contact.getFixtureB().getBody() != legsBody )
 				contact.setEnabled(false);
 			else if( manifold.getNormal().y < 0 )
@@ -646,7 +646,7 @@ public class PlayerActor extends BodyActor {
 			else
 				contact.setEnabled(true);
 		}
-		else if( objB instanceof PlatformActor && objA instanceof PlayerActor ) {
+		else if( objB instanceof com.penguin.physics.PlatformActor && objA instanceof PlayerActor ) {
 			if( contact.getFixtureA().getBody() != legsBody )
 				contact.setEnabled(false);
 			else if( manifold.getNormal().y < 0 )

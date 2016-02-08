@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.physics;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -7,13 +7,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.mypinguin.game.PenguinGame;
 
 import java.util.ArrayList;
 
 /**
  * Created by savegame on 10.12.15.
  */
-public class PlatformActor extends BodyActor {
+public class PlatformActor extends com.penguin.physics.BodyActor {
 	enum SmoothPointType {
 		all, //смазывать все точки
 		ends //смазывать только крайние
@@ -38,7 +39,7 @@ public class PlatformActor extends BodyActor {
 	protected float currentSpeed;
 	protected ArrayList<Part> parts = new ArrayList<Part>();
 
-	PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
+	public PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
 		super(penguinGame);
 		setFixtureDef(_fixturedef);
 		bodydef.type = BodyDef.BodyType.KinematicBody;

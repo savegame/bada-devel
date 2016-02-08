@@ -74,10 +74,10 @@ public class MapBodyManager implements Disposable {
 /** Параметрыы */
 	private Logger logger;
 	private World world;
-	private List<BodyActor> actors = new ArrayList<BodyActor>();
+	private List<com.penguin.physics.BodyActor> actors = new ArrayList<com.penguin.physics.BodyActor>();
 	private Array<Body> bodies = new Array<Body>();
 	private ObjectMap<String, FixtureDef> materials = new ObjectMap<String, FixtureDef>();
-	private ObjectMap<String, PlatformActor> platforms = new ObjectMap<String, PlatformActor>();
+	private ObjectMap<String, com.penguin.physics.PlatformActor> platforms = new ObjectMap<String, com.penguin.physics.PlatformActor>();
 	private ObjectMap<String, PolylineMapObject> paths = new ObjectMap<String, PolylineMapObject>();
 	private ObjectMap<String, BodyTemplate> templates = new ObjectMap<String, BodyTemplate>();
 	private ObjectMap<String, TextureTemplate> textempl = new ObjectMap<String, TextureTemplate>();
@@ -151,7 +151,7 @@ public class MapBodyManager implements Disposable {
 				if( templates.containsKey(name) )
 				{
 					BodyTemplate tmpl = templates.get(name);
-					BoxActor box = new BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
+					com.penguin.physics.BoxActor box = new com.penguin.physics.BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
 					box.setPosition( tmo.getX() + tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
@@ -195,7 +195,7 @@ public class MapBodyManager implements Disposable {
 				float width = rect.getRectangle().getWidth();
 				float height = rect.getRectangle().getHeight();
 				FixtureDef fixtureDef = materials.get(material);
-				PlatformActor plat = new PlatformActor(game, fixtureDef);
+				com.penguin.physics.PlatformActor plat = new com.penguin.physics.PlatformActor(game, fixtureDef);
 				//ищем текстуру если нужно
 				String texTemplateName = properties.get("textmpl", "none", String.class);
 				if( texTemplateName != "none" && textempl.containsKey(texTemplateName) ){
@@ -243,7 +243,7 @@ public class MapBodyManager implements Disposable {
 			else if( type.equalsIgnoreCase("water") ) {
 				FixtureDef fixtureDef = new FixtureDef();
 				fixtureDef.isSensor = true;
-				WaterActor water = new WaterActor(game, fixtureDef);
+				com.penguin.physics.WaterActor water = new com.penguin.physics.WaterActor(game, fixtureDef);
 				water.setName(name);
 				RectangleMapObject rectangle = (RectangleMapObject) object;
 				water.setSize(rectangle.getRectangle().getWidth(), rectangle.getRectangle().getHeight() );
@@ -283,7 +283,7 @@ public class MapBodyManager implements Disposable {
 			ObjectMap.Entry<String, PolylineMapObject> current = it.next();
 
 			if( platforms.containsKey(current.key) ){
-				PlatformActor plat = platforms.get(current.key);
+				com.penguin.physics.PlatformActor plat = platforms.get(current.key);
 				PolylineMapObject poly = current.value;
 				float[] vertices = poly.getPolyline().getVertices();
 				Vector2[] path = new Vector2[vertices.length / 2];
@@ -417,7 +417,7 @@ public class MapBodyManager implements Disposable {
 	}
 
 	public void actorsToStage(Stage stage) {
-		for( BodyActor actor : actors ) {
+		for( com.penguin.physics.BodyActor actor : actors ) {
 			stage.addActor(actor);
 		}
 	}

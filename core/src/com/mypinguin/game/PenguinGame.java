@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
-import com.penguin.menu.MainMenuStage;
 
 public class PenguinGame extends Game {
 	public class ContactsController implements ContactListener {
@@ -29,11 +28,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).beginContact(fixtureA, fixtureB, contact);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).beginContact(fixtureA, fixtureB, contact);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).beginContact(fixtureB, fixtureA, contact);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).beginContact(fixtureB, fixtureA, contact);
 			}
 		}
 
@@ -43,11 +42,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).endContact(fixtureA, fixtureB, contact);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).endContact(fixtureA, fixtureB, contact);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).endContact(fixtureB, fixtureA, contact);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).endContact(fixtureB, fixtureA, contact);
 			}
 		}
 
@@ -57,11 +56,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).preSolve(contact, oldManifold);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).preSolve(contact, oldManifold);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).preSolve(contact, oldManifold);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).preSolve(contact, oldManifold);
 			}
 		}
 
@@ -71,11 +70,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).postSolve(contact, impulse);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).postSolve(contact, impulse);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).postSolve(contact, impulse);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).postSolve(contact, impulse);
 			}
 		}
 	}

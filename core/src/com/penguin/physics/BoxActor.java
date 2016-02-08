@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.physics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -11,16 +11,17 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
+import com.mypinguin.game.PenguinGame;
 
 /**
  * Created by savegame on 12.11.15.
  */
-public class BoxActor extends BodyActor {
+public class BoxActor extends com.penguin.physics.BodyActor {
 	private TextureRegion  picture;
 	private boolean picked = false; //значит что предмет находиться в руках
 	private boolean platformed = false; //ЗНАЧИТ ПРЕДМЕТ НАХОДИТЬСЯ НА подвижной платформе
 	
-	BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
+	public BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
 	{
 		super(penguinGame);
 		this.setFixtureDef(fixturedef);
@@ -83,7 +84,7 @@ public class BoxActor extends BodyActor {
 	 */
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		Object objB = fixtureB.getBody().getUserData();
-		if( objB instanceof PlatformActor ) {
+		if( objB instanceof PlatformActor) {
 			platformed = true;
 		}
 		else if( objB instanceof BoxActor ) {
@@ -109,14 +110,14 @@ public class BoxActor extends BodyActor {
 	  for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
 			Object objA = contact.getFixtureA().getBody().getUserData();
 			Object objB = contact.getFixtureB().getBody().getUserData();
-			if( objA instanceof BodyActor && objB == this) {
+			if( objA instanceof com.penguin.physics.BodyActor && objB == this) {
 					if( this.isPicked() ) 
 						contact.setEnabled(false);
 //					else if( objA instanceof PlatformActor && manifold.getNormal().y >= 0 ) {
 //						
 //					}
 			}
-			else if( objB instanceof BodyActor && objA == this ) {
+			else if( objB instanceof com.penguin.physics.BodyActor && objA == this ) {
 				if( this.isPicked() ) 
 					contact.setEnabled(false);
 			}
