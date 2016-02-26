@@ -73,6 +73,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
 		camera.zoom = 1.0f;
+		game.camera = this.camera;
 
 		camControl = new CameraControl(camera);
 		camControl.setShift(0, 128);
@@ -296,10 +297,9 @@ public class Box2DTestLevel extends ExtendedScreen {
 		camControl.act(Gdx.graphics.getDeltaTime());
 		camera.update();
 
-		game.batch.begin();
-		//game.batch.setProjectionMatrix(camera.combined);
-		game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight() );
-		game.batch.end();
+//		game.batch.begin();
+//		game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight() );
+//		game.batch.end();
 
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();

@@ -3,8 +3,10 @@ package com.mypinguin.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -85,9 +87,11 @@ public class PenguinGame extends Game {
 	public BitmapFont   font;  //шрифт по умолчанию
 	public BitmapFont   bigFont;
 	public SpriteBatch  batch; //отрисовщик текстур
+	public ModelBatch   modelBatch;
 	public AssetManager asset; //менеджер ресурсов
 	public PlayerActor  player;
 	public boolean      isDebug = true;
+	public Camera       camera = null;
 
 	// physics
 	public World        world;
@@ -107,6 +111,7 @@ public class PenguinGame extends Game {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
+		modelBatch = new ModelBatch();
 		asset = new AssetManager();
 		
 		fonts = new FontsManager();
