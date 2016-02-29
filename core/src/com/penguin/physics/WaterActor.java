@@ -34,7 +34,13 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 	protected Vector2 shift;
 	protected Mesh waterMesh = null;
 	protected Renderable water;
-	protected float vertices[];
+	protected float vertices[];//массив вершин
+	protected int   vertexlen;  //кол-во ячеек занимаемых одной вершиной в массиве
+	protected int   columnCount;//кол-во количество колонок (вершин для волны - 1)
+	protected RandomXS128 rand = new RandomXS128();
+	
+	protected float wave0[], wave1[], wave_old[], wave_cur[];
+	protected float wave_height = 32.0f;
 	Shader shader;
 
 	public WaterActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
@@ -63,26 +69,33 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 
 		waterControl = new WaterController(game.world, waterSensor);
 
-		int cols = (int)(getWidth()/game.units);
-		int vertexcount = (cols + 1)*2;
-		int verexlen = 5;
+		columnCount = (int)(getWidth()/game.units);
 		
-		float width = getWidth()/(float)cols;
+		int vertexcount = (columnCount + 1)*2;
+		vertexlen = 5;
+		
+		float width = getWidth()/(float)columnCount;
 		float height = width*2;
-		int cols2 = cols+1;
+		int cols2 = columnCount+1;
 		
-		vertices = new float[vertexcount*verexlen];
-		short indicies[] = new short[cols*6];
-		RandomXS128 rand = new RandomXS128();
+		vertices = new float[vertexcount*vertexlen];
+		wave0 = new float[cols2];
+		wave1 = new float[cols2];
+		wave_old = wave0;
+		wave_cur = wave1;
+		short indicies[] = new short[columnCount*6];
+		
 		for(int col = 0; col < cols2; col++)
 		{
-			int index = col*verexlen;
+			int index = col*vertexlen;	
 			vertices[index    ] = getX() + width*col;//x
-			vertices[index + 1] = getY() + getHeight() + rand.nextFloat()*32.0f - 10.0f;//y
+			wave_cur[col] = wave_old[col] = 0.0f;
+//			wave_cur[col] = wave_old[col] = vertices[index];
+			vertices[index + 1] = getY() + getHeight() /*+ rand.nextFloat()*32.0f - 10.0f*/;//y
 			vertices[index + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
 			vertices[index + 3] = col*1.0f;//u
 			vertices[index + 4] = 0.0f;//v
-			int index2 = (col + cols2)*verexlen ;
+			int index2 = (col + cols2)*vertexlen ;
 			vertices[index2    ] = getX() + width*col;//x2
 			vertices[index2 + 1] = getY() + getHeight() - game.units;//y2
 			vertices[index2 + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
@@ -90,7 +103,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			vertices[index2 + 4] = 1.0f;//v
 		}
 
-		for(short col = 0; col < (short)cols; col++)
+		for(short col = 0; col < (short)columnCount; col++)
 		{
 			short index = (short)(col*6);
 			indicies[index] = col;
@@ -138,12 +151,38 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		if( fixtureB.getBody().getType() == BodyDef.BodyType.DynamicBody ) {
 			waterControl.addBody(fixtureB);
+			
+			Vector2 vec2 = fixtureB.getBody().getPosition();
+			if( vec2.y*game.units >= getY() + getHeight() - game.units*2 )
+			{
+				float x = vec2.x*game.units;
+				x -= getX();
+				int index = (int)((columnCount+1)*x/getWidth());
+				if(index < 1)
+					index = 1;
+				else if( index >= columnCount )
+					index = columnCount - 1;
+				wave_cur[index] -= 0.70f;
+			}
 		}
 	}
 
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		if( fixtureB.getBody().getType() == BodyDef.BodyType.DynamicBody ) {
 			waterControl.removeBody(fixtureB);
+						
+			Vector2 vec2 = fixtureB.getBody().getPosition();
+			if( vec2.y*game.units <= getY() + getHeight() + game.units )
+			{
+				float x = vec2.x*game.units;
+				x -= getX();
+				int index = (int)((columnCount+1)*x/getWidth());
+				if(index < 1)
+					index = 1;
+				else if( index >= columnCount )
+					index = columnCount - 1;
+				wave_cur[index] -=  0.55f;
+			}
 		}
 	}
 
@@ -158,6 +197,27 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 	@Override
 	public void act(float delta) {
 		waterControl.step();
+		float vis = 0.015f; //что то типа вязкости
+		//тест рандомных капель на поверхность
+//		if(rand.nextInt(128) % 30 == 0 )	{
+//			int index = rand.nextInt( wave_cur.length -2)+1;
+//			 wave_cur[index] -= 1.0f;
+//		}
+		//расчет волны
+		for(int i = 1; i < wave_cur.length-1; i++ ) {
+			vertices[i*vertexlen + 1] += (wave_cur[i] - wave_old[i])*wave_height;
+			this.waterMesh.setVertices(vertices);
+			float laplas =
+				(wave_cur[i-1]+wave_cur[i+1])*0.5f-wave_cur[i];
+			wave_old[i] = ((2.0f-vis)*wave_cur[i]-wave_old[i]*(1.0f-vis)+laplas*delta);
+			if( wave_old[i] < -1.0f )
+				wave_old[i] = - 1.0f;
+			else if( wave_old[i] > 1.0f )
+				wave_old[i] = 1.0f;
+		}
+		float temp[] = wave_old;
+		wave_old = wave_cur;
+		wave_cur = temp;
 	}
 
 	public void draw (Batch batch, float parentAlpha) {
