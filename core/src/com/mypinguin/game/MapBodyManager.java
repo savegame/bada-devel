@@ -152,6 +152,7 @@ public class MapBodyManager implements Disposable {
 				{
 					BodyTemplate tmpl = templates.get(name);
 					com.penguin.physics.BoxActor box = new com.penguin.physics.BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
+					box.setName(name);
 					box.setPosition( tmo.getX() + tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);

@@ -1,5 +1,6 @@
 package com.penguin.physics;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.particles.influencers.ColorInfluencer.Random;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -33,13 +35,14 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 	private WaterController waterControl;
 	protected Vector2 shift;
 	protected Mesh waterMesh = null;
-	protected Renderable water;
+//	protected Renderable water;
 	protected float vertices[];//массив вершин
 	protected int   vertexlen;  //кол-во ячеек занимаемых одной вершиной в массиве
 	protected int   columnCount;//кол-во количество колонок (вершин для волны - 1)
 	protected RandomXS128 rand = new RandomXS128();
 	
-	protected float wave0[], wave1[], wave_old[], wave_cur[];
+	protected float wave_sin_cur[], wave_sin_old[];//синус анимация поверхности
+	protected float wave_old[], wave_cur[];        //симуляция колебаний
 	protected float wave_height = 32.0f;
 	Shader shader;
 
@@ -69,7 +72,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 
 		waterControl = new WaterController(game.world, waterSensor);
 
-		columnCount = (int)(getWidth()/game.units);
+		columnCount = (int)(getWidth()/game.units)*2;
 		
 		int vertexcount = (columnCount + 1)*2;
 		vertexlen = 5;
@@ -79,10 +82,10 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		int cols2 = columnCount+1;
 		
 		vertices = new float[vertexcount*vertexlen];
-		wave0 = new float[cols2];
-		wave1 = new float[cols2];
-		wave_old = wave0;
-		wave_cur = wave1;
+		wave_sin_cur = new float[cols2];
+		wave_sin_old = new float[cols2];
+		wave_old = new float[cols2];
+		wave_cur = new float[cols2];
 		short indicies[] = new short[columnCount*6];
 		
 		for(int col = 0; col < cols2; col++)
@@ -90,7 +93,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			int index = col*vertexlen;	
 			vertices[index    ] = getX() + width*col;//x
 			wave_cur[col] = wave_old[col] = 0.0f;
-//			wave_cur[col] = wave_old[col] = vertices[index];
+			wave_sin_old[col] = wave_sin_cur[col] = 0.0f;
 			vertices[index + 1] = getY() + getHeight() /*+ rand.nextFloat()*32.0f - 10.0f*/;//y
 			vertices[index + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
 			vertices[index + 3] = col*1.0f;//u
@@ -126,25 +129,6 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		
 		waterMesh.setVertices(vertices);
 		waterMesh.setIndices(indicies);
-//		waterMesh.setVertices(new float[]{ getX(),getY(), Color.toFloatBits(255, 0, 0, 255) , 0, 0,
-//				getX(), getY() + getHeight(), Color.toFloatBits(0, 255, 0, 255) , 1, 0,
-//				getX() + getWidth(), getY(), Color.toFloatBits(0, 0, 255, 255) , 0, 1,
-//				getX() + getWidth(), getY()+ getHeight(), Color.toFloatBits(0, 0, 255, 255) , 1, 1});
-//
-//		waterMesh.setVertices(new float[]{ 
-//				getX(), getY(), Color.toFloatBits(255, 0, 0, 255) , 0, 0,
-//				getX(), getY() + getHeight(), Color.toFloatBits(0, 255, 0, 255) , 1, 0,
-//				getX() + getWidth(), getY(), Color.toFloatBits(0, 0, 255, 255) , 0, 1,
-//				getX() + getWidth(), getY()+ getHeight(), Color.toFloatBits(0, 0, 255, 255) , 1, 1});
-//		waterMesh.setIndices(new short[]{3, 1, 0});
-
-		this.water = new Renderable();
-		this.water.mesh = waterMesh;
-		this.water.primitiveType = GL20.GL_TRIANGLES;
-		this.water.material = new Material();
-//		this.water.material.set(ColorAttribute.createDiffuse(1.0f,0.7f,0.6f,0.5f));
-//		this.water.material.set(Attribute);
-		//shader = new TestShader();
 	}
 
 
@@ -153,6 +137,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			waterControl.addBody(fixtureB);
 			
 			Vector2 vec2 = fixtureB.getBody().getPosition();
+			Vector2 vel2 = fixtureB.getBody().getLinearVelocity();
 			if( vec2.y*game.units >= getY() + getHeight() - game.units*2 )
 			{
 				float x = vec2.x*game.units;
@@ -162,7 +147,9 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 					index = 1;
 				else if( index >= columnCount )
 					index = columnCount - 1;
-				wave_cur[index] -= 0.70f;
+				float tmp = vel2.y*fixtureB.getBody().getMass()/game.units;
+				tmp = (tmp < -0.6f )?-1.0f:((tmp > 1/0f)?0.6f:tmp);
+				wave_cur[index] += tmp;
 			}
 		}
 	}
@@ -172,6 +159,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			waterControl.removeBody(fixtureB);
 						
 			Vector2 vec2 = fixtureB.getBody().getPosition();
+			Vector2 vel2 = fixtureB.getBody().getLinearVelocity();
 			if( vec2.y*game.units <= getY() + getHeight() + game.units )
 			{
 				float x = vec2.x*game.units;
@@ -181,30 +169,65 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 					index = 1;
 				else if( index >= columnCount )
 					index = columnCount - 1;
-				wave_cur[index] -=  0.55f;
+				float tmp = vel2.y*fixtureB.getBody().getMass()/game.units;
+				tmp = (tmp < -0.6f )?-1.0f:((tmp > 0.6f)?1.0f:tmp);
+				wave_cur[index] += tmp;
 			}
 		}
 	}
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
-
+//		Fixture dynamicFixture = null;
+//		if( contact.getFixtureA().getBody().getType() == BodyDef.BodyType.DynamicBody )
+//			dynamicFixture = contact.getFixtureA();
+//		else 
+//			dynamicFixture = contact.getFixtureB();
 	}
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-
+//		Fixture dynamicFixture = null;
+//		if( contact.getFixtureA().getBody().getType() == BodyDef.BodyType.DynamicBody )
+//			dynamicFixture = contact.getFixtureA();
+//		else 
+//			dynamicFixture = contact.getFixtureB();
+//		
+//		if( dynamicFixture != null ) {
+//			//узнаем вектор столкновения
+//			if( impulse.getNormalImpulses().length > 1 ) {
+//				float vel = impulse.getNormalImpulses()[1] * impulse.getTangentImpulses()[1];
+//				
+//				Vector2 vec2 = dynamicFixture.getBody().getPosition();
+//				if( vec2.y*game.units <= getY() + getHeight() + game.units )
+//				{
+//					float x = vec2.x*game.units;
+//					x -= getX();
+//					int index = (int)((columnCount+1)*x/getWidth());
+//					if(index < 1)
+//						index = 1;
+//					else if( index >= columnCount )
+//						index = columnCount - 1;
+//					wave_cur[index] +=  vel;
+//				}
+//			}
+//		}
 	}
 
 	@Override
 	public void act(float delta) {
 		waterControl.step();
-		float vis = 0.015f; //что то типа вязкости
+		float vis = 0.010f; //что то типа вязкости
 		//тест рандомных капель на поверхность
 //		if(rand.nextInt(128) % 30 == 0 )	{
 //			int index = rand.nextInt( wave_cur.length -2)+1;
 //			 wave_cur[index] -= 1.0f;
 //		}
+		//float step = 360 / (wave_cur.length - 2);
 		//расчет волны
 		for(int i = 1; i < wave_cur.length-1; i++ ) {
+			vertices[i*vertexlen + 1] -= wave_sin_cur[i];
+			wave_sin_cur[0] += delta;
+			wave_sin_cur[i] = MathUtils.sinDeg(120*i - 30 + wave_sin_cur[0]*9)*wave_height*0.17f;
+			vertices[i*vertexlen + 1] += wave_sin_cur[i];
 			vertices[i*vertexlen + 1] += (wave_cur[i] - wave_old[i])*wave_height;
 			this.waterMesh.setVertices(vertices);
 			float laplas =
@@ -218,6 +241,10 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		float temp[] = wave_old;
 		wave_old = wave_cur;
 		wave_cur = temp;
+		
+//		temp = wave_sin_old;
+//		wave_sin_old = wave_sin_cur;
+//		wave_sin_cur = temp;
 	}
 
 	public void draw (Batch batch, float parentAlpha) {
@@ -228,7 +255,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			game.font.draw(batch, this.getName(), pos.x, pos.y);
 		}
 		{// draw mesh
-			int polycount = vertices.length;
+//			int polycount = vertices.length;
 //			if (idx == 0) return;
 
 //			renderCalls++;
@@ -239,7 +266,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 
 //			lastTexture.bind();
 //			game.asset.get( "pinguin.png", Texture.class).bind();
-			Mesh mesh = this.waterMesh;
+//			Mesh mesh = ;
 //			mesh.setVertices(vertices, 0, vertices.length);
 //			mesh.getIndicesBuffer().position(0);
 //			mesh.getIndicesBuffer().limit(20);//cols*2
@@ -254,7 +281,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			//batch.
 			
 			game.asset.get( "defaultbg.png", Texture.class).bind();
-			mesh.render(batch.getShader(), GL20.GL_TRIANGLES);
+			this.waterMesh.render(batch.getShader(), GL20.GL_TRIANGLES);
 //			game.modelBatch.begin(game.camera);
 //			game.modelBatch.render(this.water);
 //			game.modelBatch.end();
