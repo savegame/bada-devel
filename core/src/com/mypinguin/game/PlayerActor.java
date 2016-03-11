@@ -3,6 +3,7 @@ package com.mypinguin.game;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -177,6 +178,23 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		if( legsBody != null )
 			legsBody.setTransform(getX() / game.units, (getY() - height4)/ game.units, 0f);
 		fixturedef.shape = null;
+		//this.setSize(64f,120f);
+	}
+
+	/**
+	 * Возвращает ширину тела
+	 * @return
+	 */
+	public float getBodyWidth() {
+		return 64f;
+	}
+
+	/**
+	 * Возвраащет высоту тела
+	 * @return
+	 */
+	public float getBodyHeight() {
+		return 120f;
 	}
 
 	/**
@@ -659,5 +677,11 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 
+	}
+	
+	public Rectangle getBoundingBox() {
+		float w = getWidth()*0.4f;
+		float h = getHeight()*0.9f;
+		return new Rectangle (getX()-w/2,getY()-getHeight()/2,w,h);
 	}
 }
