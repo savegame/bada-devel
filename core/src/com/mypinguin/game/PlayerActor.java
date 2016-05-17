@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -33,13 +34,15 @@ import java.util.Set;
  */
 public class PlayerActor extends com.penguin.physics.BodyActor {
 	//Box2D
-	private Fixture physicsFixture;
-	private Fixture sensorFixture;
-	private Fixture getRFixture;
-	private Fixture getLFixture;
-	private Fixture getItem = null;
-	private Body    getBody = null;
-	private Joint   getJoint = null;
+	private Fixture  physicsFixture;
+	private Fixture  sensorFixture;
+	private Fixture  getRFixture;
+	private Fixture  getLFixture;
+	private Fixture  getItem = null;
+	private Body     getBody = null;
+	private Joint    getJoint = null;
+	private MassData getMass = null;
+	private MassData nullMass = null;
 
 	private Body          legsBody; //ноги - колесо
 	private Fixture       legsFixture;
@@ -101,6 +104,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		this.setFixtureDef(fixtureDef);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.01f;
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
@@ -109,6 +114,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		setTexRegion(staticFront, StaticTextureType.front);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.01f;
 	}
 
 	public void initialize(Shape bodyShape) {
@@ -322,6 +329,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void pick() {
 		if( getBody != null && getJoint == null) {
 			getBody.setAwake(true);
+			getMass = getBody.getMassData();
+			getBody.setMassData(nullMass);
 			PrismaticJointDef jointDef = new PrismaticJointDef();
 			float near = 64f;
 			float far = 65f;
@@ -353,6 +362,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(false);
 			}
 			game.world.destroyJoint(getJoint);
+			MassData data = new MassData();
+			getBody.setMassData(getMass);
 			if( getItem == getLFixture )
 				getBody.applyForceToCenter(-125f, 0, true);
 			else

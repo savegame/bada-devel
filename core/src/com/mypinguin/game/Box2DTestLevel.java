@@ -220,6 +220,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		this.loadAsset("pinguin.png", Texture.class);
 		this.loadAsset("run_0.png", Texture.class);
 		this.loadAsset("defaultbg.png", Texture.class);
+		this.loadAsset("water.png", Texture.class);
 	}
 
 	private void createUI(Stage ui_stage) {

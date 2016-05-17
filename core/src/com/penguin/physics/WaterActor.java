@@ -8,11 +8,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Shader;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.particles.influencers.ColorInfluencer.Random;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
@@ -41,9 +38,11 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 	protected int   columnCount;//кол-во количество колонок (вершин для волны - 1)
 	protected RandomXS128 rand = new RandomXS128();
 	
-	protected float wave_sin_cur[], wave_sin_old[];//синус анимация поверхности
-	protected float wave_old[], wave_cur[];        //симуляция колебаний
-	protected float wave_height = 32.0f;
+	protected float         wave_sin[];//синус анимация поверхности
+	protected float         wave_old[], wave_cur[];        //симуляция колебаний
+	protected float         wave_height = 32.0f;
+	protected Texture       texa = null;
+	protected TextureRegion region = null;
 	Shader shader;
 
 	public WaterActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
@@ -51,6 +50,11 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		this.setFixtureDef(_fixturedef);
 	}
 
+	public void setTexture(Texture texture)
+	{
+		texa = texture;
+	}
+	
 	@Override
 	public void initialize(Shape bodyShape) {
 		if(  bodyShape instanceof PolygonShape == false )
@@ -72,7 +76,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 
 		waterControl = new WaterController(game.world, waterSensor);
 
-		columnCount = (int)(getWidth()/game.units)*2;
+		columnCount = (int)(getWidth()/game.units);
 		
 		int vertexcount = (columnCount + 1)*2;
 		vertexlen = 5;
@@ -81,30 +85,60 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		float height = width*2;
 		int cols2 = columnCount+1;
 		
-		vertices = new float[vertexcount*vertexlen];
-		wave_sin_cur = new float[cols2];
-		wave_sin_old = new float[cols2];
+		vertices = new float[vertexcount*vertexlen+4*vertexlen];
+		wave_sin = new float[cols2];
 		wave_old = new float[cols2];
 		wave_cur = new float[cols2];
-		short indicies[] = new short[columnCount*6];
+		short indicies[] = new short[columnCount*6 + 6];
 		
 		for(int col = 0; col < cols2; col++)
 		{
 			int index = col*vertexlen;	
 			vertices[index    ] = getX() + width*col;//x
 			wave_cur[col] = wave_old[col] = 0.0f;
-			wave_sin_old[col] = wave_sin_cur[col] = 0.0f;
+			wave_sin[col] = 0.0f;
 			vertices[index + 1] = getY() + getHeight() /*+ rand.nextFloat()*32.0f - 10.0f*/;//y
 			vertices[index + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
-			vertices[index + 3] = col*1.0f;//u
+			vertices[index + 3] = col;//u
 			vertices[index + 4] = 0.0f;//v
 			int index2 = (col + cols2)*vertexlen ;
 			vertices[index2    ] = getX() + width*col;//x2
 			vertices[index2 + 1] = getY() + getHeight() - game.units;//y2
 			vertices[index2 + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
-			vertices[index2 + 3] = col*1.0f;//u
-			vertices[index2 + 4] = 1.0f;//v
+			vertices[index2 + 3] = col;//u
+			vertices[index2 + 4] = 0.5f;//v
 		}
+
+		vertices[vertexcount*vertexlen + 0*vertexlen + 0] = getX();//x
+		vertices[vertexcount*vertexlen + 0*vertexlen + 1] = getY() + getHeight() - game.units;//y
+		vertices[vertexcount*vertexlen + 0*vertexlen + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
+		vertices[vertexcount*vertexlen + 0*vertexlen + 3] = 0;//u
+		vertices[vertexcount*vertexlen + 0*vertexlen + 4] = 0.5f;//v
+
+		vertices[vertexcount*vertexlen + 1*vertexlen + 0] = getX() + getWidth();//x
+		vertices[vertexcount*vertexlen + 1*vertexlen + 1] = getY() + getHeight() - game.units;//y
+		vertices[vertexcount*vertexlen + 1*vertexlen + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
+		vertices[vertexcount*vertexlen + 1*vertexlen + 3] = 1;//u
+		vertices[vertexcount*vertexlen + 1*vertexlen + 4] = 0.5f;//v
+
+		vertices[vertexcount*vertexlen + 2*vertexlen + 0] = getX() + getWidth();//x
+		vertices[vertexcount*vertexlen + 2*vertexlen + 1] = getY();//y
+		vertices[vertexcount*vertexlen + 2*vertexlen + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
+		vertices[vertexcount*vertexlen + 2*vertexlen + 3] = 1;//u
+		vertices[vertexcount*vertexlen + 2*vertexlen + 4] = 1;//v
+
+		vertices[vertexcount*vertexlen + 3*vertexlen + 0] = getX();//x
+		vertices[vertexcount*vertexlen + 3*vertexlen + 1] = getY();//y
+		vertices[vertexcount*vertexlen + 3*vertexlen + 2] = Color.toFloatBits(255, 255, 255, 255);//rgba
+		vertices[vertexcount*vertexlen + 3*vertexlen + 3] = 0;//u
+		vertices[vertexcount*vertexlen + 3*vertexlen + 4] = 1;//v
+
+		indicies[columnCount*6+0] = (short)(vertexcount + 0);
+		indicies[columnCount*6+1] = (short)(vertexcount + 1);
+		indicies[columnCount*6+2] = (short)(vertexcount + 2);
+		indicies[columnCount*6+3] = (short)(vertexcount + 0);
+		indicies[columnCount*6+4] = (short)(vertexcount + 2);
+		indicies[columnCount*6+5] = (short)(vertexcount + 3);
 
 		for(short col = 0; col < (short)columnCount; col++)
 		{
@@ -129,6 +163,8 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		
 		waterMesh.setVertices(vertices);
 		waterMesh.setIndices(indicies);
+
+		texa = game.asset.get("water.png", Texture.class);
 	}
 
 
@@ -221,13 +257,12 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 //			int index = rand.nextInt( wave_cur.length -2)+1;
 //			 wave_cur[index] -= 1.0f;
 //		}
-		//float step = 360 / (wave_cur.length - 2);
 		//расчет волны
 		for(int i = 1; i < wave_cur.length-1; i++ ) {
-			vertices[i*vertexlen + 1] -= wave_sin_cur[i];
-			wave_sin_cur[0] += delta;
-			wave_sin_cur[i] = MathUtils.sinDeg(120*i - 30 + wave_sin_cur[0]*9)*wave_height*0.17f;
-			vertices[i*vertexlen + 1] += wave_sin_cur[i];
+			vertices[i*vertexlen + 1] -= wave_sin[i];
+			wave_sin[0] += delta;//время 
+			wave_sin[i] = MathUtils.sinDeg(120*i - 30 + wave_sin[0]*15)*wave_height*0.17f;
+			vertices[i*vertexlen + 1] += wave_sin[i];
 			vertices[i*vertexlen + 1] += (wave_cur[i] - wave_old[i])*wave_height;
 			this.waterMesh.setVertices(vertices);
 			float laplas =
@@ -241,10 +276,6 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		float temp[] = wave_old;
 		wave_old = wave_cur;
 		wave_cur = temp;
-		
-//		temp = wave_sin_old;
-//		wave_sin_old = wave_sin_cur;
-//		wave_sin_cur = temp;
 	}
 
 	public void draw (Batch batch, float parentAlpha) {
@@ -255,36 +286,16 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			game.font.draw(batch, this.getName(), pos.x, pos.y);
 		}
 		{// draw mesh
-//			int polycount = vertices.length;
-//			if (idx == 0) return;
-
-//			renderCalls++;
-//			totalRenderCalls++;
-//			int spritesInBatch = idx / 20;
-//			if (spritesInBatch > maxSpritesInBatch) maxSpritesInBatch = spritesInBatch;
-//			int count = spritesInBatch * 6;
-
-//			lastTexture.bind();
-//			game.asset.get( "pinguin.png", Texture.class).bind();
-//			Mesh mesh = ;
-//			mesh.setVertices(vertices, 0, vertices.length);
-//			mesh.getIndicesBuffer().position(0);
-//			mesh.getIndicesBuffer().limit(20);//cols*2
-
-//			if (blendingDisabled) {
-//				Gdx.gl.glDisable(GL20.GL_BLEND);
-//			} else {
-				//Gdx.gl.glEnable(GL20.GL_BLEND);
-//				if (blendSrcFunc != -1) Gdx.gl.glBlendFunc(blendSrcFunc, blendDstFunc);
-//			}
-			//batch.setTransformMatrix(game.camera.combined);
-			//batch.
-			
-			game.asset.get( "defaultbg.png", Texture.class).bind();
+			//Texture texa = game.asset.get( "defaultbg.png", Texture.class);
+			//batch.setColor(1.0f, 1.0f, 1.0f, 0.1f);
+			if( texa != null )
+			{
+				texa.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+				texa.bind();
+				//batch.enableBlending();
+				Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+			}
 			this.waterMesh.render(batch.getShader(), GL20.GL_TRIANGLES);
-//			game.modelBatch.begin(game.camera);
-//			game.modelBatch.render(this.water);
-//			game.modelBatch.end();
 		}
 	}
 

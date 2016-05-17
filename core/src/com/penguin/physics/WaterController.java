@@ -36,6 +36,9 @@ public class WaterController {
 
 	public void step() {
 		for (Fixture fixture : fixtures) {
+			if( fixture.getBody().getUserData() instanceof BoxActor && 
+					((BoxActor )fixture.getBody().getUserData()).isPicked())
+				continue;
 			if (fixture.getBody().isAwake()) {
 
 				/* Create clipPolygon */
