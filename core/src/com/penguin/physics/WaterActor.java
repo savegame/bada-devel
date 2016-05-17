@@ -292,10 +292,12 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			{
 				texa.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 				texa.bind();
-				//batch.enableBlending();
+
 				Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+//				Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 			}
 			this.waterMesh.render(batch.getShader(), GL20.GL_TRIANGLES);
+			Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 		}
 	}
 

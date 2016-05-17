@@ -1,5 +1,6 @@
 package com.mypinguin.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -105,7 +106,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
 		nullMass = new MassData();
-		nullMass.mass = 0.01f;
+		nullMass.mass = 0.5f;
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
@@ -115,7 +116,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
 		nullMass = new MassData();
-		nullMass.mass = 0.01f;
+		nullMass.mass = 0.5f;
 	}
 
 	public void initialize(Shape bodyShape) {
@@ -331,6 +332,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 			getBody.setAwake(true);
 			getMass = getBody.getMassData();
 			getBody.setMassData(nullMass);
+			getBody.setAngularVelocity(0);
 			PrismaticJointDef jointDef = new PrismaticJointDef();
 			float near = 64f;
 			float far = 65f;
@@ -550,7 +552,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 
-		batch.setColor(1, 1, 1, parentAlpha);
+		batch.setColor( new Color(1, 1, 1, parentAlpha) );
 		currentAnim = null;
 		switch ( m_dir ){
 			case Left:
@@ -599,6 +601,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		if (staticCurrent != null) {
 			float halfWidth = staticCurrent.getRegionWidth() / 2;
 			float halfHeight = staticCurrent.getRegionHeight() / 2;
+			//Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+//			batch.disableBlending();
 			batch.draw(staticCurrent,
 							getX() - halfWidth,
 							getY() - halfHeight,

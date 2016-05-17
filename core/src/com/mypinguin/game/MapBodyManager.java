@@ -24,13 +24,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.penguin.physics.BodyActor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -75,6 +76,7 @@ public class MapBodyManager implements Disposable {
 	private Logger logger;
 	private World world;
 	private List<com.penguin.physics.BodyActor> actors = new ArrayList<com.penguin.physics.BodyActor>();
+	private List<com.penguin.physics.BodyActor> water_actors = new ArrayList<com.penguin.physics.BodyActor>();
 	private Array<Body> bodies = new Array<Body>();
 	private ObjectMap<String, FixtureDef> materials = new ObjectMap<String, FixtureDef>();
 	private ObjectMap<String, com.penguin.physics.PlatformActor> platforms = new ObjectMap<String, com.penguin.physics.PlatformActor>();
@@ -247,11 +249,12 @@ public class MapBodyManager implements Disposable {
 				com.penguin.physics.WaterActor water = new com.penguin.physics.WaterActor(game, fixtureDef);
 				water.setName(name);
 				RectangleMapObject rectangle = (RectangleMapObject) object;
-				water.setSize(rectangle.getRectangle().getWidth(), rectangle.getRectangle().getHeight() );
+				water.setSize(rectangle.getRectangle().getWidth(), rectangle.getRectangle().getHeight());
 				water.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
 				water.initialize(shape);
 
-				actors.add(water);
+//				actors.add(water);
+				water_actors.add(water);
 			}
 			else if( type.equalsIgnoreCase("ground") ) {
 				if (dynamic.equalsIgnoreCase("true"))
@@ -417,9 +420,15 @@ public class MapBodyManager implements Disposable {
 		bodies.clear();
 	}
 
-	public void actorsToStage(Stage stage) {
+	public void actorsToStage(Group layer) {
 		for( com.penguin.physics.BodyActor actor : actors ) {
-			stage.addActor(actor);
+			layer.addActor(actor);
+		}
+	}
+
+	public void waterActorToStage(Group layer) {
+		for(BodyActor actor : water_actors) {
+			layer.addActor(actor);
 		}
 	}
 

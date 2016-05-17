@@ -164,7 +164,7 @@
   <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
   <object id="121" name="stone" type="temp" gid="38" x="2136.4" y="536.463" width="64" height="64"/>
   <object id="122" name="stone" type="temp" gid="38" x="1968" y="96" width="64" height="64"/>
-  <object id="133" name="player" type="player" x="1584" y="1584" width="32" height="128"/>
+  <object id="133" name="player" type="player" x="2000" y="1856" width="32" height="128"/>
   <object id="142" name="stone" type="temp" gid="38" x="2176" y="48" width="64" height="64"/>
   <object id="143" name="water2" type="water" x="544" y="1968" width="512" height="48"/>
   <object id="144" name="water3" type="water" x="1184" y="1968" width="256" height="48"/>
@@ -226,7 +226,7 @@
    <properties>
     <property name="material" value="ice"/>
    </properties>
-   <polygon points="49,5.95903 -63,5.95903 -63,-10.041 33,-10.041"/>
+   <polygon points="49,5.95903 -143,5.95903 -143,-10.041 33,-10.041"/>
   </object>
   <object id="155" name="ground" type="ground" x="928" y="1248">
    <properties>
@@ -238,13 +238,13 @@
    <properties>
     <property name="material" value="ice"/>
    </properties>
-   <polygon points="32,80 -48,80 -48,64 16,64"/>
+   <polygon points="32,64 -48,64 -48,48 16,48"/>
   </object>
   <object id="157" name="ground" type="ground" x="928" y="1136">
    <properties>
     <property name="material" value="ice"/>
    </properties>
-   <polygon points="0,48 -64,48 -64,-128 0,-128"/>
+   <polygon points="0,32 -64,32 -64,-128 0,-128"/>
   </object>
   <object id="158" name="ground" type="ground" x="880" y="1008">
    <properties>
