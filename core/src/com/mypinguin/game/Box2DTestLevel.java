@@ -73,7 +73,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
-		game.isDebug = false;
+		game.isDebug = true;
 
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
