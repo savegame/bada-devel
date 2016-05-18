@@ -1,5 +1,6 @@
 package com.mypinguin.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -34,13 +36,18 @@ import java.util.Set;
  */
 public class PlayerActor extends com.penguin.physics.BodyActor {
 	//Box2D
-	private Fixture physicsFixture;
-	private Fixture sensorFixture;
-	private Fixture getRFixture;
-	private Fixture getLFixture;
-	private Fixture getItem = null;
-	private Body    getBody = null;
-	private Joint   getJoint = null;
+	private Fixture     physicsFixture;
+	private Fixture     sensorFixture;
+	private Fixture     getRFixture;    // правая область захвата объекта
+	private Fixture     getLFixture;    // левая область захвата объекта
+	private Fixture     getItem = null; //текущая область захвата объекта
+	private Body        getBody = null; //текущий обеъкт с которым взаимодействует игрок
+	private Body        currentGetBody = null; //текущий объект с которым МОЖЕТ взаимодействовать игрок
+	private Set<Body>   canGetBodiesL = new HashSet<Body>(); //объекты слева от игрока
+	private Set<Body>   canGetBodiesR = new HashSet<Body>(); //объекты справа от игрока
+	private Joint       getJoint = null;
+	private MassData    getMass = null;
+	private MassData    nullMass = null;
 
 	private Body          legsBody; //ноги - колесо
 	private Fixture       legsFixture;
@@ -102,6 +109,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		this.setFixtureDef(fixtureDef);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.5f;
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
@@ -110,6 +119,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		setTexRegion(staticFront, StaticTextureType.front);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.5f;
 	}
 
 	public void initialize(Shape bodyShape) {
@@ -304,20 +315,32 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 				}
 				sensor = true;
 			}
-			else if(getJoint == null) {
+			/*else if(getJoint == null) {
+				Fixture getBodyFixture = null;
+				Fixture handFixture = null;
 				if (contact.getFixtureA() == getRFixture  || contact.getFixtureA() == getLFixture) {
 					if (contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("box")) {
 						getBody = contact.getFixtureB().getBody();
+						canGetBodies.add(contact.getFixtureB().getBody());
+//						if( (getX() - ((BoxActor)getBody.getUserData()).getX())*getScaleX() < 0 ) {
 						getItem = contact.getFixtureA();
+//						}
+//						else
+//							getBody = null;
 					}
 				}
 				else if (contact.getFixtureB() == getRFixture  || contact.getFixtureB() == getLFixture) {
 					if (contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("box")) {
 						getBody = contact.getFixtureA().getBody();
+//						canGetBodies.add(contact.getFixtureA().getBody());
+//						if( (getX() - ((BoxActor)getBody.getUserData()).getX())*getScaleX() < 0 ) {
 						getItem = contact.getFixtureB();
+//						}
+//						else
+//							getBody = null;
 					}
 				}
-			}
+			}*/
 		}
 		if(!sensor){
 			//raycast
@@ -338,8 +361,12 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	}
 
 	public void pick() {
-		if( getBody != null && getJoint == null) {
+		if( canPick() ) {
+			getBody = currentGetBody;
 			getBody.setAwake(true);
+			getMass = getBody.getMassData();
+			getBody.setMassData(nullMass);
+			getBody.setAngularVelocity(0);
 			PrismaticJointDef jointDef = new PrismaticJointDef();
 			float near = 64f;
 			float far = 65f;
@@ -371,6 +398,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(false);
 			}
 			game.world.destroyJoint(getJoint);
+			MassData data = new MassData();
+			getBody.setMassData(getMass);
 			if( getItem == getLFixture )
 				getBody.applyForceToCenter(-125f, 0, true);
 			else
@@ -383,7 +412,23 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	}
 
 	public boolean canPick() {
-		return  getJoint == null && getBody != null;
+		boolean result = false /*&& getBody != null*/;
+		if( getScaleX() > 0 && !canGetBodiesR.isEmpty() )
+		{
+			currentGetBody = canGetBodiesR.iterator().next();
+			getItem = getRFixture;
+			result = getJoint == null  && true;
+		}
+		else if( getScaleX() < 0 && !canGetBodiesL.isEmpty() )
+		{
+			currentGetBody = canGetBodiesL.iterator().next();
+			getItem = getLFixture;
+			//canGetBodiesL.stream().findFirst();
+			result = getJoint == null  && true;
+		}
+		else
+			currentGetBody = null;
+		return  result;
 	}
 
 	public boolean isPicked() {
@@ -557,7 +602,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 
-		batch.setColor(1, 1, 1, parentAlpha);
+		batch.setColor( new Color(1, 1, 1, parentAlpha) );
 		currentAnim = null;
 		switch ( m_dir ){
 			case Left:
@@ -606,6 +651,8 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		if (staticCurrent != null) {
 			float halfWidth = staticCurrent.getRegionWidth() / 2;
 			float halfHeight = staticCurrent.getRegionHeight() / 2;
+			//Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+//			batch.disableBlending();
 			batch.draw(staticCurrent,
 							getX() - halfWidth,
 							getY() - halfHeight,
@@ -627,6 +674,12 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 			}
 			grounded = true;
 		}
+		else if( fixtureB.getUserData() != null && fixtureB.getUserData().equals("box") ) {
+			if( fixtureA == getLFixture )
+				canGetBodiesL.add( fixtureB.getBody() );
+			else if( fixtureA == getRFixture )
+				canGetBodiesR.add( fixtureB.getBody() );
+		}
 	}
 
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
@@ -644,10 +697,17 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 //				}
 			}
 		}
-		else if( getJoint == null && (fixtureA == getRFixture  || fixtureA == getLFixture) )
+		else if( fixtureA == getRFixture  || fixtureA == getLFixture )
 		{
-			getBody = null;
-			getItem = null;
+			if( fixtureA == getLFixture )
+				canGetBodiesL.remove(fixtureB.getBody());
+			else if( fixtureA == getRFixture )
+				canGetBodiesR.remove(fixtureB.getBody() );
+//			canGetBodies.remove( fixtureB.getBody() );
+			if(getJoint == null ) {
+				getBody = null;
+				getItem = null;
+			}
 		}
 	}
 
