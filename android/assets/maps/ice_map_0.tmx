@@ -156,16 +156,16 @@
   <object id="112" name="box" type="temp" gid="37" x="3936" y="848" width="64" height="64"/>
   <object id="113" name="box" type="temp" gid="37" x="2272" y="1424" width="64" height="64"/>
   <object id="114" name="box" type="temp" gid="37" x="2336" y="1440" width="64" height="64"/>
-  <object id="115" name="box" type="temp" gid="37" x="2307.3" y="1208.93" width="64" height="64" rotation="53.9933"/>
+  <object id="115" name="box" type="temp" gid="37" x="2304" y="1312" width="64" height="64" rotation="53.9933"/>
   <object id="116" name="box" type="temp" gid="37" x="1888" y="704" width="64" height="64" rotation="45"/>
   <object id="117" name="box" type="temp" gid="37" x="1792" y="608" width="64" height="64"/>
   <object id="118" name="stone" type="temp" gid="38" x="624" y="1216" width="64" height="64"/>
-  <object id="119" name="stone" type="temp" gid="38" x="2136.4" y="536.463" width="64" height="64"/>
+  <object id="119" name="stone" type="temp" gid="38" x="2080" y="688" width="64" height="64"/>
   <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
-  <object id="121" name="stone" type="temp" gid="38" x="2136.4" y="536.463" width="64" height="64"/>
-  <object id="122" name="stone" type="temp" gid="38" x="1968" y="96" width="64" height="64"/>
-  <object id="133" name="player" type="player" x="2000" y="1856" width="32" height="128"/>
-  <object id="142" name="stone" type="temp" gid="38" x="2176" y="48" width="64" height="64"/>
+  <object id="121" name="stone" type="temp" gid="38" x="2048" y="736" width="64" height="64"/>
+  <object id="122" name="stone" type="temp" gid="38" x="1968" y="544" width="64" height="64"/>
+  <object id="133" name="player" type="player" x="2048" y="1264" width="32" height="128"/>
+  <object id="142" name="stone" type="temp" gid="38" x="1920" y="288" width="64" height="64"/>
   <object id="143" name="water2" type="water" x="544" y="1968" width="512" height="48"/>
   <object id="144" name="water3" type="water" x="1184" y="1968" width="256" height="48"/>
   <object id="145" name="ground" type="ground" x="176" y="672">

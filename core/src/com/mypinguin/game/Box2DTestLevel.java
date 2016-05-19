@@ -17,7 +17,6 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -66,7 +65,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private Group              waterlayer          = null;
 	private Group              foreground          = null;
 	//randomizer
-	RandomXS128 rand = new RandomXS128();
+
 	
 	
 	Box2DTestLevel( PenguinGame penguinGame ) {
@@ -139,7 +138,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		
 		//Временное решение для информирования системы частиц о прямоугольниках с водой,
 		//впрочем если не париться, то такое решение вполне нормальное и для продакшена
-		Array<Actor> actors = stage.getActors();
+		Array<Actor> actors = waterlayer.getChildren();
 		for (int i = 0; i < actors.size; i++)
 		{
 			if (actors.items[i] instanceof com.penguin.physics.WaterActor)
@@ -218,8 +217,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 	
 	private void createRect() {
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set( rand.nextFloat()*(game.width/game.units-4)+2, rand.nextFloat()*(game.height/game.units-2)+5);
-		bodyDef.angle = rand.nextFloat()*360f;
+		bodyDef.position.set( game.rand.nextFloat()*(game.width/game.units-4)+2, game.rand.nextFloat()*(game.height/game.units-2)+5);
+		bodyDef.angle = game.rand.nextFloat()*360f;
 		bodyDef.type = BodyType.DynamicBody;
 		
 		Body body = world.createBody(bodyDef);
@@ -314,6 +313,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		{
 			time_stamp = delta;
 			world.step(time_stamp, 6, 2);
+			game.destroyBodies();
 			accumulator -= time_stamp;
 		}
 

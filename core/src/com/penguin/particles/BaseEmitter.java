@@ -1,13 +1,13 @@
 package com.penguin.particles;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mypinguin.game.PenguinGame;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class BaseEmitter<T> extends Actor
 {
@@ -232,8 +232,22 @@ public class BaseEmitter<T> extends Actor
 	}
 	
 	//virtual methods
+
 	public void emit(float delta) {}
+
+	/**
+	 * Инициализация частицы (при ее пересоздании)
+	 * @param particle частица
+	 */
 	public void resetParticle(Particle particle) {}
+
+	/**
+	 * Обновление состояния частицы
+	 * @param delta     время в секундах
+	 * @param particle  частица
+	 * @return          true если обновление выполнено
+	 */
 	public boolean updateParticle(float delta, Particle particle) { return true; }
+
 	public void interpolateParticle(float delta, Particle particle) {}
 }

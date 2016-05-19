@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -15,6 +16,9 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.penguin.physics.BodyActor;
+
+import java.util.ArrayList;
 
 public class PenguinGame extends Game {
 	public class ContactsController implements ContactListener {
@@ -93,6 +97,8 @@ public class PenguinGame extends Game {
 	public boolean      isDebug = true;
 	public Camera       camera = null;
 
+	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
+
 	// physics
 	public World        world;
 	public float        units  = 64f; //пикселей на физю метр
@@ -107,6 +113,8 @@ public class PenguinGame extends Game {
 	 * */ 
 	public float       width  = 800;
 	public float       height = 480;
+	//глобальный генератор случайных чисел
+	public RandomXS128 rand = new RandomXS128();
 
 	@Override
 	public void create() {
@@ -146,5 +154,22 @@ public class PenguinGame extends Game {
 		batch.dispose();
 		asset.dispose();
 		world.dispose();
+	}
+
+	public void addToDestroy(BodyActor actor) {
+		if(!destroy.contains(actor))
+			destroy.add(actor);
+	}
+
+	public void destroyBodies() {
+		while( destroy.iterator().hasNext() ) {
+			BodyActor actor = destroy.iterator().next();
+
+			if( actor.destroyBody() ) {
+				actor.clear();
+				actor.remove();
+				destroy.remove(actor);
+			}
+		}
 	}
 }

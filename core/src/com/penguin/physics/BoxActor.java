@@ -3,7 +3,6 @@ package com.penguin.physics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -12,14 +11,18 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.mypinguin.game.PenguinGame;
+import com.penguin.particles.Emitter_BoxPart;
+import com.penguin.particles.Particle_BoxPart;
 
 /**
  * Created by savegame on 12.11.15.
+ * Класс геометрических объектов которые игрок может подобрать и нести
  */
 public class BoxActor extends com.penguin.physics.BodyActor {
 	private TextureRegion  picture;
 	private boolean picked = false; //значит что предмет находиться в руках
 	private boolean platformed = false; //ЗНАЧИТ ПРЕДМЕТ НАХОДИТЬСЯ НА подвижной платформе
+	private float   destroyForce = 10.0f; //сила при которой объект разрушаеться
 	
 	public BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
 	{
@@ -59,7 +62,9 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 	public boolean isPlatformed() {
 		return platformed;
 	}
-	
+
+
+
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
@@ -127,12 +132,39 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 	}
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-		if( impulse.getNormalImpulses().length >= 2 ) {
-			Vector2 vec = new Vector2( impulse.getNormalImpulses()[0], impulse.getNormalImpulses()[1] );
-			if( vec.len() > 10f ) {
-				//body.getFixtureList().get(0).setSensor(true);
-				body.setLinearVelocity(0f, 0f);
-				//body.setActive(false);
+//		if( impulse.getNormalImpulses().length >= 2 ) {
+//			Vector2 vec = new Vector2( impulse.getNormalImpulses()[0], impulse.getNormalImpulses()[1] );
+//			if( vec.len() > 10f ) {
+//				//body.getFixtureList().get(0).setSensor(true);
+//				body.setLinearVelocity(0f, 0f);
+//				//body.setActive(false);
+//			}
+//		}
+		for( int i =0; i < impulse.getNormalImpulses().length; i++) {
+			if( impulse.getNormalImpulses()[0] >= this.destroyForce )
+			{
+				//тут нужна функция уничтожения объекта, и создание системы частиц на его местеыгвщ нгь штыефдд
+//				body.getFixtureList().get(0).setSensor(true);
+//				//body.setType(BodyDef.BodyType.StaticBody);
+//				body.setLinearVelocity(0f, 0f);
+//				body.setAngularVelocity(0f);
+//				MassData mass = new MassData();
+//				mass.mass = 0.01f;
+//				//body.setActive(false);
+//				if(game.world.isLocked() == false)
+//					body.setMassData( mass );
+
+				game.addToDestroy(this);
+
+				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("default"), Particle_BoxPart.class );
+				boxEmitter.setPosition( getX(), getY() );
+				boxEmitter.generate(10);
+				boxEmitter.setMaxParticlesCount(10);
+				game.particles.addEmitter( boxEmitter, 0 );
+
+				//this.clear();
+				//this.remove();
+				break;
 			}
 		}
 	}

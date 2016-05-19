@@ -1,15 +1,14 @@
 package com.mypinguin.game;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.utils.Array;
 import com.penguin.particles.BaseEmitter;
 import com.penguin.particles.Emitter_Snow;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ParticlesManager {
 	//---------------------------------------------
@@ -65,6 +64,17 @@ public class ParticlesManager {
 			emitter.remove();
 		}
 	}
+
+//	public void removeEmitter( BaseEmitter emitter, int layer ) {
+//		Layer pLayer = getLayer(layer);
+//		//Actor emitter = pLayer.findActor(name);
+//		if (emitter != null)
+//		{
+//			pLayer.removeActor(emitter);
+//			emitter.clear();
+//			emitter.remove();
+//		}
+//	}
 	
 	public void clearLayers(){
 		Iterator<Layer> it = layers.iterator();

@@ -19,6 +19,7 @@ import com.penguin.mechanism.Activable;
  * Created by savegame on 10.11.15.
  */
 public class BodyActor extends Actor implements Activable {
+
 	protected FixtureDef  fixturedef = null;//настройки геометрии физического тела
 	protected BodyDef     bodydef = null; //настройки физщического тела по умолчанию
 	protected Body        body    = null; //физическое тело
@@ -35,6 +36,14 @@ public class BodyActor extends Actor implements Activable {
 		//fixturedef = _fixturedef;
 	}
 
+	public boolean destroyBody() {
+		if( game.world.isLocked() == false ) {
+			body.setActive(false);
+			game.world.destroyBody(body);
+			return  true;
+		}
+		return false;
+	}
 	public void setFixtureDef(FixtureDef fixtureDef) {
 		this.fixturedef = fixtureDef;
 	}
