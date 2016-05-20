@@ -14,9 +14,11 @@ import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.penguin.physics.BodyActor;
+import com.penguin.physics.BoxActor;
 
 import java.util.ArrayList;
 
@@ -98,6 +100,7 @@ public class PenguinGame extends Game {
 	public Camera       camera = null;
 
 	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
+	private ArrayList<Joint> destroyJoint = new ArrayList<Joint>();
 
 	// physics
 	public World        world;
@@ -157,11 +160,26 @@ public class PenguinGame extends Game {
 	}
 
 	public void addToDestroy(BodyActor actor) {
-		if(!destroy.contains(actor))
+		if(!destroy.contains(actor)) {
 			destroy.add(actor);
+			if(player != null && actor instanceof BoxActor )
+				player.detachIfNeed( (BoxActor) actor);
+		}
+	}
+
+	public void addToDestroy(Joint joint) {
+		if(!destroyJoint.contains(joint)) {
+			destroyJoint.add(joint);
+		}
 	}
 
 	public void destroyBodies() {
+		if( world.isLocked() ) return;
+		while( destroyJoint.iterator().hasNext() ) {
+			Joint joint = destroyJoint.iterator().next();
+			world.destroyJoint(joint);
+			destroyJoint.remove(joint);
+		}
 		while( destroy.iterator().hasNext() ) {
 			BodyActor actor = destroy.iterator().next();
 

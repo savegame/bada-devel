@@ -37,12 +37,9 @@ public class BodyActor extends Actor implements Activable {
 	}
 
 	public boolean destroyBody() {
-		if( game.world.isLocked() == false ) {
 			body.setActive(false);
 			game.world.destroyBody(body);
 			return  true;
-		}
-		return false;
 	}
 	public void setFixtureDef(FixtureDef fixtureDef) {
 		this.fixturedef = fixtureDef;

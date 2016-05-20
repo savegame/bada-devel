@@ -15,7 +15,6 @@ public class FontsManager {
 	Array<FontStyleLoaded> stylesLibrary = null;
 	
 	public FontsManager() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void dispose()

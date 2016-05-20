@@ -143,7 +143,6 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 		for( int i =0; i < impulse.getNormalImpulses().length; i++) {
 			if( impulse.getNormalImpulses()[0] >= this.destroyForce )
 			{
-				//тут нужна функция уничтожения объекта, и создание системы частиц на его местеыгвщ нгь штыефдд
 //				body.getFixtureList().get(0).setSensor(true);
 //				//body.setType(BodyDef.BodyType.StaticBody);
 //				body.setLinearVelocity(0f, 0f);
@@ -151,7 +150,8 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 //				MassData mass = new MassData();
 //				mass.mass = 0.01f;
 //				//body.setActive(false);
-//				if(game.world.isLocked() == false)
+//				if(game.world.isLoexit
+// cked() == false)
 //					body.setMassData( mass );
 
 				game.addToDestroy(this);
@@ -159,7 +159,7 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("default"), Particle_BoxPart.class );
 				boxEmitter.setPosition( getX(), getY() );
 				boxEmitter.generate(10);
-				boxEmitter.setMaxParticlesCount(10);
+//				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, 0 );
 
 				//this.clear();

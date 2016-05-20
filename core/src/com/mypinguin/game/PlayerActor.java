@@ -27,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.Array;
+import com.penguin.physics.BoxActor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -345,7 +346,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		if(!sensor){
 			//raycast
 			final Vector2 p1 = new Vector2(this.getX()/game.units, this.getY()/game.units);
-			Vector2 p2 = new Vector2(p1.x, p1.y - 2f);
+			Vector2 p2 = new Vector2(p1.x, p1.y - 0.5f);
 			MyRayCallback mrcb = new MyRayCallback(sensor, p1);
 			game.world.rayCast(  mrcb, p1, p2);
 			sensor = mrcb.sensor; 
@@ -358,6 +359,35 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		Vector2 pos = body.getPosition();
 		body.applyLinearImpulse( new Vector2(0,jumpImpulse/game.units) , pos, true);
 		grounded = false;
+	}
+
+	/**
+	 * Отсоединяет объект от игрока, если он в руках
+	 * @param box   объект
+	 */
+	public void detachIfNeed( BoxActor box ) {
+		if( this.isPicked() ) {
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor )
+			{
+				BoxActor _box = (BoxActor)getBody.getUserData();
+				if( _box == box )
+				{
+					box.setPicked(false);
+
+					game.addToDestroy(getJoint);
+//			MassData data = new MassData();
+//					getBody.setMassData(getMass);
+//					if( getItem == getLFixture )
+//						getBody.applyForceToCenter(-125f, 0, true);
+//					else
+//						getBody.applyForceToCenter(125f, 0, true);
+					getJoint = null;
+					getBody = null;
+					getItem = null;
+					physicsFixture.setDensity(bodyDencity);
+				}
+			}
+		}
 	}
 
 	public void pick() {
@@ -393,12 +423,12 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(true);
 			}
 		}
-		else 	if( getJoint != null ) {
+		else 	if( this.isPicked() ) {
 			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor) {
 				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(false);
 			}
 			game.world.destroyJoint(getJoint);
-			MassData data = new MassData();
+//			MassData data = new MassData();
 			getBody.setMassData(getMass);
 			if( getItem == getLFixture )
 				getBody.applyForceToCenter(-125f, 0, true);
