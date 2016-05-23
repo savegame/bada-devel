@@ -145,14 +145,14 @@
   <object id="96" name="box" type="temp" gid="37" x="64" y="896" width="64" height="64"/>
   <object id="98" name="stone" type="temp" gid="38" x="192" y="896" width="64" height="64"/>
   <object id="100" name="box" type="temp" gid="37" x="2176" y="736" width="64" height="64"/>
-  <object id="104" name="box" type="temp" gid="37" x="2176" y="672" width="64" height="64"/>
+  <object id="104" name="box" type="temp" gid="37" x="3600" y="1440" width="64" height="64"/>
   <object id="105" name="box" type="temp" gid="37" x="2112" y="736" width="64" height="64"/>
-  <object id="106" name="box" type="temp" gid="37" x="2153.33" y="606.667" width="64" height="64"/>
+  <object id="106" name="box" type="temp" gid="37" x="3520" y="1504" width="64" height="64"/>
   <object id="107" name="box" type="temp" gid="37" x="1792" y="672" width="64" height="64"/>
   <object id="108" name="box" type="temp" gid="37" x="1792" y="736" width="64" height="64"/>
   <object id="109" name="box" type="temp" gid="37" x="864" y="1568" width="64" height="64"/>
   <object id="110" name="box" type="temp" gid="37" x="864" y="1488" width="64" height="64"/>
-  <object id="111" name="box" type="temp" gid="37" x="3088" y="720" width="64" height="64"/>
+  <object id="111" name="box" type="temp" gid="37" x="3584" y="1504" width="64" height="64"/>
   <object id="112" name="box" type="temp" gid="37" x="3936" y="848" width="64" height="64"/>
   <object id="113" name="box" type="temp" gid="37" x="2272" y="1424" width="64" height="64"/>
   <object id="114" name="box" type="temp" gid="37" x="2336" y="1440" width="64" height="64"/>
@@ -331,7 +331,7 @@
    </properties>
    <polygon points="-464,-464 -480,-448 -480,-416 -464,-400 96,-400 96,-464"/>
   </object>
-  <object id="174" name="box_emitter_0" type="emitter" gid="37" x="3520" y="880" width="64" height="64">
+  <object id="174" name="box_emitter_0" type="emitter" gid="37" x="3520" y="864" width="64" height="64">
    <properties>
     <property name="max_count" value="3"/>
     <property name="template" value="box"/>

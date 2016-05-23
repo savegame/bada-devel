@@ -157,7 +157,7 @@ public class MapBodyManager implements Disposable {
 					BodyTemplate tmpl = templates.get(name);
 					com.penguin.physics.BoxActor box = new com.penguin.physics.BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
 					box.setName(name);
-					box.setPosition( tmo.getX() - tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
+					box.setPosition( tmo.getX(), tmo.getY() + tmo.getTextureRegion().getRegionHeight() );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
 					actors.add(box);
@@ -171,7 +171,7 @@ public class MapBodyManager implements Disposable {
 						BodyTemplate tmpl = templates.get(tempName);
 						if( tmpl == null ) continue;
 						Emitter_BodyActor emitter = new Emitter_BodyActor(game, tmpl.shape, tmpl.fixturDef,tmo.getTextureRegion(), Particle_BodyActor.class);
-						emitter.setPosition(tmo.getX() - tmo.getTextureRegion().getRegionWidth() / 2, tmo.getY() + tmo.getTextureRegion().getRegionHeight() / 2);
+						emitter.setPosition(tmo.getX() , tmo.getY() + tmo.getTextureRegion().getRegionHeight() );
 						emitter.setEmitTime(Float.valueOf(time));
 						emitter.setMaxParticlesCount( Integer.valueOf(maxCount) );
 						emitter.generate(1);
