@@ -331,8 +331,9 @@
    </properties>
    <polygon points="-464,-464 -480,-448 -480,-416 -464,-400 96,-400 96,-464"/>
   </object>
-  <object id="174" name="box" type="emitter" gid="37" x="3520" y="864" width="64" height="64">
+  <object id="174" name="box_emitter_0" type="emitter" gid="37" x="3520" y="880" width="64" height="64">
    <properties>
+    <property name="max_count" value="3"/>
     <property name="template" value="box"/>
     <property name="time" value="3"/>
    </properties>

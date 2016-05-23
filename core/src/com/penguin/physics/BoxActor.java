@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.mypinguin.game.PenguinGame;
 import com.penguin.particles.Emitter_BoxPart;
+import com.penguin.particles.Particle_BodyActor;
 import com.penguin.particles.Particle_BoxPart;
 
 /**
@@ -23,6 +24,7 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 	private boolean picked = false; //значит что предмет находиться в руках
 	private boolean platformed = false; //ЗНАЧИТ ПРЕДМЕТ НАХОДИТЬСЯ НА подвижной платформе
 	private float   destroyForce = 10.0f; //сила при которой объект разрушаеться
+	public Particle_BodyActor particle = null;
 	
 	public BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
 	{
@@ -161,6 +163,12 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, 0 );
+
+				if(particle != null)
+				{
+					particle.actor = null;
+					particle = null;
+				}
 
 				//this.clear();
 				//this.remove();

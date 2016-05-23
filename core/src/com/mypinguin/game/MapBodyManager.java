@@ -31,6 +31,8 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.penguin.particles.Emitter_BodyActor;
+import com.penguin.particles.Particle_BodyActor;
 import com.penguin.physics.BodyActor;
 
 import java.util.ArrayList;
@@ -150,15 +152,32 @@ public class MapBodyManager implements Disposable {
 
 			if (object instanceof TextureMapObject){
 				TextureMapObject tmo = (TextureMapObject)object;
-				if( templates.containsKey(name) )
+				if( type.compareTo("temp") == 0 && templates.containsKey(name) )
 				{
 					BodyTemplate tmpl = templates.get(name);
 					com.penguin.physics.BoxActor box = new com.penguin.physics.BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
 					box.setName(name);
-					box.setPosition( tmo.getX() + tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
+					box.setPosition( tmo.getX() - tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
 					actors.add(box);
+				}
+				else if( type.compareTo("emitter") == 0 ) { //эмиттер частиц или физических объектов
+					String tempName = properties.get( "template", "none", String.class ); //имя физического шаблона
+					String time = properties.get( "time", "1", String.class ); // таймаут генерации
+					String maxCount = properties.get( "max_count", "1", String.class ); //максимальное кол-во
+					if( tempName.compareTo("none") != 0 )
+					{
+						BodyTemplate tmpl = templates.get(tempName);
+						if( tmpl == null ) continue;
+						Emitter_BodyActor emitter = new Emitter_BodyActor(game, tmpl.shape, tmpl.fixturDef,tmo.getTextureRegion(), Particle_BodyActor.class);
+						emitter.setPosition(tmo.getX() - tmo.getTextureRegion().getRegionWidth() / 2, tmo.getY() + tmo.getTextureRegion().getRegionHeight() / 2);
+						emitter.setEmitTime(Float.valueOf(time));
+						emitter.setMaxParticlesCount( Integer.valueOf(maxCount) );
+						emitter.generate(1);
+						emitter.setName(name);
+						game.particles.addEmitter(emitter, 0);
+					}
 				}
 				continue;
 			}
