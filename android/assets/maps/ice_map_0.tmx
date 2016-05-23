@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="173">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="175">
  <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
   <image source="ice_tiles_0.png" width="384" height="448"/>
   <terraintypes>
@@ -30,7 +30,7 @@
  </tileset>
  <layer name="tiles" width="64" height="32">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+1Y207DMAwN22DcBkjc+7LC/38k9oO1KBwncTBrqvZIlsjN2D127OwQlotHkoepjZgQT2HZ/jP/h6mNmBAr/yv/K//Lxcr/yv/S+f8k2ZBsSXYkl9E4nb8COi6SfVtlHzon+3P6rUjtEX+Qbub/meSa5IbkluROGb8EnCt7sP++ws7Wcy162XYU55b8n3OusO3IT20eYc53pfbOs/If3xUeuXouePDPeSU5pd0FvcKD/xp9vSLHf4sfkgteNeu/keOf/UC1P1eTORekrswhD3L8H0lGki+SbzDO+RfHzzvJh4u1/sjxn/Y/lp5kLjXRO/9LehlaH1oz9r5XvO//kl4G6kNrx169sKCl/nMuIw7jv4fM+Z6g8aTFv/jN/qH3Ueld0Rs0nrX4j2M3F4f7wnovsPJvwVthnWPJepe1nMnByr8FpZrf8o2939panKZvul2o6/9ivBbWW76x5V32F7BtRyBjOPV/JR44VtF7WH7fGip0ILvOca/ydx7DyVfU/8bxgfqVIdonczIvemQN1dBNJDI/hN/vEnRG66XSNa3f4v/zA/mHsBwAIAAA
+   H4sIAAAAAAAAA+1YyW4DMQh1ljbd0lTqkmQumfb/P7JwQLFcwMahs2j8JA5eBoEfGDz7sFwcQF7HNmJEvIVl+4/878c2YkQ0/hv/jf/lovHf+F86/2eQNcgGZAtyF43T+XtGxyrZtxH2cd/Rfk2/Fak95A+nG/l/B3kAeQR5AnkWxh+Bz5Uds/+lwM7a72r0ou1cnFvyf865grZzfkrzHOZ8V0rvPCv/8V3hkatDwYN/zCvKKekumCo8+C/RN1Vo/Nf4QbngVbP+Gxr/6AdX+7WajLlAdWUOeaDxfwHpQb5Bfpix5l8cP0eQk4u1/tD4T/sfS08yl5ronf85vQipDy0Ze98r3vd/Ti+C60NLx5ZeuOScu2Cv/ydBd4neIVFyzlL/L8U/+Y3+ce+jnN6pQeJZiv/4TLU43GXWpwIpTz3edF+ZdYwl611W840GK/8W5Gp+zRl7v7WlOE3fdNtQ1v/F+Mys15yx5V12C9C2CyN9uPZ/OR4wVrn3MP3f6gp0cHYNca/iOffh6ivX/8bxwdXZLtpHczRPemiNq6HrSGi+C3/fJdw3Us1P17S+4BchMNogACAAAA==
   </data>
  </layer>
  <objectgroup name="Objects">
@@ -54,7 +54,7 @@
    </properties>
    <polygon points="0,0 -16,-16 -16,-48 0,-64 992,-64 1008,-48 1008,-16 992,0"/>
   </object>
-  <object id="45" name="water0" type="water" x="1616" y="1776" width="800" height="256"/>
+  <object id="45" name="water0" type="water" x="1632" y="1776" width="768" height="240"/>
   <object id="46" name="lift02" type="lift" x="2480" y="1440" width="320" height="64">
    <properties>
     <property name="textmpl" value="platform2"/>
@@ -92,7 +92,7 @@
    </properties>
    <polygon points="0,0 16,16 48,16 64,0 64,-1056 0,-1008"/>
   </object>
-  <object id="65" name="water1" type="water" x="3728" y="752" width="352" height="1280"/>
+  <object id="65" name="water1" type="water" x="3744" y="752" width="320" height="1264"/>
   <object id="67" name="lift06" type="lift" x="3040" y="736" width="321.5" height="32">
    <properties>
     <property name="textmpl" value="platform1"/>
@@ -164,10 +164,10 @@
   <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
   <object id="121" name="stone" type="temp" gid="38" x="2048" y="736" width="64" height="64"/>
   <object id="122" name="stone" type="temp" gid="38" x="1968" y="544" width="64" height="64"/>
-  <object id="133" name="player" type="player" x="2048" y="1264" width="32" height="128"/>
+  <object id="133" name="player" type="player" x="3200" y="1328" width="32" height="128"/>
   <object id="142" name="stone" type="temp" gid="38" x="1920" y="288" width="64" height="64"/>
   <object id="143" name="water2" type="water" x="544" y="1968" width="512" height="48"/>
-  <object id="144" name="water3" type="water" x="1184" y="1968" width="256" height="48"/>
+  <object id="144" name="water3" type="water" x="2464" y="1776" width="1280" height="240"/>
   <object id="145" name="ground" type="ground" x="176" y="672">
    <properties>
     <property name="material" value="ice"/>
@@ -323,6 +323,19 @@
     <property name="material" value="ice"/>
    </properties>
    <polygon points="128,176 96,176 96,-1840 128,-1840"/>
+  </object>
+  <object id="173" name="ground" type="ground" x="3584" y="1968">
+   <properties>
+    <property name="dynamic" value="false"/>
+    <property name="material" value="ice"/>
+   </properties>
+   <polygon points="-464,-464 -480,-448 -480,-416 -464,-400 96,-400 96,-464"/>
+  </object>
+  <object id="174" name="box" type="emitter" gid="37" x="3520" y="864" width="64" height="64">
+   <properties>
+    <property name="template" value="box"/>
+    <property name="time" value="3"/>
+   </properties>
   </object>
  </objectgroup>
  <objectgroup name="Templates">
