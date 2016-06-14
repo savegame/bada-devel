@@ -1,6 +1,7 @@
 package com.penguin.particles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.utils.Disposable;
@@ -11,11 +12,13 @@ import com.penguin.physics.BoxActor;
  * Created by savegame on 23.05.16.
  */
 public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
-	private  FixtureDef fixtureDef = null;
+	private FixtureDef fixtureDef = null;
 	private TextureRegion textureRegion = null;
+	private Vector2 direction = new Vector2(0,0);
 	private Shape shape = null;
 	private float emissionTimer = 0; //время прошедшее с последнего emit
 	private float emitTime = 3f; // таймаут между emit
+	private boolean breakable = true;
 	Class<T> bodyActorClass;
 
 	public Emitter_BodyActor(PenguinGame game, Shape shape, FixtureDef fixtureDef, TextureRegion textureRegion, Class<Particle_BodyActor> particleClass) {
@@ -25,7 +28,15 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 		this.shape = shape;
 		unlimitedGenerationEnabled = false;
 	}
-
+	
+	public void setBreakable(boolean breakable) {
+		this.breakable = breakable;
+	}
+	
+	public boolean isBreakable() {
+		return this.breakable;
+	}
+	
 	public void setEmitTime( float time ) {
 		this.emitTime = time;
 	}
@@ -58,6 +69,7 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 		bodyActor.actor = new BoxActor(game, textureRegion, fixtureDef);
 		bodyActor.actor.setPosition(getX(), getY());
 		bodyActor.actor.initialize( shape );
+		((BoxActor)bodyActor.actor).setBreakable(this.breakable);
 		((BoxActor)bodyActor.actor).particle = bodyActor;
 	}
 
@@ -70,6 +82,6 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 	}
 
 	public void dispose() {
-
+		shape.dispose();
 	}
 }

@@ -10,7 +10,8 @@ public class Particle_BoxPart extends Particle {
 	float horizontal_speed = 0.5f;
 	float screenScale;
 	float angle = 0f; //угол полета
-	private float velocity = 5f;
+	private float velocity = 10f;
+	float alphaTime = 1f; //время исчезновения частицы
 //	boolean solid;
 	//float translation_x, translation_y;
 

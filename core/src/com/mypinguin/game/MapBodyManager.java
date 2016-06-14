@@ -53,6 +53,7 @@ public class MapBodyManager implements Disposable {
 		public FixtureDef  fixturDef;
 		public BodyDef     bodyDef;
 		public Shape       shape;
+		public boolean     breakable = false; //ломается ли объект
 		//public boolean     isdynamic;
 
 		public BodyTemplate( Shape shape ) {
@@ -160,12 +161,15 @@ public class MapBodyManager implements Disposable {
 					box.setPosition( tmo.getX(), tmo.getY() + tmo.getTextureRegion().getRegionHeight() );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
+					box.setBreakable(tmpl.breakable);
 					actors.add(box);
 				}
 				else if( type.compareTo("emitter") == 0 ) { //эмиттер частиц или физических объектов
 					String tempName = properties.get( "template", "none", String.class ); //имя физического шаблона
 					String time = properties.get( "time", "1", String.class ); // таймаут генерации
 					String maxCount = properties.get( "max_count", "1", String.class ); //максимальное кол-во
+					String breakable = properties.get( "break", "true", String.class ); //максимальное кол-во
+
 					if( tempName.compareTo("none") != 0 )
 					{
 						BodyTemplate tmpl = templates.get(tempName);
@@ -176,6 +180,7 @@ public class MapBodyManager implements Disposable {
 						emitter.setMaxParticlesCount( Integer.valueOf(maxCount) );
 						emitter.generate(1);
 						emitter.setName(name);
+						emitter.setBreakable(breakable.compareToIgnoreCase("true")==0);
 						game.particles.addEmitter(emitter, 0);
 					}
 				}
@@ -345,6 +350,7 @@ public class MapBodyManager implements Disposable {
 			String material = properties.get("material", "default", String.class);
 			String type = properties.get("type", "notype", String.class);
 			String name = object.getName();
+			String breakable = properties.get("break", "false", String.class);
 
 			if (object instanceof TextureMapObject && type.equalsIgnoreCase("texture") ){
 				TextureMapObject tmo = (TextureMapObject)object;
@@ -400,6 +406,7 @@ public class MapBodyManager implements Disposable {
 				BodyTemplate temp = new BodyTemplate(shape);
 				temp.bodyDef = bodyDef;
 				temp.fixturDef = materials.get(material);
+				temp.breakable = breakable.compareToIgnoreCase("true")==0?true:false; 
 				templates.put(name, temp);
 			}
 			else if( type.equalsIgnoreCase("static") ) {

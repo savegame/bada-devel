@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="175">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="182">
  <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
   <image source="ice_tiles_0.png" width="384" height="448"/>
-  <terraintypes>
-   <terrain name="Новый участок" tile="-1"/>
-  </terraintypes>
-  <tile id="0" terrain=",,,0"/>
-  <tile id="1" terrain=",,0,0"/>
-  <tile id="5" terrain=",,0,"/>
-  <tile id="6" terrain=",0,,"/>
-  <tile id="7" terrain="0,0,,"/>
-  <tile id="11" terrain="0,,,"/>
-  <tile id="13" terrain="0,,0,"/>
-  <tile id="14" terrain=",0,,0"/>
   <tile id="15">
    <objectgroup draworder="index">
     <object id="0" x="33" y="62">
@@ -28,6 +17,14 @@
    </objectgroup>
   </tile>
  </tileset>
+ <tileset firstgid="43" name="ice_boat" tilewidth="64" tileheight="64" tilecount="256">
+  <image source="ice_boat.png" width="1024" height="1024"/>
+ </tileset>
+ <layer name="images" width="64" height="32">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3WuQ2AMBBFQffDVQAG+u+KH1rEyCB5RnqxV5t4SwEAAID3bV8PAAAdTWlOS1rLeP/gnmo60pmuDm+2Ox9Ru3MA+As3Uf+b6OkGrc0tEQAgAAA=
+  </data>
+ </layer>
  <layer name="tiles" width="64" height="32">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+1YyW4DMQh1ljbd0lTqkmQumfb/P7JwQLFcwMahs2j8JA5eBoEfGDz7sFwcQF7HNmJEvIVl+4/878c2YkQ0/hv/jf/lovHf+F86/2eQNcgGZAtyF43T+XtGxyrZtxH2cd/Rfk2/Fak95A+nG/l/B3kAeQR5AnkWxh+Bz5Uds/+lwM7a72r0ou1cnFvyf865grZzfkrzHOZ8V0rvPCv/8V3hkatDwYN/zCvKKekumCo8+C/RN1Vo/Nf4QbngVbP+Gxr/6AdX+7WajLlAdWUOeaDxfwHpQb5Bfpix5l8cP0eQk4u1/tD4T/sfS08yl5ronf85vQipDy0Ze98r3vd/Ti+C60NLx5ZeuOScu2Cv/ydBd4neIVFyzlL/L8U/+Y3+ce+jnN6pQeJZiv/4TLU43GXWpwIpTz3edF+ZdYwl611W840GK/8W5Gp+zRl7v7WlOE3fdNtQ1v/F+Mys15yx5V12C9C2CyN9uPZ/OR4wVrn3MP3f6gp0cHYNca/iOffh6ivX/8bxwdXZLtpHczRPemiNq6HrSGi+C3/fJdw3Us1P17S+4BchMNogACAAAA==
@@ -145,14 +142,14 @@
   <object id="96" name="box" type="temp" gid="37" x="64" y="896" width="64" height="64"/>
   <object id="98" name="stone" type="temp" gid="38" x="192" y="896" width="64" height="64"/>
   <object id="100" name="box" type="temp" gid="37" x="2176" y="736" width="64" height="64"/>
-  <object id="104" name="box" type="temp" gid="37" x="3600" y="1440" width="64" height="64"/>
+  <object id="104" name="box" type="temp" gid="37" x="3328" y="1440" width="64" height="64"/>
   <object id="105" name="box" type="temp" gid="37" x="2112" y="736" width="64" height="64"/>
-  <object id="106" name="box" type="temp" gid="37" x="3520" y="1504" width="64" height="64"/>
+  <object id="106" name="box" type="temp" gid="37" x="3296" y="1504" width="64" height="64"/>
   <object id="107" name="box" type="temp" gid="37" x="1792" y="672" width="64" height="64"/>
   <object id="108" name="box" type="temp" gid="37" x="1792" y="736" width="64" height="64"/>
   <object id="109" name="box" type="temp" gid="37" x="864" y="1568" width="64" height="64"/>
   <object id="110" name="box" type="temp" gid="37" x="864" y="1488" width="64" height="64"/>
-  <object id="111" name="box" type="temp" gid="37" x="3584" y="1504" width="64" height="64"/>
+  <object id="111" name="box" type="temp" gid="37" x="3360" y="1504" width="64" height="64"/>
   <object id="112" name="box" type="temp" gid="37" x="3936" y="848" width="64" height="64"/>
   <object id="113" name="box" type="temp" gid="37" x="2272" y="1424" width="64" height="64"/>
   <object id="114" name="box" type="temp" gid="37" x="2336" y="1440" width="64" height="64"/>
@@ -164,7 +161,7 @@
   <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
   <object id="121" name="stone" type="temp" gid="38" x="2048" y="736" width="64" height="64"/>
   <object id="122" name="stone" type="temp" gid="38" x="1968" y="544" width="64" height="64"/>
-  <object id="133" name="player" type="player" x="3200" y="1328" width="32" height="128"/>
+  <object id="133" name="player" type="player" x="1520" y="1296" width="32" height="128"/>
   <object id="142" name="stone" type="temp" gid="38" x="1920" y="288" width="64" height="64"/>
   <object id="143" name="water2" type="water" x="544" y="1968" width="512" height="48"/>
   <object id="144" name="water3" type="water" x="2464" y="1776" width="1280" height="240"/>
@@ -338,16 +335,36 @@
     <property name="time" value="3"/>
    </properties>
   </object>
+  <object id="176" name="ground" type="ground" x="1616" y="1312">
+   <properties>
+    <property name="material" value="ice"/>
+   </properties>
+   <polygon points="57.9371,128 51.4062,105.144 84.7677,90.5566 130.406,82.2563 162.719,55.0624 212.569,45.619 268.75,83.75 272,128"/>
+  </object>
+  <object id="177" name="ground" type="ground" x="1920" y="1488">
+   <properties>
+    <property name="material" value="ice"/>
+   </properties>
+   <polygon points="-32,-48 -36,-91.75 -24.1625,-101.694 -2.81865,-104.687 -2.42158,-84.1144 6.09333,-71.2838 -6.86659,-48.3084"/>
+  </object>
+  <object id="178" name="ground" type="ground" x="3615" y="1374">
+   <properties>
+    <property name="material" value="ice"/>
+   </properties>
+   <polygon points="-84.0629,130.333 -91.3438,113.394 -85.8156,103.39 -10.344,84.673 22.969,53.6457 63.7357,44.0357 66.6667,130"/>
+  </object>
  </objectgroup>
  <objectgroup name="Templates">
-  <object id="90" name="box" type="dynamic" x="64" y="832" width="64" height="64">
+  <object id="90" name="box" type="dynamic" x="65" y="832.957" width="62" height="62">
    <properties>
+    <property name="break" value="true"/>
     <property name="material" value="wood"/>
     <property name="pick" value="true"/>
    </properties>
   </object>
   <object id="92" name="stone" type="dynamic" x="192" y="864">
    <properties>
+    <property name="break" value="false"/>
     <property name="material" value="stone"/>
     <property name="pick" value="true"/>
    </properties>
