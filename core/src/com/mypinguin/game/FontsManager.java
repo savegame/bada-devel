@@ -15,7 +15,6 @@ public class FontsManager {
 	Array<FontStyleLoaded> stylesLibrary = null;
 	
 	public FontsManager() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void dispose()
@@ -54,7 +53,7 @@ public class FontsManager {
 		stylesLibrary = new Array<FontStyleLoaded>(styles.styles.size);
 		
 		Color tmpColor = null;
-		Boolean rebuild;
+		boolean rebuild;
 		
 		for (FontStyleDataEntry style : styles.styles)
 		{
@@ -139,7 +138,7 @@ class FreeTypeFontGeneratorExt extends FreeTypeFontGenerator
 	public String name;
 	public FreeTypeFontParameter parameters;
 	public BitmapFont fontBitmap;
-	public Boolean justCreated;
+	public boolean justCreated;
 	
 	public FreeTypeFontGeneratorExt(FileHandle font) {
 		super(font);

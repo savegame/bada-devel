@@ -1,8 +1,10 @@
 package com.mypinguin.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -13,8 +15,11 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
@@ -22,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.Array;
+import com.penguin.physics.BoxActor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,15 +35,20 @@ import java.util.Set;
 /*
  * Created by savegame on 04.11.15.
  */
-public class PlayerActor extends BodyActor {
+public class PlayerActor extends com.penguin.physics.BodyActor {
 	//Box2D
-	private Fixture physicsFixture;
-	private Fixture sensorFixture;
-	private Fixture getRFixture;
-	private Fixture getLFixture;
-	private Fixture getItem = null;
-	private Body    getBody = null;
-	private Joint   getJoint = null;
+	private Fixture     physicsFixture;
+	private Fixture     sensorFixture;
+	private Fixture     getRFixture;    // правая область захвата объекта
+	private Fixture     getLFixture;    // левая область захвата объекта
+	private Fixture     getItem = null; //текущая область захвата объекта
+	private Body        getBody = null; //текущий обеъкт с которым взаимодействует игрок
+	private Body        currentGetBody = null; //текущий объект с которым МОЖЕТ взаимодействовать игрок
+	private Set<Body>   canGetBodiesL = new HashSet<Body>(); //объекты слева от игрока
+	private Set<Body>   canGetBodiesR = new HashSet<Body>(); //объекты справа от игрока
+	private Joint       getJoint = null;
+	private MassData    getMass = null;
+	private MassData    nullMass = null;
 
 	private Body          legsBody; //ноги - колесо
 	private Fixture       legsFixture;
@@ -63,6 +74,7 @@ public class PlayerActor extends BodyActor {
 	private Set<Fixture> groundedFixtures; //список геометрий с которыми столкнулись ноги
 	private boolean   grounded    = false; //находится на земле
 	private boolean   underwater  = false; //находиться под водой
+	private Vector2   realitiveMoveVel = new Vector2(); //относительная скорость (без учета скорости платформы например)
 	private float     moveSpeed   = 400f;  //скорость передвижения
 	private float     flySpeed    = 400f;  //скорость передвижения в воздухе
 	private float     moveImpulse = 86f;  //ускорение хотьбы
@@ -71,8 +83,8 @@ public class PlayerActor extends BodyActor {
 	private float     bodyHeight  = 110f; //высота в пикселах
 	private float     bodyDencity = 4f;
 	private float     bodyPickDencity = 12f;
-	private float     vlocityEpsilon = 0.1f; //минимальная скорость, которая приравниваеться к нулю
-	private PlatformActor platform = null;//платформа на которой находиться игрок
+	private float     vlocityEpsilon = 0.05f; //минимальная скорость, которая приравниваеться к нулю
+	private com.penguin.physics.BodyActor platform = null;//платформа на которой находиться игрок (или другой объект)
 	//Debug
 	private TextureRegion staticRight = null; //
 	private TextureRegion staticFront = null; //
@@ -94,16 +106,22 @@ public class PlayerActor extends BodyActor {
 	MoveDirection m_dir = MoveDirection.None;
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef) {
-		super(game, fixtureDef);
+		super(game);
+		this.setFixtureDef(fixtureDef);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.5f;
 	}
 
 	public PlayerActor( PenguinGame game, FixtureDef fixtureDef, TextureRegion staticFront ) {
-		super(game, fixtureDef);
+		super(game);
+		this.setFixtureDef(fixtureDef);
 		setTexRegion(staticFront, StaticTextureType.front);
 		this.setName("PlayerActor");
 		groundedFixtures = new HashSet<Fixture>();
+		nullMass = new MassData();
+		nullMass.mass = 0.5f;
 	}
 
 	public void initialize(Shape bodyShape) {
@@ -172,6 +190,23 @@ public class PlayerActor extends BodyActor {
 		if( legsBody != null )
 			legsBody.setTransform(getX() / game.units, (getY() - height4)/ game.units, 0f);
 		fixturedef.shape = null;
+		//this.setSize(64f,120f);
+	}
+
+	/**
+	 * Возвращает ширину тела
+	 * @return
+	 */
+	public float getBodyWidth() {
+		return 64f;
+	}
+
+	/**
+	 * Возвраащет высоту тела
+	 * @return
+	 */
+	public float getBodyHeight() {
+		return 120f;
 	}
 
 	/**
@@ -240,6 +275,29 @@ public class PlayerActor extends BodyActor {
 		return underwater;
 	}
 	
+	private class MyRayCallback implements RayCastCallback {
+		public boolean sensor = false;
+		public Vector2 p1;
+		
+		MyRayCallback(boolean sens, Vector2 p) {
+			sensor = sens;
+			p1 = p;
+		}
+		@Override
+		public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal,
+				float fraction) {
+			if( !fixture.isSensor() && !(fixture.getBody().getUserData() instanceof com.penguin.physics.WaterActor) ) {
+				Vector2 l = new Vector2( point.x - p1.x, point.y - p1.y + 1 );
+				float length = l.len() ;
+				if( length < 1.1f ) {
+					sensor = true;
+					return length;
+				}
+			}
+			return 0;
+		}
+	}
+	
 	public boolean isPlayerGrounded() {
 		boolean sensor = false;
 		Array<Contact> contactList = game.world.getContactList();
@@ -250,14 +308,48 @@ public class PlayerActor extends BodyActor {
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
 				Object objA = contact.getFixtureA().getBody().getUserData();
 				Object objB = contact.getFixtureB().getBody().getUserData();
-				if( /*objA != null && */objA instanceof PlatformActor ) {
-					platform = (PlatformActor)objA;
+				if( objA instanceof com.penguin.physics.PlatformActor || objA instanceof com.penguin.physics.BoxActor) {
+					platform = (com.penguin.physics.BodyActor)objA;
 				}
-				else if( /*objB != null && */objB instanceof PlatformActor ) {
-					platform = (PlatformActor)objB;
+				else if( objB instanceof com.penguin.physics.PlatformActor || objB instanceof com.penguin.physics.BoxActor) {
+					platform = (com.penguin.physics.BodyActor)objB;
 				}
 				sensor = true;
 			}
+			/*else if(getJoint == null) {
+				Fixture getBodyFixture = null;
+				Fixture handFixture = null;
+				if (contact.getFixtureA() == getRFixture  || contact.getFixtureA() == getLFixture) {
+					if (contact.getFixtureB().getUserData() != null && contact.getFixtureB().getUserData().equals("box")) {
+						getBody = contact.getFixtureB().getBody();
+						canGetBodies.add(contact.getFixtureB().getBody());
+//						if( (getX() - ((BoxActor)getBody.getUserData()).getX())*getScaleX() < 0 ) {
+						getItem = contact.getFixtureA();
+//						}
+//						else
+//							getBody = null;
+					}
+				}
+				else if (contact.getFixtureB() == getRFixture  || contact.getFixtureB() == getLFixture) {
+					if (contact.getFixtureA().getUserData() != null && contact.getFixtureA().getUserData().equals("box")) {
+						getBody = contact.getFixtureA().getBody();
+//						canGetBodies.add(contact.getFixtureA().getBody());
+//						if( (getX() - ((BoxActor)getBody.getUserData()).getX())*getScaleX() < 0 ) {
+						getItem = contact.getFixtureB();
+//						}
+//						else
+//							getBody = null;
+					}
+				}
+			}*/
+		}
+		if(!sensor){
+			//raycast
+			final Vector2 p1 = new Vector2(this.getX()/game.units, this.getY()/game.units);
+			Vector2 p2 = new Vector2(p1.x, p1.y - 0.5f);
+			MyRayCallback mrcb = new MyRayCallback(sensor, p1);
+			game.world.rayCast(  mrcb, p1, p2);
+			sensor = mrcb.sensor; 
 		}
 		return sensor;
 	}
@@ -269,9 +361,42 @@ public class PlayerActor extends BodyActor {
 		grounded = false;
 	}
 
+	/**
+	 * Отсоединяет объект от игрока, если он в руках
+	 * @param box   объект
+	 */
+	public void detachIfNeed( BoxActor box ) {
+		if( this.isPicked() ) {
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor )
+			{
+				BoxActor _box = (BoxActor)getBody.getUserData();
+				if( _box == box )
+				{
+					box.setPicked(false);
+
+					game.addToDestroy(getJoint);
+//			MassData data = new MassData();
+//					getBody.setMassData(getMass);
+//					if( getItem == getLFixture )
+//						getBody.applyForceToCenter(-125f, 0, true);
+//					else
+//						getBody.applyForceToCenter(125f, 0, true);
+					getJoint = null;
+					getBody = null;
+					getItem = null;
+					physicsFixture.setDensity(bodyDencity);
+				}
+			}
+		}
+	}
+
 	public void pick() {
-		if( getBody != null && getJoint == null) {
+		if( canPick() ) {
+			getBody = currentGetBody;
 			getBody.setAwake(true);
+			getMass = getBody.getMassData();
+			getBody.setMassData(nullMass);
+			getBody.setAngularVelocity(0);
 			PrismaticJointDef jointDef = new PrismaticJointDef();
 			float near = 64f;
 			float far = 65f;
@@ -294,9 +419,17 @@ public class PlayerActor extends BodyActor {
 			getJoint = game.world.createJoint(jointDef);
 			PrismaticJoint joint = (PrismaticJoint)getJoint;
 			physicsFixture.setDensity(bodyPickDencity);
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor) {
+				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(true);
+			}
 		}
-		else 	if( getJoint != null ) {
+		else 	if( this.isPicked() ) {
+			if( getBody.getUserData() instanceof com.penguin.physics.BoxActor) {
+				((com.penguin.physics.BoxActor)getBody.getUserData()).setPicked(false);
+			}
 			game.world.destroyJoint(getJoint);
+//			MassData data = new MassData();
+			getBody.setMassData(getMass);
 			if( getItem == getLFixture )
 				getBody.applyForceToCenter(-125f, 0, true);
 			else
@@ -309,7 +442,23 @@ public class PlayerActor extends BodyActor {
 	}
 
 	public boolean canPick() {
-		return  getJoint == null && getBody != null;
+		boolean result = false /*&& getBody != null*/;
+		if( getScaleX() > 0 && !canGetBodiesR.isEmpty() )
+		{
+			currentGetBody = canGetBodiesR.iterator().next();
+			getItem = getRFixture;
+			result = getJoint == null  && true;
+		}
+		else if( getScaleX() < 0 && !canGetBodiesL.isEmpty() )
+		{
+			currentGetBody = canGetBodiesL.iterator().next();
+			getItem = getLFixture;
+			//canGetBodiesL.stream().findFirst();
+			result = getJoint == null  && true;
+		}
+		else
+			currentGetBody = null;
+		return  result;
 	}
 
 	public boolean isPicked() {
@@ -335,9 +484,6 @@ public class PlayerActor extends BodyActor {
 			if( vel.x > 0.1f || vel.x < -0.1f ){
 				physicsFixture.setFriction(100.1f);
 				legsFixture.setFriction(100.1f);
-				legsJoint.setLimits(legsBody.getAngle(), legsBody.getAngle());
-				legsJoint.setMaxMotorTorque(1f);
-				legsJoint.enableLimit(true);
 			}
 		}
 		else if( arr.size == 0 ) {
@@ -354,33 +500,42 @@ public class PlayerActor extends BodyActor {
 		}
 
 		Vector2 platformVel = new Vector2(0,0);
-		if( platform != null )
-			platformVel = platform.getVelocity();
+		if( platform != null ) {
+			if( platform instanceof com.penguin.physics.BoxActor && ((com.penguin.physics.BoxActor)platform).isPlatformed() )
+				platformVel = platform.getVelocity();
+			else 
+				platformVel = platform.getVelocity();
+		}
 
 		if( arr.size == 0 && isGrounded() ) {
-			Vector2 vel = body.getLinearVelocity();
+			//Vector2 vel = body.getLinearVelocity();
 			Vector2 pos = body.getPosition();
-			if( vel.x <  - vlocityEpsilon + platformVel.x ) { //move left
+			realitiveMoveVel.y = body.getLinearVelocity().y;
+			if( realitiveMoveVel.x <  - vlocityEpsilon ) { //move left
 				//body.applyLinearImpulse(impulse, 0, pos.x, pos.y, true);
-				vel.x += speed * delta * 0.1;
+				realitiveMoveVel.x += speed * delta * 0.1;
+				if( realitiveMoveVel.x > -vlocityEpsilon )
+					realitiveMoveVel.x = 0;
 			}
-			else if( vel.x > vlocityEpsilon + platformVel.x ) { //move rigth
+			else if( realitiveMoveVel.x > vlocityEpsilon ) { //move rigth
 				//body.applyLinearImpulse(-impulse, 0, pos.x, pos.y, true);
-				vel.x -= speed * delta * 0.1;
+				realitiveMoveVel.x -= speed * delta * 0.1;
+				if( realitiveMoveVel.x < vlocityEpsilon )
+					realitiveMoveVel.x = 0;
 			}
-			else if(vel.x > - vlocityEpsilon + platformVel.x && vel.x < vlocityEpsilon + platformVel.x ) {
-				vel.x = platformVel.x;
+			else if(realitiveMoveVel.x > - vlocityEpsilon && realitiveMoveVel.x < vlocityEpsilon ) {
+				realitiveMoveVel.x = 0f;
 			}
-			body.setLinearVelocity(vel);
+			body.setLinearVelocity(realitiveMoveVel.x + platformVel.x, realitiveMoveVel.y);
 		}
-		else {
+		else if( isGrounded() && platform != null ) {
 			for (Action act : arr) {
 				if (act instanceof MoveByAction) {
 					MoveByAction moveact = (MoveByAction) act;
 					Vector2 vel = body.getLinearVelocity();
 					Vector2 pos = body.getPosition();
-					float velocity = moveact.getAmountX() * speed / game.units;
-
+					float velocity = speed / game.units;
+					realitiveMoveVel.y = vel.y;
 					if (moveact.getAmountX() < 0) {
 						if (getItem != getLFixture && getJoint != null) {
 							PrismaticJoint joint = (PrismaticJoint) getJoint;
@@ -390,12 +545,19 @@ public class PlayerActor extends BodyActor {
 						physicsFixture.setFriction(0.2f);
 						legsFixture.setFriction(0.2f);
 						m_dir = MoveDirection.Left;
-						if (vel.x > velocity + platformVel.x) {
-							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-						} else if (vel.x < velocity + platformVel.x) {
-							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+
+						if( realitiveMoveVel.x > 0 )
+							//realitiveMoveVel.x -= speed * delta * 0.1;
+							realitiveMoveVel.x = 0f;
+						if ( realitiveMoveVel.x > -velocity) {
+							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+							realitiveMoveVel.x -= speed * delta * 0.045 ;
+							if( realitiveMoveVel.x < -velocity) {
+								realitiveMoveVel.x = -velocity ;
+							}
 						}
-					} else if (moveact.getAmountX() > 0) {
+					}
+					else if (moveact.getAmountX() > 0) {
 						if (getItem != getRFixture && getJoint != null) {
 							PrismaticJoint joint = (PrismaticJoint) getJoint;
 							joint.setLimits(64f / game.units, 68f / game.units);
@@ -404,24 +566,73 @@ public class PlayerActor extends BodyActor {
 						physicsFixture.setFriction(0.2f);
 						legsFixture.setFriction(0.2f);
 						m_dir = MoveDirection.Right;
-						if (vel.x < velocity + platformVel.x) {
+
+						if( realitiveMoveVel.x < 0 )
+							//realitiveMoveVel.x += speed * delta * 0.1;
+							realitiveMoveVel.x = 0f;
+						if ( realitiveMoveVel.x < velocity) {
+							//body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+							realitiveMoveVel.x += speed * delta * 0.045 ;
+							if( realitiveMoveVel.x > velocity) {
+								realitiveMoveVel.x = velocity ;
+							}
+						}
+					}
+
+					body.setLinearVelocity(realitiveMoveVel.x + platformVel.x, realitiveMoveVel.y);
+				}
+			}
+			clearActions();
+		}
+		else {
+			for (Action act : arr) {
+				if (act instanceof MoveByAction) {
+					MoveByAction moveact = (MoveByAction) act;
+					Vector2 vel = body.getLinearVelocity();
+					Vector2 pos = body.getPosition();
+					float velocity = moveact.getAmountX() * speed / game.units;
+					realitiveMoveVel.y = vel.y;
+					if (moveact.getAmountX() < 0) {
+						if (getItem != getLFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(-68f / game.units, -64f / game.units);
+							getItem = getLFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Left;
+						if (vel.x > velocity) {
 							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
-						} else if (vel.x > velocity + platformVel.x) {
-							body.setLinearVelocity(velocity + platformVel.x, body.getLinearVelocity().y);
+						} else if (vel.x < velocity) {
+							body.setLinearVelocity(velocity, body.getLinearVelocity().y);
+						}
+					}
+					else if (moveact.getAmountX() > 0) {
+						if (getItem != getRFixture && getJoint != null) {
+							PrismaticJoint joint = (PrismaticJoint) getJoint;
+							joint.setLimits(64f / game.units, 68f / game.units);
+							getItem = getRFixture;
+						}
+						physicsFixture.setFriction(0.2f);
+						legsFixture.setFriction(0.2f);
+						m_dir = MoveDirection.Right;
+						if (vel.x < velocity ) {
+							body.applyLinearImpulse(impulse * moveact.getAmountX(), 0, pos.x, pos.y, true);
+						} else if (vel.x > velocity ) {
+							body.setLinearVelocity(velocity, body.getLinearVelocity().y);
 						}
 					}
 				}
 			}
 			clearActions();
 		}
-//		body.setTransform( body.getPosition(), 0 );
 	}
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		super.draw(batch, parentAlpha);
 
-		batch.setColor(1, 1, 1, parentAlpha);
+		batch.setColor( new Color(1, 1, 1, parentAlpha) );
 		currentAnim = null;
 		switch ( m_dir ){
 			case Left:
@@ -453,8 +664,10 @@ public class PlayerActor extends BodyActor {
 						currentAnim = animStay;
 					}
 					else {
-						setScaleX(1);
-						staticCurrent = staticFront;
+						//setScaleX(1);
+						//if(this.getScaleX() < 0)
+							staticCurrent = staticRight;
+						//staticCurrent = staticFront;
 						currentAnim = animStay;
 					}
 				}
@@ -466,12 +679,14 @@ public class PlayerActor extends BodyActor {
 		}
 
 		if (staticCurrent != null) {
-			setSize(staticCurrent.getRegionWidth(), staticCurrent.getRegionHeight());
-			setOrigin(staticCurrent.getRegionWidth() / 2, staticCurrent.getRegionHeight() / 2);
+			float halfWidth = staticCurrent.getRegionWidth() / 2;
+			float halfHeight = staticCurrent.getRegionHeight() / 2;
+			//Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+//			batch.disableBlending();
 			batch.draw(staticCurrent,
-							getX() - staticCurrent.getRegionWidth() / 2,
-							getY() - staticCurrent.getRegionHeight() / 2,
-							getOriginX(), getOriginY(),
+							getX() - halfWidth,
+							getY() - halfHeight,
+							halfWidth, halfHeight,
 							staticCurrent.getRegionWidth(), staticCurrent.getRegionHeight(),
 							getScaleX(), getScaleY(),
 							getRotation());
@@ -481,7 +696,7 @@ public class PlayerActor extends BodyActor {
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.add(fixtureB);
 		if(fixtureA == sensorFixture) {
-			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
 				underwater = true;
 			else {
 				groundedFixtures.add(fixtureB);
@@ -489,33 +704,18 @@ public class PlayerActor extends BodyActor {
 			}
 			grounded = true;
 		}
-		else if(getJoint == null) {
-			if (fixtureA == getRFixture  || fixtureA == getLFixture) {
-				if (fixtureB.getUserData() != null && fixtureB.getUserData().equals("box")) {
-					getBody = fixtureB.getBody();
-					getItem = fixtureA;
-				}
-			}
-		}
-		else //отлов непонятного контакта
-		{
-//			grounded = isPlayerGrounded(0);
-//			if( fixtureA == sensorFixture || fixtureB == sensorFixture )
-//			{
-//				int hj = 0;
-//			}
-//			if( isPlayerGrounded(0) != grounded ) {
-//				Shape.Type typeA = fixtureA.getType();
-//				Shape.Type typeB = fixtureB.getType();
-//				int  p = 0;
-//			}
+		else if( fixtureB.getUserData() != null && fixtureB.getUserData().equals("box") ) {
+			if( fixtureA == getLFixture )
+				canGetBodiesL.add( fixtureB.getBody() );
+			else if( fixtureA == getRFixture )
+				canGetBodiesR.add( fixtureB.getBody() );
 		}
 	}
 
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.remove(fixtureB);
 		if(fixtureA == sensorFixture || fixtureA == legsFixture) {
-			if( fixtureB.getBody().getUserData() instanceof WaterActor )
+			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
 				underwater = false;
 			else
 				groundedFixtures.remove(fixtureB);
@@ -527,18 +727,51 @@ public class PlayerActor extends BodyActor {
 //				}
 			}
 		}
-		else if( getJoint == null && (fixtureA == getRFixture  || fixtureA == getLFixture) )
+		else if( fixtureA == getRFixture  || fixtureA == getLFixture )
 		{
-			getBody = null;
-			getItem = null;
+			if( fixtureA == getLFixture )
+				canGetBodiesL.remove(fixtureB.getBody());
+			else if( fixtureA == getRFixture )
+				canGetBodiesR.remove(fixtureB.getBody() );
+//			canGetBodies.remove( fixtureB.getBody() );
+			if(getJoint == null ) {
+				getBody = null;
+				getItem = null;
+			}
 		}
 	}
 
 	public void preSolve(Contact contact, Manifold oldManifold) {
-
+	  WorldManifold manifold = contact.getWorldManifold();
+	  for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
+		Object objA = contact.getFixtureA().getBody().getUserData();
+		Object objB = contact.getFixtureB().getBody().getUserData();
+		if( objA instanceof com.penguin.physics.PlatformActor && objB instanceof PlayerActor ) {
+			if( contact.getFixtureB().getBody() != legsBody )
+				contact.setEnabled(false);
+			else if( manifold.getNormal().y < 0 )
+				contact.setEnabled(false);
+			else
+				contact.setEnabled(true);
+		}
+		else if( objB instanceof com.penguin.physics.PlatformActor && objA instanceof PlayerActor ) {
+			if( contact.getFixtureA().getBody() != legsBody )
+				contact.setEnabled(false);
+			else if( manifold.getNormal().y < 0 )
+				contact.setEnabled(false);
+			else
+				contact.setEnabled(true);
+		}
+	  }
 	}
 
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 
+	}
+	
+	public Rectangle getBoundingBox() {
+		float w = getWidth()*0.4f;
+		float h = getHeight()*0.9f;
+		return new Rectangle (getX()-w/2,getY()-getHeight()/2,w,h);
 	}
 }

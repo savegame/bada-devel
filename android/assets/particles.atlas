@@ -1,0 +1,19 @@
+particles.png
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+default
+  rotate: false
+  xy: 1, 1
+  size: 12, 12
+  orig: 6, 6
+  offset: 0, 0
+  index: -1
+tiny_snowflake
+  rotate: false
+  xy: 14, 1
+  size: 11, 11
+  orig: 5, 5
+  offset: 0, 0
+  index: -1

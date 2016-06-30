@@ -11,15 +11,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mypinguin.game.PenguinGame;
@@ -29,7 +26,7 @@ import com.mypinguin.game.PenguinGame;
  */
 public class MainMenuStage extends ExtendedScreen {
 
-	private boolean needUpdateViewport = false;
+	private boolean needUpdateViewport = true;
 	private OrthographicCamera  camera = null;
 	private Stage currentStage = null;
 	
@@ -238,6 +235,8 @@ public class MainMenuStage extends ExtendedScreen {
 	
 	public void OnExitPressed()
 	{
+		game.dispose();
+		Gdx.app.exit();
 	}
 	
 	public void OnOptionsBackPressed()

@@ -3,20 +3,24 @@ package com.mypinguin.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.penguin.menu.MainMenuStage;
+import com.penguin.physics.BodyActor;
+import com.penguin.physics.BoxActor;
+import java.util.ArrayList;
 
 public class PenguinGame extends Game {
 	public class ContactsController implements ContactListener {
@@ -32,11 +36,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).beginContact(fixtureA, fixtureB, contact);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).beginContact(fixtureA, fixtureB, contact);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).beginContact(fixtureB, fixtureA, contact);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).beginContact(fixtureB, fixtureA, contact);
 			}
 		}
 
@@ -46,11 +50,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).endContact(fixtureA, fixtureB, contact);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).endContact(fixtureA, fixtureB, contact);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).endContact(fixtureB, fixtureA, contact);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).endContact(fixtureB, fixtureA, contact);
 			}
 		}
 
@@ -60,11 +64,11 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).preSolve(contact, oldManifold);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).preSolve(contact, oldManifold);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).preSolve(contact, oldManifold);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).preSolve(contact, oldManifold);
 			}
 		}
 
@@ -74,23 +78,29 @@ public class PenguinGame extends Game {
 			Fixture fixtureB = contact.getFixtureB();
 			Object objA = fixtureA.getBody().getUserData();
 			Object objB = fixtureB.getBody().getUserData();
-			if( objA != null && objA instanceof BodyActor ) {
-				((BodyActor)objA).postSolve(contact, impulse);
+			if( objA != null && objA instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objA).postSolve(contact, impulse);
 			}
-			if( objB != null && objB instanceof BodyActor ) {
-				((BodyActor)objB).postSolve(contact, impulse);
+			if( objB != null && objB instanceof com.penguin.physics.BodyActor) {
+				((com.penguin.physics.BodyActor)objB).postSolve(contact, impulse);
 			}
 		}
 	}
 
 	public FontsManager fonts;
+	public ParticlesManager particles;
 
 	public BitmapFont   font;  //шрифт по умолчанию
 	public BitmapFont   bigFont;
 	public SpriteBatch  batch; //отрисовщик текстур
+	public ModelBatch   modelBatch;
 	public AssetManager asset; //менеджер ресурсов
 	public PlayerActor  player;
 	public boolean      isDebug = true;
+	public Camera       camera = null;
+
+	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
+	private ArrayList<Joint> destroyJoint = new ArrayList<Joint>();
 
 	// physics
 	public World        world;
@@ -106,26 +116,19 @@ public class PenguinGame extends Game {
 	 * */ 
 	public float       width  = 800;
 	public float       height = 480;
+	//глобальный генератор случайных чисел
+	public RandomXS128 rand = new RandomXS128();
 
 	@Override
 	public void create() {
-//		font = new BitmapFont();
-//		font.setUseIntegerPositions(true);
 		batch = new SpriteBatch();
+		modelBatch = new ModelBatch();
 		asset = new AssetManager();
 		
 		fonts = new FontsManager();
 		fonts.LoadStylesFromJson(Gdx.files.internal("styles.json"));
 		
-		// тест загрузки шрифта
-		/*float densityIndependentSize = m_mainFontSize * Gdx.graphics.getDensity();
-		int fontSize = Math.round(densityIndependentSize );
-//		FreeTypeFontGenerator.NO_MAXIMUM = 32;
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Agentorange.ttf"));
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = m_mainFontSize;
-		bigFont = generator.generateFont(parameter);
-		generator.dispose(); // don't forget to dispose to avoid memory leaks!*/
+		particles = new ParticlesManager(this);
 		
 		bigFont = fonts.GetFont("bigFont");
 
@@ -137,9 +140,8 @@ public class PenguinGame extends Game {
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
 		this.setScreen(new MainMenuStage(this));
-		
 		//this.setScreen( new MainMenuScreen(this) );
-		//this.setScreen( new Box2DTestLevel(this) );
+//		this.setScreen( new Box2DTestLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -150,10 +152,45 @@ public class PenguinGame extends Game {
 	}
 	
 	public void dispose() {
-		font.dispose();
-		fonts.dispose();
-		batch.dispose();
+		super.dispose();
+//		world.dispose();
+//		world = null;
+//		fonts.dispose();
+//		particles.dispose();
+//		batch.dispose();
 		asset.dispose();
-		world.dispose();
+		asset = null;
+	}
+
+	public void addToDestroy(BodyActor actor) {
+		if(!destroy.contains(actor)) {
+			destroy.add(actor);
+			if(player != null && actor instanceof BoxActor )
+				player.detachIfNeed( (BoxActor) actor);
+		}
+	}
+
+	public void addToDestroy(Joint joint) {
+		if(!destroyJoint.contains(joint)) {
+			destroyJoint.add(joint);
+		}
+	}
+
+	public void destroyBodies() {
+		if( world.isLocked() ) return;
+		while( destroyJoint.iterator().hasNext() ) {
+			Joint joint = destroyJoint.iterator().next();
+			world.destroyJoint(joint);
+			destroyJoint.remove(joint);
+		}
+		while( destroy.iterator().hasNext() ) {
+			BodyActor actor = destroy.iterator().next();
+
+			if( actor.destroyBody() ) {
+				actor.clear();
+				actor.remove();
+				destroy.remove(actor);
+			}
+		}
 	}
 }

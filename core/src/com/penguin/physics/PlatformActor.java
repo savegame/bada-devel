@@ -1,21 +1,28 @@
-package com.mypinguin.game;
+package com.penguin.physics;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.mypinguin.game.PenguinGame;
 
 import java.util.ArrayList;
 
 /**
  * Created by savegame on 10.12.15.
  */
-public class PlatformActor extends BodyActor {
+public class PlatformActor extends com.penguin.physics.BodyActor {
 	enum SmoothPointType {
 		all, //смазывать все точки
 		ends //смазывать только крайние
+	}
+
+	public class Part {
+		TextureRegion region; //текстура
+		Vector2       shift; // смещение
 	}
 
 	protected ArrayList<Vector2> path = new ArrayList<Vector2>();
@@ -30,10 +37,13 @@ public class PlatformActor extends BodyActor {
 	protected int smoothSteps = 20;
 	protected SmoothPointType smoothType = SmoothPointType.ends;
 	protected float currentSpeed;
+	protected ArrayList<Part> parts = new ArrayList<Part>();
 
-	PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
-		super(penguinGame, _fixturedef);
+	public PlatformActor(PenguinGame penguinGame, FixtureDef _fixturedef) {
+		super(penguinGame);
+		setFixtureDef(_fixturedef);
 		bodydef.type = BodyDef.BodyType.KinematicBody;
+		mode = Animation.PlayMode.LOOP_PINGPONG;
 	}
 
 	public void setBodyType( BodyDef.BodyType bodyType ) {
@@ -41,6 +51,12 @@ public class PlatformActor extends BodyActor {
 		bodydef.type = BodyDef.BodyType.KinematicBody;
 	}
 
+	public void addTextureRegion(TextureRegion texa, float shiftX, float shiftY) {
+		Part part = new Part();
+		part.region = texa;
+		part.shift = new Vector2(shiftX, shiftY);
+		parts.add(part);
+	}
 	public void setMoveSpeed(float speed) {
 		moveSpeed = speed;
 	}
@@ -100,6 +116,8 @@ public class PlatformActor extends BodyActor {
 	 */
 	@Override
 	public void act(float delta) {
+		if( !isActive() ) return;
+
 		Vector2 bodyPos = body.getPosition();
 		bodyPos.x *= game.units;
 		bodyPos.y *= game.units;
@@ -107,9 +125,10 @@ public class PlatformActor extends BodyActor {
 		Vector2 len = new Vector2();
 
 		if( path.isEmpty() ) {
-			nextPointPos = new Vector2(firstPoint.x, firstPoint.y * game.units * 5);
-			if( bodyPos.y * game.units == nextPointPos.y )
-				nextPointPos = firstPoint;
+//			nextPointPos = new Vector2(firstPoint.x, firstPoint.y * game.units * 5);
+//			if( bodyPos.y * game.units == nextPointPos.y )
+//				nextPointPos = firstPoint;
+			deactivate();
 		}
 		else {
 			switch ( mode ) {
@@ -151,9 +170,9 @@ public class PlatformActor extends BodyActor {
 						if( ( 	(nextPoint == 0  && incPoint == -1 )
 								|| 	(nextPoint == path.size() - 1 && incPoint == 1 )
 							) && distance <= smoothDist) {
-//							int p = (int)(distance * smoothSteps / smoothDist);
-//							speed = moveSpeed / (smoothSteps * game.units) * ( (p == 0)?1:p );
-							speed = moveSpeed * distance/ (smoothDist*game.units);
+							int p = (int)(distance * smoothSteps / smoothDist);
+							speed = moveSpeed / (smoothSteps * game.units) * ( (p == 0)?1:p );
+//							speed = moveSpeed * distance/ (smoothDist*game.units);
 						}
 						else if( (nextPoint == 1 && incPoint == 1) || (nextPoint == path.size() - 2 && incPoint == -1) ) {
 							Vector2 distV = new Vector2( path.get(nextPoint - incPoint).x - bodyPos.x, path.get(nextPoint - incPoint).y - bodyPos.y );
@@ -182,11 +201,21 @@ public class PlatformActor extends BodyActor {
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
-		super.draw(batch,parentAlpha);
+		super.draw(batch, parentAlpha);
 		if( game.isDebug ) {
 			String text = new String();
-			text = "speed = " + currentSpeed;
-			game.font.draw( batch, text, (int)this.getX(), (int)this.getY() );
+			//Color ret = game.font.getColor();
+			game.font.setColor(1f, 0.3f, 0.25f,1f);
+			text = "speed = " + currentSpeed
+					+ "\nActive = " + isActive();
+			game.font.draw( batch, text, (int)this.getX(), (int)this.getY() + (int)this.getHeight() );
+			game.font.setColor(1f,1f,1f,1f);
+		}
+		float length = 0;
+		game.batch.setColor(1,1,1,1);
+		for (Part part : parts) {
+			game.batch.draw( part.region, this.getX() + length + part.shift.x, this.getY() + part.shift.y );
+			length += part.region.getRegionWidth();
 		}
 	}
 	/**
@@ -194,5 +223,21 @@ public class PlatformActor extends BodyActor {
 	 */
 	public void dispose() {
 		super.dispose();
+	}
+
+	/**
+	 * Активируем объект
+	 */
+	@Override
+	public void activate() {
+		super.activate();
+	}
+
+	/**
+	 * Декативирует объект
+	 */
+	@Override
+	public void deactivate() {
+		super.deactivate();
 	}
 }

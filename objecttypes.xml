@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttypes>
+ <objecttype name="box" color="#fc97d4"/>
+ <objecttype name="ground" color="#a44f28"/>
+ <objecttype name="player" color="#a4869e"/>
+ <objecttype name="lift" color="#282d76"/>
+ <objecttype name="path" color="#ff0004"/>
+ <objecttype name="water" color="#35a405"/>
+ <objecttype name="button" color="#00aaff"/>
+ <objecttype name="fixture" color="#889ca4"/>
+ <objecttype name="temp" color="#8d61ce"/>
+</objecttypes>

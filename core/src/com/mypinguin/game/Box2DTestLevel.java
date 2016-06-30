@@ -17,7 +17,6 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -27,12 +26,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.penguin.menu.ExtendedScreen;
+import com.penguin.particles.Emitter_Snow;
 
 public class Box2DTestLevel extends ExtendedScreen {
 	private boolean             needUpdateViewport = false;
@@ -58,29 +59,50 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private float    time_stamp  = 1/30f;
 
 	private MapBodyManager     mapBodyManager      = null;
+	private Texture            defaultBG           = null;
+	private Group              background          = null;
+	private Group              middleground        = null;
+	private Group              waterlayer          = null;
+	private Group              foreground          = null;
 	//randomizer
-	RandomXS128 rand = new RandomXS128();
+
 	
 	
 	Box2DTestLevel( PenguinGame penguinGame ) {
 		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
+		game.isDebug = false;
 
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
 		camera.zoom = 1.0f;
+		game.camera = this.camera;
 
 		camControl = new CameraControl(camera);
 		camControl.setShift(0, 128);
 		camControl.setPosition(game.width / 2, game.height / 2);
+		//camControl.setCameraZoom(2);
 //		camControl.draw(null, 1f);
 		camera.update();
 		//b2d_matrix = new Matrix4( camera.combined.scale(b2d_scale, b2d_scale, 1f) );
 		stage = new Stage( new ExtendViewport(game.width, game.height, camera), game.batch);
+		background = new Group();
+		background.setName("BackgroundLayer");
+		middleground = new Group();
+		middleground.setName("MiddleLayer");
+		waterlayer = new Group();
+		waterlayer.setName("WaterLayer");
+		foreground = new Group();
+		foreground.setName("ForegroundLayer");
+		stage.addActor(background);
+		stage.addActor(middleground);
+		stage.addActor(waterlayer);
+		stage.addActor(foreground);
+
 		ui = new Stage( new ExtendViewport(game.width, game.height), game.batch);
 		createUI(ui);
-		stage.addActor(camControl);
+		background.addActor(camControl);
 		
 		map = new TmxMapLoader().load("maps/ice_map_0.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
@@ -92,26 +114,44 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 		world = game.world;
 		debugRenderer = new Box2DDebugRenderer();
-		
-//		createGround();
-//		for(int i = 0 ; i < 10; ++i ) {
-//			createRect();
-//		}
 
 //		positionPlayer(map, camControl );
 		
 		mapBodyManager = new MapBodyManager(game, Gdx.files.internal("PhysicsMaterials.json"), 0 );
 		mapBodyManager.createPhysics(map);
-		mapBodyManager.actorsToStage(stage);
+		mapBodyManager.actorsToStage(middleground);
+		defaultBG = game.asset.get("defaultbg.png", Texture.class );
+
 
 		if( game.player != null )
 		{
 			camControl.setTarget(game.player);
-			positionPlayer(map, game.player );
+			positionPlayer(map, game.player);
 			movePanel.setPlayer(game.player);
-			stage.addActor(game.player);
+			middleground.addActor(game.player);
 			setupPlayer(game.player);
 		}
+
+		mapBodyManager.waterActorToStage(waterlayer);
+
+		Emitter_Snow snowEmitter = new Emitter_Snow(game, camera);
+		
+		//Временное решение для информирования системы частиц о прямоугольниках с водой,
+		//впрочем если не париться, то такое решение вполне нормальное и для продакшена
+		Array<Actor> actors = waterlayer.getChildren();
+		for (int i = 0; i < actors.size; i++)
+		{
+			if (actors.items[i] instanceof com.penguin.physics.WaterActor)
+			{
+				com.penguin.physics.WaterActor water = (com.penguin.physics.WaterActor) actors.items[i];
+				snowEmitter.AddSolidRegion(water.getX(),water.getY(),water.getWidth(),water.getHeight());
+			}
+		}
+		
+		snowEmitter.SetPlayerActor(game.player);
+		
+		game.particles.addEmitter(snowEmitter, 0);
+		foreground.addActor(game.particles.getLayer(0));
 	}
 
 	private void setupPlayer(PlayerActor player) {
@@ -161,6 +201,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 			}
 		}
 	}
+	
 	private void createGround() {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.position.set(0, 0);
@@ -176,8 +217,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 	
 	private void createRect() {
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set( rand.nextFloat()*(game.width/game.units-4)+2, rand.nextFloat()*(game.height/game.units-2)+5);
-		bodyDef.angle = rand.nextFloat()*360f;
+		bodyDef.position.set( game.rand.nextFloat()*(game.width/game.units-4)+2, game.rand.nextFloat()*(game.height/game.units-2)+5);
+		bodyDef.angle = game.rand.nextFloat()*360f;
 		bodyDef.type = BodyType.DynamicBody;
 		
 		Body body = world.createBody(bodyDef);
@@ -198,8 +239,9 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private void loadTextures(AssetManager manager) {
 		this.loadAsset("ui/btn_lr.png", Texture.class);
 		this.loadAsset("pinguin.png", Texture.class);
-		this.loadAsset("box_0.png", Texture.class);
 		this.loadAsset("run_0.png", Texture.class);
+		this.loadAsset("defaultbg.png", Texture.class);
+		this.loadAsset("water.png", Texture.class);
 	}
 
 	private void createUI(Stage ui_stage) {
@@ -252,7 +294,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -262,39 +303,50 @@ public class Box2DTestLevel extends ExtendedScreen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+
 		ui.act();
 		stage.act();
+
 		float frameTime = Math.min(delta, 0.25f);
 		accumulator += frameTime;
 //		while (accumulator >= time_stamp)
 		{
 			time_stamp = delta;
 			world.step(time_stamp, 6, 2);
+			game.destroyBodies();
 			accumulator -= time_stamp;
 		}
 
 		camControl.act(Gdx.graphics.getDeltaTime());
 		camera.update();
-		
+
+		game.batch.begin();
+		game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight() );
+		game.batch.end();
+
 		m_mapRenderer.setView(camera);
 		m_mapRenderer.render();
+
 		stage.draw();
-		debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
+		if( game.isDebug )
+			debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
 		ui.draw();
 //		String str = ;
 		game.batch.begin();
-		if( game.player != null)
-			game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
-							+ "\nGrounded2: " + game.player.isPlayerGrounded()
-							+ "\nUnderwater: " + game.player.isUnderwater()
-							+ "\nContactCount: " + game.player.allContacts.size()
-							+ "\nCanPick: " + game.player.canPick()
-							+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
-						+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
-		else
-			game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
-
+		if(game.isDebug)
+		{
+			if (game.player != null)
+				game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
+								+ "\nUnderwater: " + game.player.isUnderwater()
+								+ "\nContactCount: " + game.player.allContacts.size()
+								+ "\nCanPick: " + game.player.canPick()
+								+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
+								+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
+			else
+				game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
+		}
 		game.batch.end();
+		
 		
 		if(needUpdateViewport){
 			stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
@@ -304,11 +356,12 @@ public class Box2DTestLevel extends ExtendedScreen {
 			btnPick.setPosition(ui.getViewport().getWorldWidth() - 263, 5);
 			needUpdateViewport = false;
 		}
+		
+		
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		camera.setToOrtho(false, width, height);
 		Vector2 pos = new Vector2(140f, 5f);
 		needUpdateViewport = true;
@@ -316,27 +369,25 @@ public class Box2DTestLevel extends ExtendedScreen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
+		//
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		//
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		super.dispose();
 		map.dispose();
-		mapBodyManager.destroyPhysics();
+		mapBodyManager.dispose();
+		game.particles.clearLayers();
 	}
 
 }
