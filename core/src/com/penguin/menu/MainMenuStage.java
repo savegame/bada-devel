@@ -12,10 +12,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mypinguin.game.PenguinGame;
@@ -53,8 +57,8 @@ public class MainMenuStage extends ExtendedScreen {
 		camera.zoom = 1.0f;
 		
 		main_stage = new Stage( new ExtendViewport(game.width, game.height, camera), game.batch);
-		options_stage = new MMenu_Options(new ExtendViewport(game.width, game.height, camera), game.batch);
-		levels_stage = new MMenu_LevelSelect(new ExtendViewport(game.width, game.height, camera), game.batch);
+		options_stage = new MMenu_Options(new ExtendViewport(game.width, game.height, camera), game.batch,this);
+		levels_stage = new MMenu_LevelSelect(new ExtendViewport(game.width, game.height, camera), game.batch, this);
 
 		buildSkin();
 		
@@ -63,7 +67,6 @@ public class MainMenuStage extends ExtendedScreen {
 		levels_stage.buildLayout(skin);
 		
 		currentStage = main_stage;
-		
 		Gdx.input.setInputProcessor(currentStage);
 	}
 	
@@ -81,9 +84,7 @@ public class MainMenuStage extends ExtendedScreen {
 			
 			TextButtonStyle btnStyle = new TextButtonStyle();
 			btnStyle.up = skin.newDrawable("patch9_button_"+color,Color.WHITE);
-			btnStyle.down = skin.newDrawable("patch9_button_"+color,Color.DARK_GRAY);
-			//btnStyle.checked = skin.newDrawable("patch9_button_"+color,Color.DARK_GRAY);
-			btnStyle.over = skin.newDrawable("patch9_button_"+color,Color.LIGHT_GRAY);
+			btnStyle.down = skin.newDrawable("patch9_button_"+color,Color.LIGHT_GRAY);
 			btnStyle.font = game.fonts.GetFont("mmenu-btn-normal");
 			btnStyle.fontColor = btnStyle.font.getColor();
 			
@@ -93,22 +94,51 @@ public class MainMenuStage extends ExtendedScreen {
 	
 	public void buildLayout(Skin skin)
 	{
-		btnPlay = new TextButton("Play",skin,"button_blue");
+		btnPlay = new TextButton("PLAY",skin,"button_green");
+		btnOptions = new TextButton("OPTIONS",skin,"button_blue");
+		btnExit = new TextButton("EXIT",skin,"button_red");
+		
+		btnOptions.sizeBy(20, 0);
+		btnPlay.setWidth(btnOptions.getWidth());
+		btnExit.setWidth(btnOptions.getWidth());
+		btnPlay.sizeBy(20);
+		
+		btnPlay.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnPlay.isPressed()) OnPlayPressed();
+			}
+		});
+		
+		btnOptions.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnOptions.isPressed()) OnOptionsPressed();
+			}
+		});
+		
+		btnExit.addListener(new ChangeListener() {
+			public void changed(ChangeEvent event, Actor actor) {
+				if (btnExit.isPressed()) OnExitPressed();
+			}
+		});
+		
 		main_stage.addActor(btnPlay);
-		
-		btnPlay.sizeBy(64, 10);
-		btnPlay.setPosition(-btnPlay.getWidth()/2+main_stage.getViewport().getWorldWidth() * 0.5f,
-							-btnPlay.getHeight()/2+main_stage.getViewport().getWorldHeight() * 0.5f);
-		
-		
-		
-		
-		/*main_stage.addActor(btnOptions);
-		main_stage.addActor(btnExit);*/
+		main_stage.addActor(btnExit);
+		main_stage.addActor(btnOptions);
 		
 		spr_mmenu_logo.setOriginCenter();
-		spr_mmenu_logo.setCenter(main_stage.getViewport().getWorldWidth() * 0.5f,
-								 main_stage.getViewport().getWorldHeight() * 0.8f);
+		refreshLayout();
+	}
+	
+	public void refreshLayout()
+	{
+		float width = main_stage.getViewport().getWorldWidth();
+		float height = main_stage.getViewport().getWorldHeight();
+		
+		btnPlay.setPosition		(0.500f * (-btnPlay.getWidth()+ width), 0.025f * height);
+		btnOptions.setPosition	(0.025f * width, 						0.025f * height);
+		btnExit.setPosition		(0.975f * (-btnExit.getWidth()+ width), 0.025f * height);
+		
+		spr_mmenu_logo.setCenter(width * 0.5f, height * 0.8f);
 	}
 
 	public void loadResources(AssetManager manager)
@@ -143,18 +173,22 @@ public class MainMenuStage extends ExtendedScreen {
 							0, 0,
 							main_stage.getViewport().getWorldWidth(),
 							main_stage.getViewport().getWorldHeight());
+			if (currentStage == main_stage)
 			spr_mmenu_logo.draw(game.batch);
 		game.batch.end();
 
 		currentStage.draw();
 		
 		if(needUpdateViewport){
-			currentStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			main_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			options_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			levels_stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+			//currentStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-			spr_mmenu_logo.setCenter(main_stage.getViewport().getWorldWidth() * 0.5f,
-					 				 main_stage.getViewport().getWorldHeight() * 0.8f);
-			btnPlay.setPosition(-btnPlay.getWidth()/2+main_stage.getViewport().getWorldWidth() * 0.5f,
-								-btnPlay.getHeight()/2+main_stage.getViewport().getWorldHeight() * 0.5f);
+			refreshLayout();
+			options_stage.refreshLayout();
+			levels_stage.refreshLayout();
+			
 			needUpdateViewport = false;
 		}
 	}
@@ -188,5 +222,33 @@ public class MainMenuStage extends ExtendedScreen {
 		levels_stage.dispose();
 
 		skin.dispose();
+	}
+	
+	public void OnPlayPressed()
+	{
+		currentStage = levels_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnOptionsPressed()
+	{
+		currentStage = options_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnExitPressed()
+	{
+	}
+	
+	public void OnOptionsBackPressed()
+	{
+		currentStage = main_stage;
+		Gdx.input.setInputProcessor(currentStage);
+	}
+	
+	public void OnLevelsBackPressed()
+	{
+		currentStage = main_stage;
+		Gdx.input.setInputProcessor(currentStage);
 	}
 }
