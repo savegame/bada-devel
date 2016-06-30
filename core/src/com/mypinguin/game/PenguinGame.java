@@ -17,9 +17,9 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.penguin.menu.MainMenuStage;
 import com.penguin.physics.BodyActor;
 import com.penguin.physics.BoxActor;
-
 import java.util.ArrayList;
 
 public class PenguinGame extends Game {
@@ -139,9 +139,9 @@ public class PenguinGame extends Game {
 		contacts = new ContactsController(this);
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
-		//this.setScreen(new MainMenuStage(this));
+		this.setScreen(new MainMenuStage(this));
 		//this.setScreen( new MainMenuScreen(this) );
-		this.setScreen( new Box2DTestLevel(this) );
+//		this.setScreen( new Box2DTestLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -152,11 +152,14 @@ public class PenguinGame extends Game {
 	}
 	
 	public void dispose() {
-		fonts.dispose();
-		particles.dispose();
-		batch.dispose();
+		super.dispose();
+//		world.dispose();
+//		world = null;
+//		fonts.dispose();
+//		particles.dispose();
+//		batch.dispose();
 		asset.dispose();
-		world.dispose();
+		asset = null;
 	}
 
 	public void addToDestroy(BodyActor actor) {
