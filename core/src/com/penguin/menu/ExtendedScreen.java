@@ -18,7 +18,7 @@ public class ExtendedScreen implements Screen {
 
 	public ExtendedScreen( PenguinGame penguinGame )
 	{
-		if (penguinGame == null) throw new IllegalArgumentException("penguinGame cannot be null.");
+		if (penguinGame == null) throw new IllegalArgumentException("PenguinGame cannot be null.");
 		this.game = penguinGame;
 	}
 

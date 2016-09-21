@@ -193,4 +193,8 @@ public class PenguinGame extends Game {
 			}
 		}
 	}
+
+	public void loadLevel(String path) {
+
+	}
 }

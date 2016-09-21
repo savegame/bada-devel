@@ -1,24 +1,24 @@
 {
 	styles: [
-	{
-		class: com.mypinguin.game.FontStyleDataEntry,
-		name: mmenu-btn-normal,
-		font: fonts/RotondaC-Bold.otf,
-		size: 48,
-		color: {
-			class: com.mypinguin.game.FontStyleColorEntry,
-			r: 255, g:255, b:255, a:255
-		}
-	},
-	{
-		class: com.mypinguin.game.FontStyleDataEntry,
-		name: bigFont,
-		font: fonts/Agentorange.ttf,
-		size: 32,
-		color: {
-			class: com.mypinguin.game.FontStyleColorEntry,
-			r: 255, g:255, b:255, a:255
-		}
-	}
+      {
+          class: com.mypinguin.game.FontStyleDataEntry,
+          name: mmenu-btn-normal,
+          font: fonts/RotondaC-Bold.otf,
+          size: 48,
+          color: {
+              class: com.mypinguin.game.FontStyleColorEntry,
+              r: 255, g:255, b:255, a:255
+          }
+      },
+      {
+          class: com.mypinguin.game.FontStyleDataEntry,
+          name: bigFont,
+          font: fonts/Agentorange.ttf,
+          size: 32,
+          color: {
+              class: com.mypinguin.game.FontStyleColorEntry,
+              r: 255, g:255, b:255, a:255
+          }
+      }
 	]
 }

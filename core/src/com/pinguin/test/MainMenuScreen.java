@@ -18,7 +18,7 @@ public class MainMenuScreen extends ExtendedScreen {
 		// создаем ортоганальную камеру
 		m_camera = new OrthographicCamera(game.width, game.height);
 		m_camera.setToOrtho(false, game.width, game.height);
-		m_camera.translate(game.width, game.height / 2);
+		m_camera.translate(game.width/2, game.height / 2);
 		ui = new Stage( new ExtendViewport(game.width, game.height, m_camera) );
 	}
 	@Override

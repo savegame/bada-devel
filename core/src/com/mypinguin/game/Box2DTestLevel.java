@@ -50,13 +50,13 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private MPButton            btnPick              = null;
 	// tiled map
 	OrthogonalTiledMapRenderer  m_mapRenderer      = null;
-	TiledMap map;
+	TiledMap                    map;
 	// Box2D physics
 	private World               world              = null;
 	private Box2DDebugRenderer  debugRenderer      = null;
 	private float               accumulator        = 0;
 	
-	private float    time_stamp  = 1/30f;
+	private float              time_stamp  = 1/30f;
 
 	private MapBodyManager     mapBodyManager      = null;
 	private Texture            defaultBG           = null;
@@ -103,14 +103,15 @@ public class Box2DTestLevel extends ExtendedScreen {
 		ui = new Stage( new ExtendViewport(game.width, game.height), game.batch);
 		createUI(ui);
 		background.addActor(camControl);
-		
+
+		m_multiplexer = new InputMultiplexer();
+		Gdx.input.setInputProcessor(m_multiplexer);
+
 		map = new TmxMapLoader().load("maps/ice_map_0.tmx");
 		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
-		//m_mapRenderer.setCamera(camera);
-		m_multiplexer = new InputMultiplexer();
+
 		m_multiplexer.addProcessor(stage);
 		m_multiplexer.addProcessor(ui);
-		Gdx.input.setInputProcessor(m_multiplexer);
 
 		world = game.world;
 		debugRenderer = new Box2DDebugRenderer();

@@ -1,3 +1,22 @@
 [
-  { "name" : "IceMap", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" }
+  { "name" : "IceMap1", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap2", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap3", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap4", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap5", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap6", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap7", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap8", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap9", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap10", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap11", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap12", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap13", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap14", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap15", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap16", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap17", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap18", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap19", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" },
+  { "name" : "IceMap20", "file" : "ice_map_0.tmx", "thumb" : "ice_map_0.png" }
 ]
