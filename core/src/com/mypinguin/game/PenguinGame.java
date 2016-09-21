@@ -90,14 +90,16 @@ public class PenguinGame extends Game {
 	public FontsManager fonts;
 	public ParticlesManager particles;
 
-	public BitmapFont   font;  //шрифт по умолчанию
-	public BitmapFont   bigFont;
-	public SpriteBatch  batch; //отрисовщик текстур
-	public ModelBatch   modelBatch;
-	public AssetManager asset; //менеджер ресурсов
-	public PlayerActor  player;
-	public boolean      isDebug = true;
-	public Camera       camera = null;
+	public BitmapFont    font;  //шрифт по умолчанию
+	public BitmapFont    bigFont;
+	public SpriteBatch   batch; //отрисовщик текстур
+	public ModelBatch    modelBatch;
+	public AssetManager  asset; //менеджер ресурсов
+	public PlayerActor   player = null;
+	public boolean       isDebug = true;
+	public Camera        camera = null;
+	public Box2DLevel    m_level = null;
+	public MainMenuStage m_mainMenu = null;
 
 	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
 	private ArrayList<Joint> destroyJoint = new ArrayList<Joint>();
@@ -139,9 +141,10 @@ public class PenguinGame extends Game {
 		contacts = new ContactsController(this);
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
-		this.setScreen(new MainMenuStage(this));
+		m_mainMenu = new MainMenuStage(this);
+		this.setScreen(m_mainMenu);
 		//this.setScreen( new MainMenuScreen(this) );
-//		this.setScreen( new Box2DTestLevel(this) );
+//		this.setScreen( new Box2DLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -195,6 +198,9 @@ public class PenguinGame extends Game {
 	}
 
 	public void loadLevel(String path) {
-
+		if(m_level == null)
+			m_level = new Box2DLevel(this);
+		m_level.loadMap(path);
+		this.setScreen(m_level);
 	}
 }

@@ -209,12 +209,13 @@ public class MapBodyManager implements Disposable {
 
 			if( type.equalsIgnoreCase("player") ) {
 				FixtureDef fixtureDef = materials.get(material);
-				game.player = new PlayerActor(game, fixtureDef);
-
-				game.player.setName("PlayerActor");
+				if(game.player == null) {
+					game.player = new PlayerActor(game, fixtureDef);
+					game.player.setName("PlayerActor");
+					game.player.initialize(shape);
+				}
 				game.player.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
 				game.player.setBodyType(BodyDef.BodyType.DynamicBody);
-				game.player.initialize(shape);
 				//actors.add(player);
 			}
 			else if( type.equalsIgnoreCase("lift") ) {

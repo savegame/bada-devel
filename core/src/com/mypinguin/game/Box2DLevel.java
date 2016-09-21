@@ -18,12 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -35,7 +30,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.penguin.menu.ExtendedScreen;
 import com.penguin.particles.Emitter_Snow;
 
-public class Box2DTestLevel extends ExtendedScreen {
+public class Box2DLevel extends ExtendedScreen {
 	private boolean             needUpdateViewport = false;
 	private OrthographicCamera  camera             = null;
 	private Stage               stage              = null;
@@ -64,11 +59,12 @@ public class Box2DTestLevel extends ExtendedScreen {
 	private Group              middleground        = null;
 	private Group              waterlayer          = null;
 	private Group              foreground          = null;
+	private Emitter_Snow       snowEmitter         = null;
 	//randomizer
 
 	
 	
-	Box2DTestLevel( PenguinGame penguinGame ) {
+	Box2DLevel(PenguinGame penguinGame ) {
 		super(penguinGame);
 		loadTextures(game.asset);
 		game.asset.finishLoading();
@@ -107,8 +103,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 		m_multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(m_multiplexer);
 
-		map = new TmxMapLoader().load("maps/ice_map_0.tmx");
-		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
+//		map = new TmxMapLoader().load("maps/ice_map_0.tmx");
+//		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
 
 		m_multiplexer.addProcessor(stage);
 		m_multiplexer.addProcessor(ui);
@@ -119,8 +115,8 @@ public class Box2DTestLevel extends ExtendedScreen {
 //		positionPlayer(map, camControl );
 		
 		mapBodyManager = new MapBodyManager(game, Gdx.files.internal("PhysicsMaterials.json"), 0 );
-		mapBodyManager.createPhysics(map);
-		mapBodyManager.actorsToStage(middleground);
+//		mapBodyManager.createPhysics(map);
+//		mapBodyManager.actorsToStage(middleground);
 		defaultBG = game.asset.get("defaultbg.png", Texture.class );
 
 
@@ -133,12 +129,42 @@ public class Box2DTestLevel extends ExtendedScreen {
 			setupPlayer(game.player);
 		}
 
-		mapBodyManager.waterActorToStage(waterlayer);
+//		mapBodyManager.waterActorToStage(waterlayer);
 
-		Emitter_Snow snowEmitter = new Emitter_Snow(game, camera);
+		snowEmitter = new Emitter_Snow(game, camera);
 		
 		//Временное решение для информирования системы частиц о прямоугольниках с водой,
 		//впрочем если не париться, то такое решение вполне нормальное и для продакшена
+
+		game.particles.addEmitter(snowEmitter, 0);
+		foreground.addActor(game.particles.getLayer(0));
+	}
+
+	public boolean loadMap(String path)
+	{
+		mapBodyManager.dispose();
+		if(m_mapRenderer != null)
+			m_mapRenderer.dispose();
+		if(map != null)
+			map.dispose();
+
+		map = new TmxMapLoader().load(path);
+		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
+
+		mapBodyManager.createPhysics(map);
+		mapBodyManager.actorsToStage(middleground);
+
+		if( game.player != null )
+		{
+			camControl.setTarget(game.player);
+			positionPlayer(map, game.player);
+			movePanel.setPlayer(game.player);
+			middleground.addActor(game.player);
+			setupPlayer(game.player);
+		}
+
+		mapBodyManager.waterActorToStage(waterlayer);
+
 		Array<Actor> actors = waterlayer.getChildren();
 		for (int i = 0; i < actors.size; i++)
 		{
@@ -148,11 +174,10 @@ public class Box2DTestLevel extends ExtendedScreen {
 				snowEmitter.AddSolidRegion(water.getX(),water.getY(),water.getWidth(),water.getHeight());
 			}
 		}
-		
+
 		snowEmitter.SetPlayerActor(game.player);
-		
-		game.particles.addEmitter(snowEmitter, 0);
-		foreground.addActor(game.particles.getLayer(0));
+
+		return true;
 	}
 
 	private void setupPlayer(PlayerActor player) {
@@ -188,6 +213,7 @@ public class Box2DTestLevel extends ExtendedScreen {
 		}
 	}
 
+
 	private void positionPlayer(Map map, Actor player )
 	{
 		MapLayer layer = map.getLayers().get("Objects");
@@ -201,40 +227,6 @@ public class Box2DTestLevel extends ExtendedScreen {
 				}
 			}
 		}
-	}
-	
-	private void createGround() {
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set(0, 0);
-		bodyDef.type = BodyType.StaticBody;
-		
-		Body body = world.createBody(bodyDef);
-		PolygonShape groundShape = new PolygonShape();
-		groundShape.setAsBox(game.width/game.units, 2);
-		
-		body.createFixture(groundShape, 0.0f);
-		groundShape.dispose();
-	}
-	
-	private void createRect() {
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.position.set( game.rand.nextFloat()*(game.width/game.units-4)+2, game.rand.nextFloat()*(game.height/game.units-2)+5);
-		bodyDef.angle = game.rand.nextFloat()*360f;
-		bodyDef.type = BodyType.DynamicBody;
-		
-		Body body = world.createBody(bodyDef);
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(2, 2);
-		
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = shape;
-		fixtureDef.density = 0.5f; 
-		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.2f;
-		
-		
-		body.createFixture(fixtureDef);
-		shape.dispose();
 	}
 
 	private void loadTextures(AssetManager manager) {

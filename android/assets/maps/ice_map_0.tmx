@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="left-down" width="64" height="32" tilewidth="64" tileheight="64" nextobjectid="182">
- <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42">
+ <tileset firstgid="1" name="ice_tiles_0" tilewidth="64" tileheight="64" tilecount="42" columns="6">
   <image source="ice_tiles_0.png" width="384" height="448"/>
   <tile id="15">
    <objectgroup draworder="index">
@@ -17,7 +17,7 @@
    </objectgroup>
   </tile>
  </tileset>
- <tileset firstgid="43" name="ice_boat" tilewidth="64" tileheight="64" tilecount="256">
+ <tileset firstgid="43" name="ice_boat" tilewidth="64" tileheight="64" tilecount="256" columns="16">
   <image source="ice_boat.png" width="1024" height="1024"/>
  </tileset>
  <layer name="images" width="64" height="32">
@@ -161,7 +161,7 @@
   <object id="120" name="stone" type="temp" gid="38" x="368" y="976" width="64" height="64"/>
   <object id="121" name="stone" type="temp" gid="38" x="2048" y="736" width="64" height="64"/>
   <object id="122" name="stone" type="temp" gid="38" x="1968" y="544" width="64" height="64"/>
-  <object id="133" name="player" type="player" x="1520" y="1296" width="32" height="128"/>
+  <object id="133" name="player" type="player" x="112" y="-320" width="32" height="128"/>
   <object id="142" name="stone" type="temp" gid="38" x="1920" y="288" width="64" height="64"/>
   <object id="143" name="water2" type="water" x="544" y="1968" width="512" height="48"/>
   <object id="144" name="water3" type="water" x="2464" y="1776" width="1280" height="240"/>

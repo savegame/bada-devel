@@ -193,6 +193,15 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 		//this.setSize(64f,120f);
 	}
 
+
+	/** Sets the position of the actor's bottom left corner. */
+	public void setPosition (float x, float y) {
+		super.setPosition(x,y);
+
+		body.setTransform(getX() / game.units, getY() / game.units, 0f);
+		if( legsBody != null )
+			legsBody.setTransform(getX() / game.units, (getY() - bodyHeight*0.25f)/ game.units, 0f);
+	}
 	/**
 	 * Возвращает ширину тела
 	 * @return
