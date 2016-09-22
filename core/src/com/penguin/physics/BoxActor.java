@@ -73,7 +73,15 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 		return platformed;
 	}
 
-
+	public void setDestroyForce( float force )
+	{
+		destroyForce = force;
+	}
+	
+	public float getDestroyForce()
+	{
+		return destroyForce;
+	}
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {

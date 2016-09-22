@@ -54,6 +54,7 @@ public class MapBodyManager implements Disposable {
 		public BodyDef     bodyDef;
 		public Shape       shape;
 		public boolean     breakable = false; //ломается ли объект
+		public float       destroyForce = 10.0f;
 		//public boolean     isdynamic;
 
 		public BodyTemplate( Shape shape ) {
@@ -162,13 +163,15 @@ public class MapBodyManager implements Disposable {
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
 					box.setBreakable(tmpl.breakable);
+					box.setDestroyForce(tmpl.destroyForce);
 					actors.add(box);
 				}
 				else if( type.compareTo("emitter") == 0 ) { //эмиттер частиц или физических объектов
 					String tempName = properties.get( "template", "none", String.class ); //имя физического шаблона
 					String time = properties.get( "time", "1", String.class ); // таймаут генерации
 					String maxCount = properties.get( "max_count", "1", String.class ); //максимальное кол-во
-					String breakable = properties.get( "break", "true", String.class ); //максимальное кол-во
+					//String breakable = properties.get("break", "true", String.class ); //ломаються или нет
+					//String destroyForce = properties.get( "destroy", "10.0", String.class ); //сила при которой ломаются
 
 					if( tempName.compareTo("none") != 0 )
 					{
@@ -180,7 +183,8 @@ public class MapBodyManager implements Disposable {
 						emitter.setMaxParticlesCount( Integer.valueOf(maxCount) );
 						emitter.generate(1);
 						emitter.setName(name);
-						emitter.setBreakable(breakable.compareToIgnoreCase("true")==0);
+						emitter.setBreakable( tmpl.breakable );
+						emitter.setDestroyForce( tmpl.destroyForce );
 						game.particles.addEmitter(emitter, 0);
 					}
 				}
@@ -352,6 +356,7 @@ public class MapBodyManager implements Disposable {
 			String type = properties.get("type", "notype", String.class);
 			String name = object.getName();
 			String breakable = properties.get("break", "false", String.class);
+			String destroyForce = properties.get( "destroy", "10.0", String.class ); //сила при которой ломаются
 
 			if (object instanceof TextureMapObject && type.equalsIgnoreCase("texture") ){
 				TextureMapObject tmo = (TextureMapObject)object;
@@ -408,6 +413,7 @@ public class MapBodyManager implements Disposable {
 				temp.bodyDef = bodyDef;
 				temp.fixturDef = materials.get(material);
 				temp.breakable = breakable.compareToIgnoreCase("true")==0?true:false; 
+				temp.destroyForce = Float.valueOf(destroyForce);
 				templates.put(name, temp);
 			}
 			else if( type.equalsIgnoreCase("static") ) {

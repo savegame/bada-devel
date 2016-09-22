@@ -18,6 +18,7 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 	private Shape shape = null;
 	private float emissionTimer = 0; //время прошедшее с последнего emit
 	private float emitTime = 3f; // таймаут между emit
+	private float destroyForce = 10.0f;
 	private boolean breakable = true;
 	Class<T> bodyActorClass;
 
@@ -31,6 +32,11 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 	
 	public void setBreakable(boolean breakable) {
 		this.breakable = breakable;
+	}
+	
+	public void setDestroyForce(float force)
+	{
+		this.destroyForce = force;
 	}
 	
 	public boolean isBreakable() {
@@ -69,7 +75,9 @@ public class Emitter_BodyActor<T> extends BaseEmitter implements Disposable {
 		bodyActor.actor = new BoxActor(game, textureRegion, fixtureDef);
 		bodyActor.actor.setPosition(getX(), getY());
 		bodyActor.actor.initialize( shape );
+		
 		((BoxActor)bodyActor.actor).setBreakable(this.breakable);
+		((BoxActor)bodyActor.actor).setDestroyForce(this.destroyForce);
 		((BoxActor)bodyActor.actor).particle = bodyActor;
 	}
 
