@@ -213,7 +213,6 @@ public class Box2DLevel extends ExtendedScreen {
 		}
 	}
 
-
 	private void positionPlayer(Map map, Actor player )
 	{
 		MapLayer layer = map.getLayers().get("Objects");
@@ -230,9 +229,10 @@ public class Box2DLevel extends ExtendedScreen {
 	}
 
 	private void loadTextures(AssetManager manager) {
-		this.loadAsset("ui/btn_lr.png", Texture.class);
-		this.loadAsset("pinguin.png", Texture.class);
-		this.loadAsset("run_0.png", Texture.class);
+//		this.loadAsset("ui/btn_lr.png", Texture.class);
+		game.asset.load("ui/btn_lr.png", Texture.class);
+//		this.loadAsset("pinguin.png", Texture.class);
+		game.asset.load("run_0.png", Texture.class);
 		this.loadAsset("defaultbg.png", Texture.class);
 		this.loadAsset("water.png", Texture.class);
 	}
@@ -292,54 +292,67 @@ public class Box2DLevel extends ExtendedScreen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.8f, 0.8f, 0.85f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		if( game.asset.update() && game.asset.getProgress() < 1.0f ) {
+			Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+			game.batch.begin();
+			game.font.draw(game.batch, "Loading " + (int)(game.asset.getProgress()*100) + "%",
+							ui.getViewport().getWorldWidth()*0.5f,
+							(ui.getViewport().getWorldHeight() - game.font.getLineHeight())*0.5f);
+			game.batch.end();
+			return;
+		}
+		else
+		{
+			Gdx.gl.glClearColor(0.8f, 0.8f, 0.85f, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		ui.act();
-		stage.act();
+			//render world
+			ui.act();
+			stage.act();
 
-		float frameTime = Math.min(delta, 0.25f);
-		accumulator += frameTime;
+			float frameTime = Math.min(delta, 0.25f);
+			accumulator += frameTime;
 //		while (accumulator >= time_stamp)
-		{
-			time_stamp = delta;
-			world.step(time_stamp, 6, 2);
-			game.destroyBodies();
-			accumulator -= time_stamp;
-		}
+			{
+				time_stamp = delta;
+				world.step(time_stamp, 6, 2);
+				game.destroyBodies();
+				accumulator -= time_stamp;
+			}
 
-		camControl.act(Gdx.graphics.getDeltaTime());
-		camera.update();
+			camControl.act(Gdx.graphics.getDeltaTime());
+			camera.update();
 
-		game.batch.begin();
-		game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight() );
-		game.batch.end();
+			game.batch.begin();
+			game.batch.draw(defaultBG, 0, 0, ui.getViewport().getWorldWidth(), ui.getViewport().getWorldHeight());
+			game.batch.end();
 
-		m_mapRenderer.setView(camera);
-		m_mapRenderer.render();
+			m_mapRenderer.setView(camera);
+			m_mapRenderer.render();
 
-		stage.draw();
-		if( game.isDebug )
-			debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
-		ui.draw();
+			stage.draw();
+			if (game.isDebug)
+				debugRenderer.render(world, camera.combined.scale(game.units, game.units, 1f));
+			ui.draw();
 //		String str = ;
-		game.batch.begin();
-		if(game.isDebug)
-		{
-			if (game.player != null)
-				game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
-								+ "\nUnderwater: " + game.player.isUnderwater()
-								+ "\nContactCount: " + game.player.allContacts.size()
-								+ "\nCanPick: " + game.player.canPick()
-								+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
-								+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
-			else
-				game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
+			game.batch.begin();
+			if (game.isDebug) {
+				if (game.player != null)
+					game.font.draw(game.batch, "Grounded: " + game.player.isGrounded() + "  count " + game.player.groundedCount()
+									+ "\nUnderwater: " + game.player.isUnderwater()
+									+ "\nContactCount: " + game.player.allContacts.size()
+									+ "\nCanPick: " + game.player.canPick()
+									+ "\nVelocity: \n  X(" + game.player.getVelocity().x + ")\n  Y(" + game.player.getVelocity().y + ")"
+									+ "\nFriction: " + game.player.getFriction(), 3, ui.getViewport().getWorldHeight() - 3);
+				else
+					game.font.draw(game.batch, "Player don't exists!", 3, ui.getViewport().getWorldHeight() - 3);
+			}
+			game.batch.end();
 		}
-		game.batch.end();
-		
 		
 		if(needUpdateViewport){
 			stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);

@@ -174,9 +174,24 @@ public class MainMenuStage extends ExtendedScreen {
 	/** Called when the screen should render itself.
 	 * @param delta The time in seconds since the last render. */
 	public void render (float delta) {
-		Gdx.gl.glClearColor(0.8f, 0.8f, 0.85f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		if( game.asset.update() && game.asset.getProgress() < 1.0f ) {
+			Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+			game.batch.begin();
+			game.bigFont.draw(game.batch, "Loading " + (int)(game.asset.getProgress()*100) + "%",
+							main_stage.getViewport().getWorldWidth()*0.5f,
+							(main_stage.getViewport().getWorldHeight() - game.bigFont.getLineHeight())*0.5f);
+			game.batch.end();
+			return;
+		}
+		else
+		{
+			Gdx.gl.glClearColor(0.8f, 0.8f, 0.85f, 1);
+			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		}
 
 		currentStage.act(delta);
 		camera.update();

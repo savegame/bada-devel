@@ -168,6 +168,7 @@ public class PenguinGame extends Game {
 	public void addToDestroy(BodyActor actor) {
 		if(!destroy.contains(actor)) {
 			destroy.add(actor);
+			actor.setDestroy();
 			if(player != null && actor instanceof BoxActor )
 				player.detachIfNeed( (BoxActor) actor);
 		}

@@ -158,7 +158,7 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 //				//body.setActive(false);
 //			}
 //		}
-		if(breakable)
+		if(breakable && !m_isDestroy)
 		for( int i =0; i < impulse.getNormalImpulses().length; i++) {
 			if( impulse.getNormalImpulses()[0] >= this.destroyForce )
 			{
