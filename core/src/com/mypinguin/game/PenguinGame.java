@@ -20,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.penguin.menu.MainMenuStage;
 import com.penguin.physics.BodyActor;
 import com.penguin.physics.BoxActor;
+
 import java.util.ArrayList;
 
 public class PenguinGame extends Game {
@@ -120,6 +121,8 @@ public class PenguinGame extends Game {
 	public float       height = 480;
 	//глобальный генератор случайных чисел
 	public RandomXS128 rand = new RandomXS128();
+
+	//public int eParticles_Foreground = 0;
 
 	@Override
 	public void create() {

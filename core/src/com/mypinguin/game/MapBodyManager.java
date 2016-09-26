@@ -185,7 +185,7 @@ public class MapBodyManager implements Disposable {
 						emitter.setName(name);
 						emitter.setBreakable( tmpl.breakable );
 						emitter.setDestroyForce( tmpl.destroyForce );
-						game.particles.addEmitter(emitter, 0);
+						game.particles.addEmitter(emitter, 1);
 					}
 				}
 				continue;

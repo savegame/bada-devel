@@ -294,6 +294,7 @@ public class Box2DLevel extends ExtendedScreen {
 				snowEmitter = new Emitter_Snow(game, camera);
 				game.particles.addEmitter(snowEmitter, 0);
 				foreground.addActor(game.particles.getLayer(0));
+				middleground.addActor(game.particles.getLayer(1));
 			}
 
 			if( m_isMapLoaded == false && game.asset.getProgress() == 1.0f)
