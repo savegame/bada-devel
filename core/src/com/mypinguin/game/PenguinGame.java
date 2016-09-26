@@ -201,7 +201,7 @@ public class PenguinGame extends Game {
 	public void loadLevel(String path) {
 		if(m_level == null)
 			m_level = new Box2DLevel(this);
-		m_level.loadMap(path);
 		this.setScreen(m_level);
+		m_level.loadMap(path);
 	}
 }

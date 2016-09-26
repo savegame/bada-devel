@@ -17,7 +17,6 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -31,6 +30,9 @@ import com.penguin.menu.ExtendedScreen;
 import com.penguin.particles.Emitter_Snow;
 
 public class Box2DLevel extends ExtendedScreen {
+	private String              m_mapPath          = new String();
+	private boolean             m_isMapLoaded      = false;
+	private boolean             m_isResourcesLoaded = false;
 	private boolean             needUpdateViewport = false;
 	private OrthographicCamera  camera             = null;
 	private Stage               stage              = null;
@@ -67,7 +69,7 @@ public class Box2DLevel extends ExtendedScreen {
 	Box2DLevel(PenguinGame penguinGame ) {
 		super(penguinGame);
 		loadTextures(game.asset);
-		game.asset.finishLoading();
+//		game.asset.finishLoading();
 		game.isDebug = false;
 
 		camera = new OrthographicCamera(game.width, game.height);
@@ -78,10 +80,8 @@ public class Box2DLevel extends ExtendedScreen {
 		camControl = new CameraControl(camera);
 		camControl.setShift(0, 128);
 		camControl.setPosition(game.width / 2, game.height / 2);
-		//camControl.setCameraZoom(2);
-//		camControl.draw(null, 1f);
 		camera.update();
-		//b2d_matrix = new Matrix4( camera.combined.scale(b2d_scale, b2d_scale, 1f) );
+
 		stage = new Stage( new ExtendViewport(game.width, game.height, camera), game.batch);
 		background = new Group();
 		background.setName("BackgroundLayer");
@@ -97,50 +97,21 @@ public class Box2DLevel extends ExtendedScreen {
 		stage.addActor(foreground);
 
 		ui = new Stage( new ExtendViewport(game.width, game.height), game.batch);
-		createUI(ui);
+
 		background.addActor(camControl);
 
 		m_multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(m_multiplexer);
-
-//		map = new TmxMapLoader().load("maps/ice_map_0.tmx");
-//		m_mapRenderer = new OrthogonalTiledMapRenderer(map);
 
 		m_multiplexer.addProcessor(stage);
 		m_multiplexer.addProcessor(ui);
 
 		world = game.world;
 		debugRenderer = new Box2DDebugRenderer();
-
-//		positionPlayer(map, camControl );
-		
 		mapBodyManager = new MapBodyManager(game, Gdx.files.internal("PhysicsMaterials.json"), 0 );
-//		mapBodyManager.createPhysics(map);
-//		mapBodyManager.actorsToStage(middleground);
-		defaultBG = game.asset.get("defaultbg.png", Texture.class );
-
-
-		if( game.player != null )
-		{
-			camControl.setTarget(game.player);
-			positionPlayer(map, game.player);
-			movePanel.setPlayer(game.player);
-			middleground.addActor(game.player);
-			setupPlayer(game.player);
-		}
-
-//		mapBodyManager.waterActorToStage(waterlayer);
-
-		snowEmitter = new Emitter_Snow(game, camera);
-		
-		//Временное решение для информирования системы частиц о прямоугольниках с водой,
-		//впрочем если не париться, то такое решение вполне нормальное и для продакшена
-
-		game.particles.addEmitter(snowEmitter, 0);
-		foreground.addActor(game.particles.getLayer(0));
 	}
 
-	public boolean loadMap(String path)
+	private boolean loadMapPrivate(String path)
 	{
 		mapBodyManager.dispose();
 		if(m_mapRenderer != null)
@@ -176,7 +147,13 @@ public class Box2DLevel extends ExtendedScreen {
 		}
 
 		snowEmitter.SetPlayerActor(game.player);
+		return false;
+	}
 
+	public boolean loadMap(String path)
+	{
+		m_isMapLoaded = false;
+		m_mapPath = path;
 		return true;
 	}
 
@@ -231,6 +208,8 @@ public class Box2DLevel extends ExtendedScreen {
 	private void loadTextures(AssetManager manager) {
 //		this.loadAsset("ui/btn_lr.png", Texture.class);
 		game.asset.load("ui/btn_lr.png", Texture.class);
+		game.asset.load("ui/btn_jump.png", Texture.class);
+		game.asset.load("ui/btn_hand.png", Texture.class);
 //		this.loadAsset("pinguin.png", Texture.class);
 		game.asset.load("run_0.png", Texture.class);
 		this.loadAsset("defaultbg.png", Texture.class);
@@ -246,7 +225,7 @@ public class Box2DLevel extends ExtendedScreen {
 		movePanel.addButton(btnLeft);
 		movePanel.addButton(btnRight);
 
-		btnUp = new MPButton(new TextureRegion(game.asset.get("ui/btn_lr.png", Texture.class), 128, 0, 128, 128), Gdx.graphics.getWidth() - 64 - 5, 5);
+		btnUp = new MPButton(new TextureRegion(game.asset.get("ui/btn_jump.png", Texture.class), 0, 0, 128, 128), Gdx.graphics.getWidth() - 64 - 5, 5);
 //		btnUp.setRotation(90);
 		ui.addActor(movePanel);
 		ui.setKeyboardFocus(movePanel);
@@ -265,7 +244,7 @@ public class Box2DLevel extends ExtendedScreen {
 			}
 		});
 
-		btnPick = new MPButton(new TextureRegion(game.asset.get("ui/btn_lr.png", Texture.class), 0, 0, 128, 128), Gdx.graphics.getWidth() - 256 - 5, 5);
+		btnPick = new MPButton(new TextureRegion(game.asset.get("ui/btn_hand.png", Texture.class), 0, 0, 128, 128), Gdx.graphics.getWidth() - 256 - 5, 5);
 //		btnUp.setRotation(90);;
 
 		ui.addActor(btnPick);
@@ -292,7 +271,9 @@ public class Box2DLevel extends ExtendedScreen {
 
 	@Override
 	public void render(float delta) {
-		if( game.asset.update() && game.asset.getProgress() < 1.0f ) {
+		if( m_isResourcesLoaded == false || m_isMapLoaded == false ) {
+			game.asset.update();
+
 			Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -302,6 +283,24 @@ public class Box2DLevel extends ExtendedScreen {
 							ui.getViewport().getWorldWidth()*0.5f,
 							(ui.getViewport().getWorldHeight() - game.font.getLineHeight())*0.5f);
 			game.batch.end();
+
+			if( m_isResourcesLoaded == false && game.asset.getProgress() == 1.0f)
+			{
+				m_isResourcesLoaded = true;
+
+				defaultBG = game.asset.get("defaultbg.png", Texture.class);
+				createUI(ui);
+
+				snowEmitter = new Emitter_Snow(game, camera);
+				game.particles.addEmitter(snowEmitter, 0);
+				foreground.addActor(game.particles.getLayer(0));
+			}
+
+			if( m_isMapLoaded == false && game.asset.getProgress() == 1.0f)
+			{
+				m_isMapLoaded = true;
+				loadMapPrivate(m_mapPath);
+			}
 			return;
 		}
 		else
@@ -369,7 +368,7 @@ public class Box2DLevel extends ExtendedScreen {
 	@Override
 	public void resize(int width, int height) {
 		camera.setToOrtho(false, width, height);
-		Vector2 pos = new Vector2(140f, 5f);
+//		Vector2 pos = new Vector2(140f, 5f);
 		needUpdateViewport = true;
 	}
 
