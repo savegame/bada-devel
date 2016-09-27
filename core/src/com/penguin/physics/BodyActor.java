@@ -26,6 +26,7 @@ public class BodyActor extends Actor implements Activable {
 	protected PenguinGame game   = null;  //главный игровой класс
 	protected boolean     isinit  = false;//объект проинициаоизирован
 	protected boolean     active = true;  //объект активный или нет
+	protected boolean     m_isDestroy = false; //объект добавлен на удалние
 
 	public BodyActor(PenguinGame penguinGame) {
 		game = penguinGame;
@@ -34,6 +35,10 @@ public class BodyActor extends Actor implements Activable {
 		this.bodydef.type = BodyDef.BodyType.DynamicBody;
 
 		//fixturedef = _fixturedef;
+	}
+
+	public void setDestroy() {
+		m_isDestroy = true;
 	}
 
 	public boolean destroyBody() {

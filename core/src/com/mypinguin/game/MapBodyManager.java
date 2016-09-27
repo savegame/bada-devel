@@ -31,6 +31,9 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.penguin.core.LayerNum;
+import com.penguin.particles.Emitter_BodyActor;
+import com.penguin.particles.Particle_BodyActor;
 import com.penguin.physics.BodyActor;
 
 import java.util.ArrayList;
@@ -51,6 +54,8 @@ public class MapBodyManager implements Disposable {
 		public FixtureDef  fixturDef;
 		public BodyDef     bodyDef;
 		public Shape       shape;
+		public boolean     breakable = false; //ломается ли объект
+		public float       destroyForce = 10.0f;
 		//public boolean     isdynamic;
 
 		public BodyTemplate( Shape shape ) {
@@ -133,6 +138,7 @@ public class MapBodyManager implements Disposable {
 			logger.error("layer " + layerName + " does not exist");
 			return;
 		}
+		String layerNum = layer.getProperties().get("layer", "mid", String.class);//top, bg
 
 		MapObjects objects = layer.getObjects();
 		Iterator<MapObject> objectIt = objects.iterator();
@@ -150,15 +156,44 @@ public class MapBodyManager implements Disposable {
 
 			if (object instanceof TextureMapObject){
 				TextureMapObject tmo = (TextureMapObject)object;
-				if( templates.containsKey(name) )
+				if( type.compareTo("temp") == 0 && templates.containsKey(name) )
 				{
 					BodyTemplate tmpl = templates.get(name);
 					com.penguin.physics.BoxActor box = new com.penguin.physics.BoxActor(game, tmo.getTextureRegion(), tmpl.fixturDef );
 					box.setName(name);
-					box.setPosition( tmo.getX() + tmo.getTextureRegion().getRegionWidth()/2, tmo.getY() + tmo.getTextureRegion().getRegionHeight()/2 );
+					box.setPosition( tmo.getX(), tmo.getY() + tmo.getTextureRegion().getRegionHeight() );
 					box.setRotation( tmo.getRotation() );
 					box.initialize(tmpl.shape);
+					box.setBreakable(tmpl.breakable);
+					box.setDestroyForce(tmpl.destroyForce);
 					actors.add(box);
+				}
+				else if( type.compareTo("emitter") == 0 ) { //эмиттер частиц или физических объектов
+					String tempName = properties.get( "template", "none", String.class ); //имя физического шаблона
+					String time = properties.get( "time", "1", String.class ); // таймаут генерации
+					String maxCount = properties.get( "max_count", "1", String.class ); //максимальное кол-во
+					//String breakable = properties.get("break", "true", String.class ); //ломаються или нет
+					//String destroyForce = properties.get( "destroy", "10.0", String.class ); //сила при которой ломаются
+
+					if( tempName.compareTo("none") != 0 )
+					{
+						BodyTemplate tmpl = templates.get(tempName);
+						if( tmpl == null ) continue;
+						Emitter_BodyActor emitter = new Emitter_BodyActor(game, tmpl.shape, tmpl.fixturDef,tmo.getTextureRegion(), Particle_BodyActor.class);
+						emitter.setPosition(tmo.getX() , tmo.getY() + tmo.getTextureRegion().getRegionHeight() );
+						emitter.setEmitTime(Float.valueOf(time));
+						emitter.setMaxParticlesCount( Integer.valueOf(maxCount) );
+						emitter.generate(1);
+						emitter.setName(name);
+						emitter.setBreakable( tmpl.breakable );
+						emitter.setDestroyForce( tmpl.destroyForce );
+						if( layerNum.compareToIgnoreCase("mid") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Middle.n() );
+						else if( layerNum.compareToIgnoreCase("bg") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Background.n() );
+						else if( layerNum.compareToIgnoreCase("top") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Foreground.n() );
+					}
 				}
 				continue;
 			}
@@ -185,12 +220,13 @@ public class MapBodyManager implements Disposable {
 
 			if( type.equalsIgnoreCase("player") ) {
 				FixtureDef fixtureDef = materials.get(material);
-				game.player = new PlayerActor(game, fixtureDef);
-
-				game.player.setName("PlayerActor");
+				if(game.player == null) {
+					game.player = new PlayerActor(game, fixtureDef);
+					game.player.setName("PlayerActor");
+					game.player.initialize(shape);
+				}
 				game.player.setPosition(bodyDef.position.x * game.units, bodyDef.position.y * game.units);
 				game.player.setBodyType(BodyDef.BodyType.DynamicBody);
-				game.player.initialize(shape);
 				//actors.add(player);
 			}
 			else if( type.equalsIgnoreCase("lift") ) {
@@ -326,6 +362,8 @@ public class MapBodyManager implements Disposable {
 			String material = properties.get("material", "default", String.class);
 			String type = properties.get("type", "notype", String.class);
 			String name = object.getName();
+			String breakable = properties.get("break", "false", String.class);
+			String destroyForce = properties.get( "destroy", "10.0", String.class ); //сила при которой ломаются
 
 			if (object instanceof TextureMapObject && type.equalsIgnoreCase("texture") ){
 				TextureMapObject tmo = (TextureMapObject)object;
@@ -381,6 +419,8 @@ public class MapBodyManager implements Disposable {
 				BodyTemplate temp = new BodyTemplate(shape);
 				temp.bodyDef = bodyDef;
 				temp.fixturDef = materials.get(material);
+				temp.breakable = breakable.compareToIgnoreCase("true")==0?true:false; 
+				temp.destroyForce = Float.valueOf(destroyForce);
 				templates.put(name, temp);
 			}
 			else if( type.equalsIgnoreCase("static") ) {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
 import com.mypinguin.game.PenguinGame;
 import com.penguin.particles.Emitter_BoxPart;
+import com.penguin.particles.Particle_BodyActor;
 import com.penguin.particles.Particle_BoxPart;
 
 /**
@@ -23,6 +24,8 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 	private boolean picked = false; //значит что предмет находиться в руках
 	private boolean platformed = false; //ЗНАЧИТ ПРЕДМЕТ НАХОДИТЬСЯ НА подвижной платформе
 	private float   destroyForce = 10.0f; //сила при которой объект разрушаеться
+	private boolean breakable = false;
+	public Particle_BodyActor particle = null;
 	
 	public BoxActor(PenguinGame penguinGame, TextureRegion reg, FixtureDef fixturedef)
 	{
@@ -40,6 +43,13 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 		body.getFixtureList().get(0).setUserData("box");
 	}
 
+	public void setBreakable(boolean breakable) {
+		this.breakable = breakable;
+	}
+	
+	public boolean isBreakable() {
+		return this.breakable;
+	}
 	/**
 	 * Находиться ли данный предмет в руках персонажа
 	 * @return
@@ -63,7 +73,15 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 		return platformed;
 	}
 
-
+	public void setDestroyForce( float force )
+	{
+		destroyForce = force;
+	}
+	
+	public float getDestroyForce()
+	{
+		return destroyForce;
+	}
 
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
@@ -140,30 +158,29 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 //				//body.setActive(false);
 //			}
 //		}
+		if(breakable && !m_isDestroy)
 		for( int i =0; i < impulse.getNormalImpulses().length; i++) {
 			if( impulse.getNormalImpulses()[0] >= this.destroyForce )
 			{
-//				body.getFixtureList().get(0).setSensor(true);
-//				//body.setType(BodyDef.BodyType.StaticBody);
-//				body.setLinearVelocity(0f, 0f);
-//				body.setAngularVelocity(0f);
-//				MassData mass = new MassData();
-//				mass.mass = 0.01f;
-//				//body.setActive(false);
-//				if(game.world.isLoexit
-// cked() == false)
-//					body.setMassData( mass );
-
 				game.addToDestroy(this);
 
 				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("default"), Particle_BoxPart.class );
-				boxEmitter.setPosition( getX(), getY() );
+
+//				boxEmitter.setPosition( getX(), getY() );
+				boxEmitter.setPosition(
+								body.getWorldCenter().x * game.units,
+								body.getWorldCenter().y * game.units
+				);
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, 0 );
 
-				//this.clear();
-				//this.remove();
+				if(particle != null)
+				{
+					particle.actor = null;
+					particle = null;
+				}
+
 				break;
 			}
 		}

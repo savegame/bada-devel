@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.penguin.menu.MainMenuStage;
 import com.penguin.physics.BodyActor;
 import com.penguin.physics.BoxActor;
 
@@ -90,14 +91,16 @@ public class PenguinGame extends Game {
 	public FontsManager fonts;
 	public ParticlesManager particles;
 
-	public BitmapFont   font;  //шрифт по умолчанию
-	public BitmapFont   bigFont;
-	public SpriteBatch  batch; //отрисовщик текстур
-	public ModelBatch   modelBatch;
-	public AssetManager asset; //менеджер ресурсов
-	public PlayerActor  player;
-	public boolean      isDebug = true;
-	public Camera       camera = null;
+	public BitmapFont    font;  //шрифт по умолчанию
+	public BitmapFont    bigFont;
+	public SpriteBatch   batch; //отрисовщик текстур
+	public ModelBatch    modelBatch;
+	public AssetManager  asset; //менеджер ресурсов
+	public PlayerActor   player = null;
+	public boolean       isDebug = true;
+	public Camera        camera = null;
+	public Box2DLevel    m_level = null;
+	public MainMenuStage m_mainMenu = null;
 
 	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
 	private ArrayList<Joint> destroyJoint = new ArrayList<Joint>();
@@ -119,6 +122,8 @@ public class PenguinGame extends Game {
 	//глобальный генератор случайных чисел
 	public RandomXS128 rand = new RandomXS128();
 
+	//public int eParticles_Foreground = 0;
+
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
@@ -139,9 +144,10 @@ public class PenguinGame extends Game {
 		contacts = new ContactsController(this);
 		world.setContactListener(contacts);
 		// установка начального уровня MainMenu
-		//this.setScreen(new MainMenuStage(this));
+		m_mainMenu = new MainMenuStage(this);
+		this.setScreen(m_mainMenu);
 		//this.setScreen( new MainMenuScreen(this) );
-		this.setScreen( new Box2DTestLevel(this) );
+//		this.setScreen( new Box2DLevel(this) );
 //		this.setScreen( new MainMenuScreen(this) );
 //		this.setScreen( new PhysicsTest() );
 	}
@@ -152,16 +158,20 @@ public class PenguinGame extends Game {
 	}
 	
 	public void dispose() {
-		fonts.dispose();
-		particles.dispose();
-		batch.dispose();
+		super.dispose();
+//		world.dispose();
+//		world = null;
+//		fonts.dispose();
+//		particles.dispose();
+//		batch.dispose();
 		asset.dispose();
-		world.dispose();
+		asset = null;
 	}
 
 	public void addToDestroy(BodyActor actor) {
 		if(!destroy.contains(actor)) {
 			destroy.add(actor);
+			actor.setDestroy();
 			if(player != null && actor instanceof BoxActor )
 				player.detachIfNeed( (BoxActor) actor);
 		}
@@ -189,5 +199,12 @@ public class PenguinGame extends Game {
 				destroy.remove(actor);
 			}
 		}
+	}
+
+	public void loadLevel(String path) {
+		if(m_level == null)
+			m_level = new Box2DLevel(this);
+		this.setScreen(m_level);
+		m_level.loadMap(path);
 	}
 }

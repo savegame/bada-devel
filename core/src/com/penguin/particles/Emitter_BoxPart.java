@@ -36,11 +36,14 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 	}
 
 	public void resetParticle(Particle particle) {
-		particle.setPosition(getX() + (game.rand.nextFloat()-0.5f)* game.units*0.5f,
+		Particle_BoxPart part = (Particle_BoxPart)particle;
+		part.setPosition(getX() + (game.rand.nextFloat()-0.5f)* game.units*0.5f,
 						getY() + (game.rand.nextFloat()-0.5f)*game.units*0.5f);
-		particle.life = 10.0f;
-		particle.setScale(game.rand.nextFloat()*3);
-		particle.setRotation( angleIncrement*anglePart + game.rand.nextFloat()*angleIncrement*0.33f );
+		part.life = 0.5f + game.rand.nextFloat()*0.3f;
+		part.alphaTime = 0.15f;
+		part.setVelocity( game.units*6 + game.rand.nextFloat()*game.units*0.5f );
+		part.setScale(game.rand.nextFloat()*1.5f);
+		part.setRotation( angleIncrement*anglePart + game.rand.nextFloat()*angleIncrement*0.33f );
 		anglePart++;
 	}
 
@@ -49,9 +52,13 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 		Particle_BoxPart part = (Particle_BoxPart)particle;
 		part.life -= delta;
 		if( part.life <= 0 ) return false;
-		float x = part.getX() + part.getVelocity()* MathUtils.sinDeg(part.getRotation());
-		float y = part.getY() + part.getVelocity()* MathUtils.cosDeg(part.getRotation());
-		part.setPosition(x,y);
+		if( part.life <= part.alphaTime ) { //пора исчезать
+			float alpha = part.life / part.alphaTime ;
+			part.setAlpha( alpha );
+		}
+		float x = (part.getVelocity()* MathUtils.cosDeg(part.getRotation()))*delta;
+		float y = (part.getVelocity()* MathUtils.sinDeg(part.getRotation()))*delta;
+		part.translate(x,y);
 		return true;
 	}
 
