@@ -165,7 +165,12 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 				game.addToDestroy(this);
 
 				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("default"), Particle_BoxPart.class );
-				boxEmitter.setPosition( getX(), getY() );
+
+//				boxEmitter.setPosition( getX(), getY() );
+				boxEmitter.setPosition(
+								body.getWorldCenter().x * game.units,
+								body.getWorldCenter().y * game.units
+				);
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, 0 );

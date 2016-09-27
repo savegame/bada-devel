@@ -31,6 +31,9 @@
   </data>
  </layer>
  <objectgroup name="Objects">
+  <properties>
+   <property name="layer" value="mid"/>
+  </properties>
   <object id="29" name="lift01" type="lift" x="1184" y="1936" width="256" height="64">
    <properties>
     <property name="textmpl" value="platform2"/>

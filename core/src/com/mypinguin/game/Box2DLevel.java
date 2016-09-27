@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.penguin.core.LayerNum;
 import com.penguin.menu.ExtendedScreen;
 import com.penguin.particles.Emitter_Snow;
 
@@ -70,7 +71,7 @@ public class Box2DLevel extends ExtendedScreen {
 		super(penguinGame);
 		loadTextures(game.asset);
 //		game.asset.finishLoading();
-		game.isDebug = false;
+//		game.isDebug = false;
 
 		camera = new OrthographicCamera(game.width, game.height);
 		camera.setToOrtho(false, game.width, game.height);
@@ -292,9 +293,10 @@ public class Box2DLevel extends ExtendedScreen {
 				createUI(ui);
 
 				snowEmitter = new Emitter_Snow(game, camera);
-				game.particles.addEmitter(snowEmitter, 0);
-				foreground.addActor(game.particles.getLayer(0));
-				middleground.addActor(game.particles.getLayer(1));
+				game.particles.addEmitter(snowEmitter, LayerNum.Top.n());
+				foreground.addActor  ( game.particles.getLayer( LayerNum.Top.n()        ) );
+				middleground.addActor( game.particles.getLayer( LayerNum.Middle.n()     ) );
+				background.addActor  ( game.particles.getLayer( LayerNum.Background.n() ) );
 			}
 
 			if( m_isMapLoaded == false && game.asset.getProgress() == 1.0f)

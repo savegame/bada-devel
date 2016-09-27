@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.penguin.core.LayerNum;
 import com.penguin.particles.Emitter_BodyActor;
 import com.penguin.particles.Particle_BodyActor;
 import com.penguin.physics.BodyActor;
@@ -137,6 +138,7 @@ public class MapBodyManager implements Disposable {
 			logger.error("layer " + layerName + " does not exist");
 			return;
 		}
+		String layerNum = layer.getProperties().get("layer", "mid", String.class);//top, bg
 
 		MapObjects objects = layer.getObjects();
 		Iterator<MapObject> objectIt = objects.iterator();
@@ -185,7 +187,12 @@ public class MapBodyManager implements Disposable {
 						emitter.setName(name);
 						emitter.setBreakable( tmpl.breakable );
 						emitter.setDestroyForce( tmpl.destroyForce );
-						game.particles.addEmitter(emitter, 1);
+						if( layerNum.compareToIgnoreCase("mid") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Middle.n() );
+						else if( layerNum.compareToIgnoreCase("bg") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Background.n() );
+						else if( layerNum.compareToIgnoreCase("top") == 0 )
+							game.particles.addEmitter(emitter, LayerNum.Foreground.n() );
 					}
 				}
 				continue;
