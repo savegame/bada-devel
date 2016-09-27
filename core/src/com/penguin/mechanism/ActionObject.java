@@ -1,7 +1,7 @@
 package com.penguin.mechanism;
 
 import com.penguin.physics.BodyActor;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 public class ActionObject extends BodyActor {
 	boolean active = true;

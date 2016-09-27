@@ -1,7 +1,7 @@
 
 
 
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -26,7 +26,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.penguin.core.LayerNum;
 import com.penguin.menu.ExtendedScreen;
 import com.penguin.particles.Emitter_Snow;
 
@@ -37,12 +36,12 @@ public class Box2DLevel extends ExtendedScreen {
 	private boolean             needUpdateViewport = false;
 	private OrthographicCamera  camera             = null;
 	private Stage               stage              = null;
-	private CameraControl       camControl         = null;
+	private CameraControl camControl         = null;
 	private InputMultiplexer    m_multiplexer      = null;
 	// user inteface
 	private Stage               ui                 = null;
-	private MovePanel           movePanel          = null;
-	private MPButton            btnLeft            = null;
+	private MovePanel movePanel          = null;
+	private MPButton btnLeft            = null;
 	private MPButton            btnRight           = null;
 	private MPButton            btnUp              = null;
 	private MPButton            btnPick              = null;
@@ -56,7 +55,7 @@ public class Box2DLevel extends ExtendedScreen {
 	
 	private float              time_stamp  = 1/30f;
 
-	private MapBodyManager     mapBodyManager      = null;
+	private MapBodyManager mapBodyManager      = null;
 	private Texture            defaultBG           = null;
 	private Group              background          = null;
 	private Group              middleground        = null;

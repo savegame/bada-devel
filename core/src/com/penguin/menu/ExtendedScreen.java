@@ -3,7 +3,7 @@ package com.penguin.menu;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 import java.util.ArrayList;
 import java.util.List;

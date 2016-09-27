@@ -3,7 +3,7 @@ package com.mypinguin.game.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 //import com.mypinguin.game.MyPinguinGame;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

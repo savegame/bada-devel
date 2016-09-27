@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;

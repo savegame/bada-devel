@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -105,7 +105,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 
 	MoveDirection m_dir = MoveDirection.None;
 
-	public PlayerActor( PenguinGame game, FixtureDef fixtureDef) {
+	public PlayerActor(PenguinGame game, FixtureDef fixtureDef) {
 		super(game);
 		this.setFixtureDef(fixtureDef);
 		this.setName("PlayerActor");

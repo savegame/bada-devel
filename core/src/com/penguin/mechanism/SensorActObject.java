@@ -2,7 +2,7 @@ package com.penguin.mechanism;
 
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 /**
  * Created by savegame on 06.01.16.

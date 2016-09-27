@@ -3,7 +3,7 @@ package com.penguin.particles;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -31,7 +31,6 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.penguin.core.LayerNum;
 import com.penguin.particles.Emitter_BodyActor;
 import com.penguin.particles.Particle_BodyActor;
 import com.penguin.physics.BodyActor;

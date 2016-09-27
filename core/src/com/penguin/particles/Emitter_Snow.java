@@ -6,8 +6,8 @@ import java.util.Iterator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.mypinguin.game.PenguinGame;
-import com.mypinguin.game.PlayerActor;
+import com.penguin.core.PenguinGame;
+import com.penguin.core.PlayerActor;
 
 public class Emitter_Snow extends BaseEmitter<Particle_Snow>
 {

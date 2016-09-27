@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 import com.penguin.particles.Emitter_BoxPart;
 import com.penguin.particles.Particle_BodyActor;
 import com.penguin.particles.Particle_BoxPart;

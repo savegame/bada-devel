@@ -22,12 +22,12 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.mypinguin.game.CameraControl;
-import com.mypinguin.game.MPButton;
-import com.mypinguin.game.MovePanel;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.CameraControl;
+import com.penguin.core.MPButton;
+import com.penguin.core.MovePanel;
+import com.penguin.core.PenguinGame;
 import com.mypinguin.game.Player;
-import com.mypinguin.game.MPButton.ButtonType;
+import com.penguin.core.MPButton.ButtonType;
 
 import java.util.ArrayList;
 import java.util.Iterator;

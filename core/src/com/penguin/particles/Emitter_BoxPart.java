@@ -2,7 +2,7 @@ package com.penguin.particles;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 
 /**
  * Created by savegame on 19.05.16.

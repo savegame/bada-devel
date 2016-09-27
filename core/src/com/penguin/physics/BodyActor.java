@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 import com.penguin.mechanism.Activable;
 
 /**

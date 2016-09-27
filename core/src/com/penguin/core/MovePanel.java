@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.mypinguin.game.MPButton.ButtonType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public class MovePanel extends Actor {
 			if( btn.isPushed() ) {
 				//Pushed!
 				if( player != null ) {
-					player.addAction(Actions.moveBy( ((btn.getType() == ButtonType.LeftButton)?-1:1), 0));
+					player.addAction(Actions.moveBy( ((btn.getType() == MPButton.ButtonType.LeftButton)?-1:1), 0));
 				}
 			}
 		}
@@ -84,11 +83,11 @@ public class MovePanel extends Actor {
 					for(int i = 0; i < children.size(); i++ ) {
 						MPButton btn = children.get(i);
 						if( (keycode == Input.Keys.A || keycode == Input.Keys.LEFT)
-										&& btn.getType() == ButtonType.LeftButton ) {
+										&& btn.getType() == MPButton.ButtonType.LeftButton ) {
 							btn.setPushed(true);
 						}
 						else if( (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT)
-										&& btn.getType() == ButtonType.RightButton ) {
+										&& btn.getType() == MPButton.ButtonType.RightButton ) {
 							btn.setPushed(true);
 						}
 					}
@@ -104,11 +103,11 @@ public class MovePanel extends Actor {
 					for(int i = 0; i < children.size(); i++ ) {
 						MPButton btn = children.get(i);
 						if( (keycode == Input.Keys.A || keycode == Input.Keys.LEFT)
-										&& btn.getType() == ButtonType.LeftButton ) {
+										&& btn.getType() == MPButton.ButtonType.LeftButton ) {
 							btn.setPushed(false);
 						}
 						else if( (keycode == Input.Keys.D || keycode == Input.Keys.RIGHT)
-										&& btn.getType() == ButtonType.RightButton ) {
+										&& btn.getType() == MPButton.ButtonType.RightButton ) {
 							btn.setPushed(false);
 						}
 					}

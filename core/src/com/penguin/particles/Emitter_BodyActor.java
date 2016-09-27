@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.utils.Disposable;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 import com.penguin.physics.BoxActor;
 
 /**

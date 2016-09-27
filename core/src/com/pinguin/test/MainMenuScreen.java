@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.mypinguin.game.PenguinGame;
+import com.penguin.core.PenguinGame;
 import com.penguin.menu.ExtendedScreen;
 
 public class MainMenuScreen extends ExtendedScreen {

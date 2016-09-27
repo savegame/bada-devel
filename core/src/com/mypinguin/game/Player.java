@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.Array;
+import com.penguin.core.PenguinGame;
 
 /*
  * Created by savegame on 04.11.15.
@@ -35,7 +36,7 @@ public class Player extends Actor {
 		this.setName("PlayerActor");
 	}
 
-	public Player( PenguinGame game, TextureRegion staticR ) {
+	public Player(PenguinGame game, TextureRegion staticR ) {
 		m_game = game;
 		setTexRegion(staticR);
 		this.setName("PlayerActor");
