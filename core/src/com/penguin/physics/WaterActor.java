@@ -190,10 +190,12 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 				tmp = (tmp < -0.6f )?-1.0f:((tmp > 1/0f)?0.6f:tmp);
 				wave_cur[index] += tmp;
 
-				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("tiny_snowflake"), Particle_BoxPart.class );
+				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("water_drop"), Particle_BoxPart.class );
 				Vector2 direction = new Vector2( 0, 1 );
 				boxEmitter.m_isSolid = false;
-				boxEmitter.setScale( 1.5f );
+				boxEmitter.setScale( 1.0f );
+				boxEmitter.m_impulse = 3;
+				boxEmitter.m_rangeAngle = 60;
 				boxEmitter.setImpulseDirection( direction );
 //				boxEmitter.setPosition( getX(), getY() );
 				boxEmitter.setPosition(

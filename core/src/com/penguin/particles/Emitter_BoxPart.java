@@ -14,9 +14,10 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 	private int      anglePart = 0; //текущая часть
 	private Vector2  m_direction = new Vector2();
 	private float    m_beginAngle = 0.0f;
-	private float    m_rangeAngle = 45.0f; // 30 degrees
+	public  float    m_rangeAngle = 45.0f; // 30 degrees
 	private float    m_rotationIncrement = 25.0f;
-	public boolean m_isSolid = true;
+	public boolean   m_isSolid = true;
+	public float     m_impulse = 6f;
 
 	public Emitter_BoxPart(PenguinGame game, Sprite sprite, Class<Particle_BoxPart> particleClass) {
 		super(game, sprite, particleClass);
@@ -51,7 +52,7 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 		);
 		part.life = 0.5f + game.rand.nextFloat()*0.3f;
 		part.setAlphaTime( 0.15f );
-		float velocity = game.units * (6f + game.rand.nextFloat()*0.5f);
+		float velocity = game.units * (m_impulse + game.rand.nextFloat()*0.5f);
 		float randomScaleCoef = game.rand.nextFloat()*0.5f + 0.75f;
 		part.setScale(
 						getScaleX()*randomScaleCoef,
@@ -59,7 +60,7 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 		);
 		part.setSolid(m_isSolid);
 		//part.setRotation( angleIncrement*anglePart + game.rand.nextFloat()*angleIncrement*0.33f );
-		part.setRotation( angleIncrement*(anglePart*(game.rand.nextBoolean()?1:-1)+ game.rand.nextFloat()*0.33f - 0.15f) );
+		part.setRotation( angleIncrement*(anglePart + game.rand.nextFloat()*0.33f - 0.15f) - m_rangeAngle*0.5f );
 		Vector2 newDir = new Vector2(m_direction);
 		part.setDirection( velocity, newDir.rotate(part.getRotation()) );
 		part.setAngleVelocity( (game.rand.nextFloat()*0.5f + 0.75f)*m_rotationIncrement*(game.rand.nextBoolean()?1:-1) );

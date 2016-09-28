@@ -17,3 +17,10 @@ tiny_snowflake
   orig: 5, 5
   offset: 0, 0
   index: -1
+water_drop
+  rotate: false
+  xy: 2, 14
+  size: 18,18
+  orig: 18,18
+  offset: 0, 0
+  index: -1
