@@ -3,6 +3,7 @@ package com.penguin.physics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.WorldManifold;
+import com.penguin.core.LayerNum;
 import com.penguin.core.PenguinGame;
 import com.penguin.particles.Emitter_BoxPart;
 import com.penguin.particles.Particle_BodyActor;
@@ -165,7 +167,9 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 				game.addToDestroy(this);
 
 				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("default"), Particle_BoxPart.class );
-
+				Vector2 direction = new Vector2(contact.getWorldManifold().getNormal() );
+				boxEmitter.setImpulseDirection( direction );
+				boxEmitter.setScale( 2.0f );
 //				boxEmitter.setPosition( getX(), getY() );
 				boxEmitter.setPosition(
 								body.getWorldCenter().x * game.units,
@@ -173,7 +177,7 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 				);
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
-				game.particles.addEmitter( boxEmitter, 0 );
+				game.particles.addEmitter( boxEmitter, LayerNum.Middle.n() );
 
 				if(particle != null)
 				{

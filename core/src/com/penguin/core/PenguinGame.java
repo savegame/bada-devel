@@ -1,4 +1,4 @@
-package com.mypinguin.game;
+package com.penguin.core;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -96,10 +96,10 @@ public class PenguinGame extends Game {
 	public SpriteBatch   batch; //отрисовщик текстур
 	public ModelBatch    modelBatch;
 	public AssetManager  asset; //менеджер ресурсов
-	public PlayerActor   player = null;
-	public boolean       isDebug = true;
+	public PlayerActor player = null;
+	public boolean       isDebug = false;
 	public Camera        camera = null;
-	public Box2DLevel    m_level = null;
+	public Box2DLevel m_level = null;
 	public MainMenuStage m_mainMenu = null;
 
 	private ArrayList<BodyActor> destroy = new ArrayList<BodyActor>();
@@ -146,10 +146,6 @@ public class PenguinGame extends Game {
 		// установка начального уровня MainMenu
 		m_mainMenu = new MainMenuStage(this);
 		this.setScreen(m_mainMenu);
-		//this.setScreen( new MainMenuScreen(this) );
-//		this.setScreen( new Box2DLevel(this) );
-//		this.setScreen( new MainMenuScreen(this) );
-//		this.setScreen( new PhysicsTest() );
 	}
 	
 	@Override

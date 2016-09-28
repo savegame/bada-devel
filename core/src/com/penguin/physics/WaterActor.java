@@ -22,7 +22,10 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.penguin.core.LayerNum;
 import com.penguin.core.PenguinGame;
+import com.penguin.particles.Emitter_BoxPart;
+import com.penguin.particles.Particle_BoxPart;
 
 /**
  * Created by savegame on 14.12.15.
@@ -172,7 +175,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 		if( fixtureB.getBody().getType() == BodyDef.BodyType.DynamicBody ) {
 			waterControl.addBody(fixtureB);
 			
-			Vector2 vec2 = fixtureB.getBody().getPosition();
+			Vector2 vec2 = fixtureB.getBody().getWorldCenter();
 			Vector2 vel2 = fixtureB.getBody().getLinearVelocity();
 			if( vec2.y*game.units >= getY() + getHeight() - game.units*2 )
 			{
@@ -186,6 +189,20 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 				float tmp = vel2.y*fixtureB.getBody().getMass()/game.units;
 				tmp = (tmp < -0.6f )?-1.0f:((tmp > 1/0f)?0.6f:tmp);
 				wave_cur[index] += tmp;
+
+				Emitter_BoxPart boxEmitter = new Emitter_BoxPart(game,game.particles.getParticleSprite("tiny_snowflake"), Particle_BoxPart.class );
+				Vector2 direction = new Vector2( 0, 1 );
+				boxEmitter.m_isSolid = false;
+				boxEmitter.setScale( 1.5f );
+				boxEmitter.setImpulseDirection( direction );
+//				boxEmitter.setPosition( getX(), getY() );
+				boxEmitter.setPosition(
+								vec2.x * game.units,
+								getY() + getHeight() - 5.0f
+				);
+				boxEmitter.generate(10);
+//				boxEmitter.setMaxParticlesCount(10);
+				game.particles.addEmitter( boxEmitter, LayerNum.Top.n() );
 			}
 		}
 	}

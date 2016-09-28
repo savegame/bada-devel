@@ -27,7 +27,10 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.Array;
+import com.penguin.physics.BodyActor;
 import com.penguin.physics.BoxActor;
+import com.penguin.physics.PlatformActor;
+import com.penguin.physics.WaterActor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -317,11 +320,21 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 			if(contact.getFixtureA() == sensorFixture || contact.getFixtureB() == sensorFixture) {
 				Object objA = contact.getFixtureA().getBody().getUserData();
 				Object objB = contact.getFixtureB().getBody().getUserData();
-				if( objA instanceof com.penguin.physics.PlatformActor || objA instanceof com.penguin.physics.BoxActor) {
-					platform = (com.penguin.physics.BodyActor)objA;
+				if( objA instanceof PlatformActor ) {
+					platform = (BodyActor)objA;
 				}
-				else if( objB instanceof com.penguin.physics.PlatformActor || objB instanceof com.penguin.physics.BoxActor) {
-					platform = (com.penguin.physics.BodyActor)objB;
+				else if( objA instanceof BoxActor )
+				{
+					if( ((BoxActor)objA).isPlatformed() )
+						platform = (BodyActor)objA;
+				}
+				else if( objB instanceof PlatformActor || objB instanceof BoxActor) {
+					platform = (BodyActor)objB;
+				}
+				else if( objB instanceof BoxActor )
+				{
+					if( ((BoxActor)objB).isPlatformed() )
+						platform = (BodyActor)objB;
 				}
 				sensor = true;
 			}
@@ -705,7 +718,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void beginContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.add(fixtureB);
 		if(fixtureA == sensorFixture) {
-			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
+			if( fixtureB.getBody().getUserData() instanceof WaterActor)
 				underwater = true;
 			else {
 				groundedFixtures.add(fixtureB);
@@ -724,7 +737,7 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void endContact(Fixture fixtureA, Fixture fixtureB, Contact contact) {
 		allContacts.remove(fixtureB);
 		if(fixtureA == sensorFixture || fixtureA == legsFixture) {
-			if( fixtureB.getBody().getUserData() instanceof com.penguin.physics.WaterActor)
+			if( fixtureB.getBody().getUserData() instanceof WaterActor)
 				underwater = false;
 			else
 				groundedFixtures.remove(fixtureB);
@@ -753,24 +766,24 @@ public class PlayerActor extends com.penguin.physics.BodyActor {
 	public void preSolve(Contact contact, Manifold oldManifold) {
 	  WorldManifold manifold = contact.getWorldManifold();
 	  for(int j = 0; j < manifold.getNumberOfContactPoints(); j++) {
-		Object objA = contact.getFixtureA().getBody().getUserData();
-		Object objB = contact.getFixtureB().getBody().getUserData();
-		if( objA instanceof com.penguin.physics.PlatformActor && objB instanceof PlayerActor ) {
-			if( contact.getFixtureB().getBody() != legsBody )
-				contact.setEnabled(false);
-			else if( manifold.getNormal().y < 0 )
-				contact.setEnabled(false);
-			else
-				contact.setEnabled(true);
-		}
-		else if( objB instanceof com.penguin.physics.PlatformActor && objA instanceof PlayerActor ) {
-			if( contact.getFixtureA().getBody() != legsBody )
-				contact.setEnabled(false);
-			else if( manifold.getNormal().y < 0 )
-				contact.setEnabled(false);
-			else
-				contact.setEnabled(true);
-		}
+			Object objA = contact.getFixtureA().getBody().getUserData();
+			Object objB = contact.getFixtureB().getBody().getUserData();
+			if( objA instanceof PlatformActor && objB instanceof PlayerActor ) {
+				if( contact.getFixtureB().getBody() != legsBody )
+					contact.setEnabled(false);
+				else if( manifold.getNormal().y < 0 )
+					contact.setEnabled(false);
+				else
+					contact.setEnabled(true);
+			}
+			else if( objB instanceof PlatformActor && objA instanceof PlayerActor ) {
+				if( contact.getFixtureA().getBody() != legsBody )
+					contact.setEnabled(false);
+				else if( manifold.getNormal().y < 0 )
+					contact.setEnabled(false);
+				else
+					contact.setEnabled(true);
+			}
 	  }
 	}
 
