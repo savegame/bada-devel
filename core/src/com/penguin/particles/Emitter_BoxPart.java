@@ -9,7 +9,7 @@ import com.penguin.core.PenguinGame;
  */
 public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 
-	private float    emissionTimer = 0;
+	private float    m_emissionTimer = 0;
 	private float    angleIncrement = 360f / 10f; //часть угла
 	private int      anglePart = 0; //текущая часть
 	private Vector2  m_direction = new Vector2();
@@ -18,6 +18,8 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 	private float    m_rotationIncrement = 25.0f;
 	public boolean   m_isSolid = true;
 	public float     m_impulse = 6f;
+	public float     m_particleLifeTime = 0.5f;
+	public float m_particleLifeTimeRand = 0.3f; //random factor for life time
 
 	public Emitter_BoxPart(PenguinGame game, Sprite sprite, Class<Particle_BoxPart> particleClass) {
 		super(game, sprite, particleClass);
@@ -39,9 +41,8 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 		}
 	}
 
-	public void emit(float delta)
-	{
-		emissionTimer += delta*1000;
+	public void emit(float delta) {
+		m_emissionTimer += delta*1000;
 	}
 
 	public void resetParticle(Particle particle) {
@@ -50,7 +51,7 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 						getX() + (game.rand.nextFloat()-0.5f)* game.units*0.5f,
 						getY() + (game.rand.nextFloat()-0.5f)*game.units*0.5f
 		);
-		part.life = 0.5f + game.rand.nextFloat()*0.3f;
+		part.life = m_particleLifeTime + game.rand.nextFloat()* m_particleLifeTimeRand;
 		part.setAlphaTime( 0.15f );
 		float velocity = game.units * (m_impulse + game.rand.nextFloat()*0.5f);
 		float randomScaleCoef = game.rand.nextFloat()*0.5f + 0.75f;
@@ -64,6 +65,7 @@ public class Emitter_BoxPart extends BaseEmitter<Particle_BoxPart> {
 		Vector2 newDir = new Vector2(m_direction);
 		part.setDirection( velocity, newDir.rotate(part.getRotation()) );
 		part.setAngleVelocity( (game.rand.nextFloat()*0.5f + 0.75f)*m_rotationIncrement*(game.rand.nextBoolean()?1:-1) );
+//		part.life = m_particleLifeTime;
 		anglePart++;
 	}
 

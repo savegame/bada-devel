@@ -175,6 +175,9 @@ public class BoxActor extends com.penguin.physics.BodyActor {
 								body.getWorldCenter().x * game.units,
 								body.getWorldCenter().y * game.units
 				);
+				boxEmitter.m_impulse = 4.0f;
+				boxEmitter.m_particleLifeTime = 20.f;
+
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, LayerNum.Middle.n() );

@@ -1,6 +1,7 @@
 package com.penguin.physics;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
@@ -26,6 +27,8 @@ import com.penguin.core.LayerNum;
 import com.penguin.core.PenguinGame;
 import com.penguin.particles.Emitter_BoxPart;
 import com.penguin.particles.Particle_BoxPart;
+
+import static com.badlogic.gdx.Gdx.graphics;
 
 /**
  * Created by savegame on 14.12.15.
@@ -196,15 +199,47 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 				boxEmitter.setScale( 1.0f );
 				boxEmitter.m_impulse = 3;
 				boxEmitter.m_rangeAngle = 60;
+				boxEmitter.m_particleLifeTime = 0.6f;
 				boxEmitter.setImpulseDirection( direction );
 //				boxEmitter.setPosition( getX(), getY() );
 				boxEmitter.setPosition(
 								vec2.x * game.units,
 								getY() + getHeight() - 5.0f
 				);
+
 				boxEmitter.generate(10);
 //				boxEmitter.setMaxParticlesCount(10);
 				game.particles.addEmitter( boxEmitter, LayerNum.Top.n() );
+
+				int soundIndex = game.rand.nextInt( game.m_level.m_waterSplash.size() ) ;
+				if( soundIndex == game.m_level.m_waterSplash.size() )
+					throw new IllegalArgumentException("Fuuuck!.");
+				if( soundIndex >= 0 ) {
+					Sound splash = game.m_level.get( game.m_level.m_waterSplash.get(soundIndex), Sound.class );
+					if( splash == null ) {
+						//log("Sound not loaded.");
+						return;
+					}
+					float volume = 1.0f;
+					float pitch = 0.5f;
+					float pan = 0.0f;
+					float distance = boxEmitter.getX() - game.player.getX();
+//					if( distance > 0 )
+					{
+						pan = distance / (Gdx.graphics.getWidth()*0.5f);
+						if( pan < -1 ) {
+							volume = 2.0f + pan;
+							pan = -1;
+						} else if( pan > 1 ) {
+							volume = 2.0f - pan;
+							pan = 1;
+						}
+					}
+					if( volume > 0) {
+						long id = splash.play(volume * game.volume, pitch, pan);
+						//splash.setPan(id, volume * game.volume, -1);
+					}
+				}
 			}
 		}
 	}
@@ -312,11 +347,11 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 				texa.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 				texa.bind();
 
-				Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
+				graphics.getGL20().glEnable(GL20.GL_BLEND);
 //				Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
 			}
 			this.waterMesh.render(batch.getShader(), GL20.GL_TRIANGLES);
-			Gdx.graphics.getGL20().glDisable(GL20.GL_BLEND);
+			graphics.getGL20().glDisable(GL20.GL_BLEND);
 		}
 	}
 

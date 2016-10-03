@@ -6,6 +6,7 @@ package com.penguin.core;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,6 +29,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.penguin.menu.ExtendedScreen;
 import com.penguin.particles.Emitter_Snow;
+
+import java.util.ArrayList;
 
 public class Box2DLevel extends ExtendedScreen {
 	private String              m_mapPath          = new String();
@@ -64,6 +67,8 @@ public class Box2DLevel extends ExtendedScreen {
 	private Emitter_Snow       snowEmitter         = null;
 	//randomizer
 
+	//Sounds
+	public ArrayList<Integer>  m_waterSplash = new ArrayList<Integer>();
 	
 	
 	Box2DLevel(PenguinGame penguinGame ) {
@@ -210,10 +215,11 @@ public class Box2DLevel extends ExtendedScreen {
 		game.asset.load("ui/btn_lr.png", Texture.class);
 		game.asset.load("ui/btn_jump.png", Texture.class);
 		game.asset.load("ui/btn_hand.png", Texture.class);
-//		this.loadAsset("pinguin.png", Texture.class);
 		game.asset.load("run_0.png", Texture.class);
+
 		this.loadAsset("defaultbg.png", Texture.class);
 		this.loadAsset("water.png", Texture.class);
+		m_waterSplash.add( this.loadAsset("sound/physics/water_splash_1.wav", Sound.class ) );
 	}
 
 	private void createUI(Stage ui_stage) {
@@ -284,7 +290,8 @@ public class Box2DLevel extends ExtendedScreen {
 							(ui.getViewport().getWorldHeight() - game.font.getLineHeight())*0.5f);
 			game.batch.end();
 
-			if( m_isResourcesLoaded == false && game.asset.getProgress() == 1.0f)
+			if( m_isResourcesLoaded == false && game.asset.getProgress() == 1.0f
+							&& game.asset.isLoaded("defaultbg.png") )
 			{
 				m_isResourcesLoaded = true;
 

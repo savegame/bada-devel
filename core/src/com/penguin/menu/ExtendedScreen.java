@@ -25,9 +25,20 @@ public class ExtendedScreen implements Screen {
 	/** Adds the given asset to the loading queue of the AssetManager.
 	 * @param fileName the file name
 	 * @param type the type of the asset. */
-	public synchronized <T> void loadAsset (String fileName, Class<T> type) {
+	public synchronized <T> int loadAsset (String fileName, Class<T> type) {
 		this.assetList.add(fileName);
+		int index = this.assetList.indexOf(fileName);
 		game.asset.load(fileName,type);
+		return index;
+	}
+
+	public synchronized <T> T get(int assetIndex, Class<T> type) {
+		if( assetIndex < 0 || assetIndex >= this.assetList.size() )
+			return null;
+		String assetName = this.assetList.get(assetIndex);
+		if( !game.asset.isLoaded(assetName) )
+			return null;
+		return ( game.asset.get( assetName, type) );
 	}
 
 	public void unloadAsset( String fileName ) {

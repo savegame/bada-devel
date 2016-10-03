@@ -108,6 +108,7 @@ public class PenguinGame extends Game {
 	// physics
 	public World        world;
 	public float        units  = 64f; //пикселей на физю метр
+	public float        volume = 0.3f;
 
 	public ContactsController contacts;
 	public final int m_mainFontSize = 32; //размер главного шрифта
@@ -117,8 +118,8 @@ public class PenguinGame extends Game {
 	/* разрешение экрана,в будущем сделать функцию
 	 * для выбора разного разрешения экрана
 	 * */ 
-	public float       width  = 800;
-	public float       height = 480;
+	public float       width  = 1280;
+	public float       height = 720;
 	//глобальный генератор случайных чисел
 	public RandomXS128 rand = new RandomXS128();
 
