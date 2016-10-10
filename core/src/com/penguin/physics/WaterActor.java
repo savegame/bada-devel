@@ -318,7 +318,6 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			wave_sin[i] = MathUtils.sinDeg(120*i - 30 + wave_sin[0]*15)*wave_height*0.17f;
 			vertices[i*vertexlen + 1] += wave_sin[i];
 			vertices[i*vertexlen + 1] += (wave_cur[i] - wave_old[i])*wave_height;
-			this.waterMesh.setVertices(vertices);
 			float laplas =
 				(wave_cur[i-1]+wave_cur[i+1])*0.5f-wave_cur[i];
 			wave_old[i] = ((2.0f-vis)*wave_cur[i]-wave_old[i]*(1.0f-vis)+laplas*delta);
@@ -327,6 +326,7 @@ public class WaterActor extends com.penguin.physics.BodyActor {
 			else if( wave_old[i] > 1.0f )
 				wave_old[i] = 1.0f;
 		}
+		this.waterMesh.setVertices(vertices);
 		float temp[] = wave_old;
 		wave_old = wave_cur;
 		wave_cur = temp;

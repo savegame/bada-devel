@@ -118,8 +118,8 @@ public class PenguinGame extends Game {
 	/* разрешение экрана,в будущем сделать функцию
 	 * для выбора разного разрешения экрана
 	 * */ 
-	public float       width  = 1280;
-	public float       height = 720;
+	public float       width  = 800;
+	public float       height = 480;
 	//глобальный генератор случайных чисел
 	public RandomXS128 rand = new RandomXS128();
 

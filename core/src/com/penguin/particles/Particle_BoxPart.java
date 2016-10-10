@@ -11,16 +11,43 @@ import com.penguin.physics.WaterActor;
  * Created by savegame on 19.05.16.
  */
 public class Particle_BoxPart extends Particle {
-	private float   m_angleVelocity = 30f; //< скорость вращения
-	private float   m_velocity      = 10f;
-	private float   m_alphaTime     = 1f; //< время исчезновения частицы в секундах
-	private Vector2 m_direction     = new Vector2();
-//	private Vector2 m_vVelocity = new Vector2();
+	private float m_angleVelocity = 30f; //< скорость вращения
+	private float m_velocity = 10f;
+	private float m_alphaTime = 1f; //< время исчезновения частицы в секундах
+	private Vector2 m_direction = new Vector2();
+	//	private Vector2 m_vVelocity = new Vector2();
 	private boolean m_isSolid = true;
 	private boolean m_isNeedRayCast = true;
+	private boolean m_isUnderWater = false;
+	private float   m_bouncy = 0.6f; //торможение при столкновении
+	private boolean m_isActive = true;
+
+	public boolean isActive() {
+		return m_isActive;
+	}
+
+	public void setActive(boolean active) {
+		m_isActive = active;
+	}
 
 	public void setNoNeedRayCast() {
 		m_isNeedRayCast = false;
+	}
+
+	public void setBouncy(float bouncy) {
+		m_bouncy = bouncy;
+	}
+
+	public float getBouncy() {
+		return m_bouncy;
+	}
+
+	public void setUnderWater(boolean underWater) {
+		m_isUnderWater = underWater;
+	}
+
+	public boolean isUnderWater() {
+		return m_isUnderWater;
 	}
 
 	public void setSolid(boolean isSolid)
@@ -44,21 +71,21 @@ public class Particle_BoxPart extends Particle {
 		public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal,
 																	float fraction) {
 			if( fixture.getBody().getUserData() instanceof WaterActor ) {
-//				Vector2 l = new Vector2( point.x - m_partile.getX(), point.y - m_partile.getY() );
-//				float length = l.len() ;
-//				if( length < 1.1f ) {
-//					sensor = true;
-					m_partile.setDirection( 1.0f,
-									m_partile.getDirection().scl(0.1f) );
-					m_partile.setAngleVelocity( m_partile.getAngleVelocity() * 0.1f );
-					m_partile.setNoNeedRayCast();
+				Vector2 l = new Vector2( point.x - m_partile.getX()/m_game.units, point.y - m_partile.getY()/m_game.units );
+				float length = l.len2() ;
+				if( length < 0.04f ) {
+					m_partile.setDirection( 0.1f,
+									m_partile.getDirection() );
+					m_partile.setAngleVelocity( m_game.rand.nextFloat()*120.0f - 60.0f );
+					m_partile.setUnderWater(true);
+					m_partile.setBouncy( m_partile.getBouncy() * 0.1f );
 					return 1;
-//				}
+				}
 			}
 			else if( !fixture.isSensor() ) {
 				Vector2 l = new Vector2( point.x - m_partile.getX()/m_game.units, point.y - m_partile.getY()/m_game.units );
-				float length = l.len() ;
-				if( length < 0.2f ) {
+				float length = l.len2() ;
+				if( length < 0.04f ) {
 					Vector2 newDirection = new Vector2(m_partile.getDirection());
 					newDirection = newDirection.add( normal.scl( normal.dot(newDirection)*-2.0f ));
 					m_partile.setDirection( 1.0f,
@@ -116,6 +143,8 @@ public class Particle_BoxPart extends Particle {
 
 	public boolean update(float delta, PenguinGame game)
 	{
+		if(!isActive())
+			return false;
 		Vector2 gravity = new Vector2(game.world.getGravity());
 		gravity.scl(game.units * delta);
 
@@ -125,19 +154,21 @@ public class Particle_BoxPart extends Particle {
 			float alpha = life / getAlphaTime();
 			setAlpha( alpha );
 		}
-		// TODO перенести расчет направления частицы внутрь самой частицы, и там считать вектор направления
-		// не используя начальной скорости, но используя текущую скоростьи и графитацию
-//		setDirection( new Vector2(
-//						getVelocity()*getDirection().x + world.getGravity().x * units,
-//						part.getVelocity()*part.getDirection().y + game.world.getGravity().y * game.units
-//		).nor() );
-		if(m_isNeedRayCast ) {
+
+		if( !isUnderWater() ) {
 			m_direction.add( gravity );
 		}
+		else
+			m_direction.add( gravity.scl(0.1f) );
+
 		float x = getDirection().x * delta;
 		float y = getDirection().y * delta;
 
-		if(m_isNeedRayCast && m_isSolid) {
+		if(m_isSolid) {
+			if( m_direction.len2() <= 1.0f ) {
+				setActive(false);
+				return false;
+			}
 			Vector2 posVec = new Vector2(getX(), getY());
 
 			game.world.rayCast(new RayCallback(this, game),
